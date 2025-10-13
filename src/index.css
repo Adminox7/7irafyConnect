@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+/* باش يكون عندنا لون أساسي */
+:root {
+  --brand: #0ea5b7;
+}
