@@ -3,6 +3,7 @@ import HomeSearch from "./pages/HomeSearch";
 import TechnicianProfile from "./pages/TechnicianProfile";
 import CreateRequest from "./pages/CreateRequest";
 import MyRequests from "./pages/MyRequests";
+import TechDashboard from "./pages/TechDashboard";
 import { Toaster } from "react-hot-toast";
 
 export default function App(){
@@ -13,6 +14,7 @@ export default function App(){
           <Link to="/" className="text-xl font-semibold text-cyan-700">7irafyConnect</Link>
           <nav className="text-sm text-slate-600 flex gap-4">
             <Link to="/">البحث</Link>
+            <Link to="/dashboard">Dashboard</Link>
           </nav>
         </div>
       </header>
@@ -22,6 +24,7 @@ export default function App(){
           <Route path="/technicians/:id" element={<TechnicianProfile/>} />
           <Route path="/create-request" element={<CreateRequest/>} />
           <Route path="/requests" element={<MyRequests/>} />
+          <Route path="/dashboard" element={<TechDashboard/>} />
         </Routes>
       </main>
       <Toaster position="top-center" />
