@@ -63,7 +63,7 @@ export default function CreateRequest(){
         <textarea className="border rounded-lg px-3 py-2 w-full" rows="4" placeholder="الوصف"
                   value={desc} onChange={(e)=>setDesc(e.target.value)} />
         <div className="flex justify-end">
-          <Button onClick={submit} disabled={m.isPending}>
+          <Button className="bg-black" onClick={submit} disabled={m.isPending}>
             {m.isPending ? "جارٍ الإرسال…" : "إرسال"}
           </Button>
         </div>

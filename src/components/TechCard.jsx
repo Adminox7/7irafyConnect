@@ -8,7 +8,7 @@ export default function TechCard({ t }) {
         <div className="text-sm text-slate-600">{t.city} • {t.specialties?.join(", ")}</div>
         <div className="text-sm mt-1">⭐ {t.averageRating}</div>
       </div>
-      <Link to={`/technicians/${t.id}`} className="px-3 py-2 bg-brand-600 text-white rounded-2xl hover:bg-brand-700 transition-colors">
+      <Link to={`/technicians/${t.id}`} className="px-3 py-2 bg-black text-white rounded-2xl hover:bg-brand-700 transition-colors">
         البروفايل
       </Link>
     </div>
