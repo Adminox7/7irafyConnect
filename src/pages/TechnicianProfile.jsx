@@ -1,15 +1,16 @@
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
+import { http } from "../api/http";
 
 export default function TechnicianProfile(){
   const { id } = useParams();
-  const { data:t, isLoading } = useQuery({
+  const { data:t, isLoading, isError } = useQuery({
     queryKey:["tech", id],
-    queryFn: async () => (await axios.get(`/api/v1/technicians/${id}`)).data
+    queryFn: async () => (await http.get(`/technicians/${id}`)).data
   });
 
-  if (isLoading) return <div>...</div>;
+  if (isLoading) return <div className="text-slate-500">جارٍ التحميل…</div>;
+  if (isError) return <div className="text-red-600">وقع خطأ. حاول لاحقاً.</div>;
   if (!t) return <div>ما لقايناهش</div>;
 
   return (
