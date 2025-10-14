@@ -6,19 +6,20 @@ import MyRequests from "./pages/MyRequests";
 import TechDashboard from "./pages/TechDashboard";
 import { Toaster } from "react-hot-toast";
 
-export default function App(){
+export default function App() {
   return (
     <BrowserRouter>
-      <header className="p-4 border-b bg-white">
-        <div className="max-w-5xl mx-auto flex items-center gap-6">
-          <Link to="/" className="text-xl font-semibold text-cyan-700">7irafyConnect</Link>
-          <nav className="text-sm text-slate-600 flex gap-4">
-            <Link to="/">البحث</Link>
-            <Link to="/dashboard">Dashboard</Link>
+      <header className="border-b bg-white">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+          <Link to="/" className="text-xl font-semibold text-brand">7irafyConnect</Link>
+          <nav className="text-sm text-slate-700 flex items-center gap-5">
+            <Link to="/" className="hover:text-brand">البحث</Link>
+            <Link to="/requests" className="hover:text-brand">طلباتي</Link>
+            <Link to="/dashboard" className="hover:text-brand">لوحة الحرفي</Link>
           </nav>
         </div>
       </header>
-      <main className="max-w-5xl mx-auto p-4">
+      <main className="max-w-6xl mx-auto px-4 py-6">
         <Routes>
           <Route path="/" element={<HomeSearch/>} />
           <Route path="/technicians/:id" element={<TechnicianProfile/>} />

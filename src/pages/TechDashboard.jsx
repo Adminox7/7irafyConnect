@@ -1,27 +1,42 @@
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
+import { http } from "../api/http";
 import DashboardCard from "../components/DashboardCard";
+import StatusBadge from "../components/StatusBadge";
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 
-// رسم بياني بسيط (اختياري)
-let LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid;
-try {
-  // dynamic import to avoid crash if recharts not installed
-  ({ LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } = await import("recharts"));
-} catch (e) {}
+// تحميل Recharts بشكل آمن بدون كسر التطبيق في حال عدم تثبيته
+function useRecharts() {
+  const [lib, setLib] = useState(null);
+  useEffect(() => {
+    let mounted = true;
+    import("recharts")
+      .then((m) => {
+        if (mounted) setLib(m);
+      })
+      .catch(() => {});
+    return () => {
+      mounted = false;
+    };
+  }, []);
+  return lib;
+}
 
 export default function TechDashboard(){
-  const { data, isLoading } = useQuery({
+  const recharts = useRecharts();
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["tech-dashboard"],
-    queryFn: async () => (await axios.get("/api/v1/tech/dashboard")).data
+    queryFn: async () => (await http.get("/tech/dashboard")).data
   });
 
-  const { data: listAll = [] } = useQuery({
-    queryKey: ["tech-requests", "all"],
-    queryFn: async () => (await axios.get("/api/v1/tech/requests?status=all")).data
+  const [status, setStatus] = useState("all");
+  const { data: listAll = [], isLoading: isLoadingList, isError: isErrorList } = useQuery({
+    queryKey: ["tech-requests", status],
+    queryFn: async () => (await http.get("/tech/requests", { params: { status } })).data
   });
 
   if (isLoading) return <div>جارٍ التحميل…</div>;
+  if (isError) return <div className="text-red-600">وقع خطأ أثناء تحميل اللوحة.</div>;
 
   const kpi = data?.kpi || { newC:0, accC:0, progC:0, doneC:0, revenue:0 };
   const recent = data?.recent || [];
@@ -31,7 +46,7 @@ export default function TechDashboard(){
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">لوحة الحرفي</h1>
-        <Link to="/" className="text-cyan-700 underline">البحث</Link>
+        <Link to="/" className="text-brand underline">البحث</Link>
       </div>
 
       {/* KPIs */}
@@ -46,17 +61,17 @@ export default function TechDashboard(){
       {/* Chart / or fallback */}
       <div className="rounded-2xl border bg-white p-4 shadow-sm">
         <div className="mb-2 text-sm text-slate-600">الطلبات خلال 7 أيام</div>
-        {LineChart ? (
+        {recharts?.LineChart ? (
           <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={weekly}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis allowDecimals={false} />
-                <Tooltip />
-                <Line type="monotone" dataKey="requests" stroke="#0ea5b7" strokeWidth={2}/>
-              </LineChart>
-            </ResponsiveContainer>
+            <recharts.ResponsiveContainer width="100%" height="100%">
+              <recharts.LineChart data={weekly}>
+                <recharts.CartesianGrid strokeDasharray="3 3" />
+                <recharts.XAxis dataKey="date" />
+                <recharts.YAxis allowDecimals={false} />
+                <recharts.Tooltip />
+                <recharts.Line type="monotone" dataKey="requests" stroke="#0ea5b7" strokeWidth={2}/>
+              </recharts.LineChart>
+            </recharts.ResponsiveContainer>
           </div>
         ) : (
           <div className="text-slate-500 text-sm">لتفعيل الرسم البياني: <code>npm i recharts</code></div>
@@ -74,7 +89,7 @@ export default function TechDashboard(){
                 <div className="text-xs text-slate-500">{r.city} • {new Date(r.createdAt).toLocaleString()}</div>
               </div>
               <div className="text-sm">
-                <span className="px-2 py-1 rounded-full bg-slate-100">{r.status}</span>
+                <StatusBadge status={r.status} />
               </div>
             </div>
           ))}
@@ -82,9 +97,30 @@ export default function TechDashboard(){
         </div>
       </div>
 
-      {/* All Requests Table */}
+      {/* الفلاتر + الجدول */}
       <div className="rounded-2xl border bg-white p-4 shadow-sm overflow-x-auto">
+        <div className="mb-3 flex flex-wrap gap-2">
+          {[
+            { key: "all", label: "الكل" },
+            { key: "new", label: "جديد" },
+            { key: "accepted", label: "مقبول" },
+            { key: "in_progress", label: "قيد الإنجاز" },
+            { key: "done", label: "مكتمل" },
+          ].map((opt) => (
+            <button
+              key={opt.key}
+              onClick={() => setStatus(opt.key)}
+              className={`px-3 py-1 rounded-full border text-sm transition ${
+                status === opt.key ? "bg-brand text-white border-brand" : "hover:bg-slate-50"
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
         <div className="mb-2 text-sm text-slate-600">كل الطلبات</div>
+        {isLoadingList && <div className="text-slate-500">جارٍ التحميل…</div>}
+        {isErrorList && <div className="text-red-600">تعذر تحميل الجدول.</div>}
         <table className="min-w-full text-sm">
           <thead className="text-left text-slate-500">
             <tr>
@@ -102,11 +138,16 @@ export default function TechDashboard(){
                 <td className="py-2 pr-4">{r.id}</td>
                 <td className="py-2 pr-4">{r.title}</td>
                 <td className="py-2 pr-4">{r.city}</td>
-                <td className="py-2 pr-4"><span className="px-2 py-1 rounded-full bg-slate-100">{r.status}</span></td>
+                <td className="py-2 pr-4"><StatusBadge status={r.status} /></td>
                 <td className="py-2 pr-4">{r.price ?? "-"}</td>
                 <td className="py-2 pr-4">{r.client}</td>
               </tr>
             ))}
+            {!isLoadingList && listAll.length === 0 && (
+              <tr>
+                <td colSpan="6" className="py-6 text-center text-slate-500">لا توجد بيانات</td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

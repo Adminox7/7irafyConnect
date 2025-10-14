@@ -1,13 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
+import { http } from "../api/http";
+import StatusBadge from "../components/StatusBadge";
 
 export default function MyRequests(){
-  const { data:list = [], isLoading } = useQuery({
+  const { data:list = [], isLoading, isError } = useQuery({
     queryKey:["my-requests"],
-    queryFn: async () => (await axios.get("/api/v1/requests/me")).data
+    queryFn: async () => (await http.get("/requests/me")).data
   });
 
-  if (isLoading) return <div>...</div>;
+  if (isLoading) return <div className="text-slate-500">جارٍ التحميل…</div>;
+  if (isError) return <div className="text-red-600">وقع خطأ فالإسترجاع. حاول لاحقاً.</div>;
 
   return (
     <div className="space-y-3">
@@ -16,7 +18,12 @@ export default function MyRequests(){
       {list.map(r => (
         <div key={r.id} className="border rounded-lg p-3">
           <div className="font-medium">{r.title}</div>
-          <div className="text-sm text-slate-600">{r.city} • الحالة: {r.status}</div>
+          <div className="text-sm text-slate-600 flex items-center gap-2">
+            <span>{r.city}</span>
+            <span>•</span>
+            <span>الحالة:</span>
+            <StatusBadge status={r.status} />
+          </div>
         </div>
       ))}
     </div>
