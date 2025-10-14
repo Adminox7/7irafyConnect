@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { http } from "../api/http";
+import { Api } from "../api/endpoints";
 import TechCard from "../components/TechCard";
 
 export default function HomeSearch() {
@@ -10,12 +10,7 @@ export default function HomeSearch() {
 
   const { data, refetch, isFetching, isError } = useQuery({
     queryKey: ["technicians", city, query],
-    queryFn: async () => {
-      const res = await http.get("/technicians", {
-        params: { city, q: query },
-      });
-      return res.data;
-    },
+    queryFn: () => Api.searchTechnicians({ city, q: query }),
     enabled: false,
   });
 

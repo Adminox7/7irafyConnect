@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { http } from "../api/http";
+import { Api } from "../api/endpoints";
 import DashboardCard from "../components/DashboardCard";
 import StatusBadge from "../components/StatusBadge";
 import { Link } from "react-router-dom";
@@ -26,13 +26,13 @@ export default function TechDashboard(){
   const recharts = useRecharts();
   const { data, isLoading, isError } = useQuery({
     queryKey: ["tech-dashboard"],
-    queryFn: async () => (await http.get("/tech/dashboard")).data
+    queryFn: () => Api.getTechDashboard()
   });
 
   const [status, setStatus] = useState("all");
   const { data: listAll = [], isLoading: isLoadingList, isError: isErrorList } = useQuery({
     queryKey: ["tech-requests", status],
-    queryFn: async () => (await http.get("/tech/requests", { params: { status } })).data
+    queryFn: () => Api.getTechRequests({ status })
   });
 
   if (isLoading) return <div>جارٍ التحميل…</div>;
