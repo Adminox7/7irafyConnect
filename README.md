@@ -18,12 +18,25 @@
 - تم إعداد العامل في `src/mocks/browser.js` ونسخة الـ worker موجودة في `public/mockServiceWorker.js`.
 - يتم تشغيل MSW تلقائياً في `src/main.jsx` أثناء التطوير.
 - النقاط المتاحة:
-  - `GET /api/v1/technicians`
-  - `GET /api/v1/technicians/:id`
-  - `POST /api/v1/requests`
-  - `GET /api/v1/requests/me`
-  - `GET /api/v1/tech/dashboard`
-  - `GET /api/v1/tech/requests?status=...`
+  - Auth:
+    - `POST /api/v1/auth/register` → `{ user, token, role }`
+    - `POST /api/v1/auth/login` → `{ user, token, role }`
+    - `GET /api/v1/auth/me` → `{ user, role }`
+    - الحسابات التجريبية:
+      - Admin: `admin@site.com` / `admin123`
+      - Technicien: `tech@site.com` / `tech123`
+      - Client: `client@site.com` / `client123`
+  - Admin:
+    - `GET /api/v1/admin/metrics`
+    - `GET /api/v1/admin/technicians?status=pending`
+    - `PATCH /api/v1/admin/technicians/:id/verify`
+  - Technicians & Requests:
+    - `GET /api/v1/technicians`
+    - `GET /api/v1/technicians/:id`
+    - `POST /api/v1/requests`
+    - `GET /api/v1/requests/me`
+    - `GET /api/v1/tech/dashboard`
+    - `GET /api/v1/tech/requests?status=...`
 
 ### بنية المجلدات
 - `src/pages` الصفحات: البحث، بروفايل الحرفي، إنشاء طلب، طلباتي، لوحة الحرفي
@@ -33,9 +46,9 @@
 - `src/util/ErrorBoundary.jsx` حاجز أخطاء لمنع الشاشة البيضاء
 
 ### التبديل لاحقاً لواجهة Laravel
-- حدِّث المتغير `VITE_API_URL` في بيئة الواجهة الأمامية ليشير إلى خادم Laravel (مثلاً: `https://api.example.com/api/v1`). يقرأ `src/api/http.js` هذا المتغير مع قيمة افتراضية `/api/v1`.
-- أزل تفعيل MSW في `main.jsx` أو عطِّله بإزالة شرط `import.meta.env.DEV`.
-- حافظ على نفس مسارات الـ API لضمان عمل الصفحات بدون تغييرات كبيرة.
+- إبقَ `baseURL` على `/api/v1` في الواجهة؛ اجعل Nginx/لارافيل يقدّم نفس المسارات.
+- عطّل MSW بإزالة شرط `import.meta.env.DEV` في `src/main.jsx`.
+- نفِّذ نفس المسارات في Laravel (انظر أدناه) لتجنّب تغييرات على الواجهة.
 
 ### Migration Guide (Laravel)
 
@@ -69,6 +82,16 @@
 - POST `/api/v1/tech/requests/:id/complete`
 - POST `/api/v1/tech/requests/:id/cancel`
   - Returns for each: updated `ServiceRequest`
+
+Auth:
+- POST `/api/v1/auth/register` → `{ user, token, role }`
+- POST `/api/v1/auth/login` → `{ user, token, role }`
+- GET `/api/v1/auth/me` → `{ user, role }`
+
+Admin:
+- GET `/api/v1/admin/metrics` → `{ users, technicians, pendingTechnicians, totalRequests, revenue }`
+- GET `/api/v1/admin/technicians?status=pending` → `User[]`
+- PATCH `/api/v1/admin/technicians/:id/verify` → `User`
 
 Shapes:
 - ServiceRequest: `{ id:number, title:string, city:string, status:'new'|'accepted'|'in_progress'|'done'|'cancelled', price?:number, client?:string, createdAt:string, description?:string, technicianId?:number }`
