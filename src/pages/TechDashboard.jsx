@@ -111,7 +111,7 @@ export default function TechDashboard(){
               key={opt.key}
               onClick={() => setStatus(opt.key)}
               className={`px-3 py-1 rounded-full border text-sm transition ${
-                status === opt.key ? "bg-brand-600 text-white border-brand-600" : "hover:bg-slate-50"
+                status === opt.key ? "bg-black text-white border-brand-600" : "hover:bg-slate-50"
               }`}
             >
               {opt.label}
