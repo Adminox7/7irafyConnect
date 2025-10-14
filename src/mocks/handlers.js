@@ -17,6 +17,8 @@ let users = [
   { id: 1, role: "admin", name: "Admin", email: "admin@site.com", password: "admin123", city: "Rabat", phone: "0600000000", verified: true },
   { id: 2, role: "technicien", name: "Tech Pro", email: "tech@site.com", password: "tech123", city: "Rabat", phone: "0611111111", verified: true },
   { id: 3, role: "client", name: "Client Test", email: "client@site.com", password: "client123", city: "Salé", phone: "0622222222", verified: true },
+  // تقني ينتظر التحقق لإظهار القائمة في لوحة الإدارة
+  { id: 4, role: "technicien", name: "Pending Tech", email: "pending@site.com", password: "pending123", city: "Temara", phone: "0633333333", verified: false },
 ];
 
 function sanitizeUser(u) {
