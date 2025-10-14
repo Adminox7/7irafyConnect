@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Api } from "../api/endpoints";
 import TechCard from "../components/TechCard";
@@ -6,6 +7,7 @@ import TechCard from "../components/TechCard";
 export default function HomeSearch() {
   const [city, setCity] = useState("");
   const [query, setQuery] = useState("");
+  const [params] = useSearchParams();
   const [searching, setSearching] = useState(false);
 
   const { data, refetch, isFetching, isError } = useQuery({
@@ -18,6 +20,21 @@ export default function HomeSearch() {
     setSearching(true);
     refetch().finally(() => setSearching(false));
   };
+
+  useEffect(() => {
+    const pCity = params.get("city") || "";
+    const pQ = params.get("q") || "";
+    if (pCity || pQ) {
+      setCity(pCity);
+      setQuery(pQ);
+      setSearching(true);
+      // wait a tick to ensure state applied before refetch closure reads it
+      setTimeout(() => {
+        refetch().finally(() => setSearching(false));
+      }, 0);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="space-y-6">
