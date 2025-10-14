@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import TechCard from "../components/TechCard";
 
 export default function HomeSearch() {
   const [city, setCity] = useState("");
   const [query, setQuery] = useState("");
   const [searching, setSearching] = useState(false);
 
-  const { data, refetch, isFetching } = useQuery({
+  const { data, refetch, isFetching, isError } = useQuery({
     queryKey: ["technicians", city, query],
     queryFn: async () => {
       const res = await axios.get("/api/v1/technicians", {
@@ -54,24 +55,21 @@ export default function HomeSearch() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {data?.length === 0 && searching === false && (
-          <p className="text-center text-gray-500">ما كاين حتى تقني بهذ المواصفات.</p>
+        {isError && (
+          <p className="text-center text-red-600">وقع خطأ فالبحث. حاول مرة أخرى.</p>
         )}
-        {data?.map((t) => (
-          <div
-            key={t.id}
-            className="border rounded-lg p-4 shadow-sm bg-white hover:shadow-md transition"
-          >
-            <h2 className="text-lg font-semibold text-cyan-700">{t.fullName}</h2>
-            <p className="text-sm text-gray-600">{t.city}</p>
-            <p className="text-sm mt-2">
-              <span className="font-medium">التخصص:</span>{" "}
-              {t.specialties?.join(", ")}
-            </p>
-            <p className="text-sm mt-2">
-              <span className="font-medium">التقييم:</span> ⭐ {t.averageRating}
-            </p>
-          </div>
+        {isFetching && (
+          <>
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="h-28 bg-white rounded-xl border animate-pulse" />
+            ))}
+          </>
+        )}
+        {!isFetching && data?.length === 0 && searching === false && (
+          <p className="text-center text-gray-500 col-span-full">ما كاين حتى تقني بهذ المواصفات.</p>
+        )}
+        {!isFetching && data?.map((t) => (
+          <TechCard t={t} key={t.id} />
         ))}
       </div>
     </div>
