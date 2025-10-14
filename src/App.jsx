@@ -41,7 +41,7 @@ export default function App() {
             {!token ? (
               <>
                 <Link to="/login" className="text-sm hover:text-brand-600">دخول</Link>
-                <Link to="/register" className="text-sm text-white bg-brand-600 px-3 py-1.5 rounded-lg hover:bg-brand-700">حساب جديد</Link>
+                <Link to="/register" className="text-sm text-white bg-black px-3 py-1.5 rounded-lg hover:bg-brand-700">حساب جديد</Link>
               </>
             ) : (
               <button onClick={logout} className="text-sm text-white bg-slate-700 px-3 py-1.5 rounded-lg hover:bg-slate-800">خروج</button>

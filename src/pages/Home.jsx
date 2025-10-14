@@ -103,7 +103,7 @@ export default function Home() {
                 className="sm:w-44"
               />
               <motion.div whileHover={r ? undefined : { scale: 1.02 }}>
-                <Button type="submit" aria-label="ابدأ البحث" className="whitespace-nowrap">بحث</Button>
+                <Button type="submit" aria-label="ابدأ البحث" className="whitespace-nowrap bg-black">بحث</Button>
               </motion.div>
             </motion.form>
 
@@ -203,13 +203,13 @@ export default function Home() {
       {/* CTA */}
       <section className="container max-w-6xl mx-auto">
         <div className="rounded-3xl bg-gradient-to-l from-brand-700 to-brand-600 text-white p-8 md:p-10 text-center shadow-md">
-          <h2 className="text-2xl font-bold tracking-tight">جاهز تبدا؟</h2>
-          <p className="mt-1 text-white/90">اكتشف الحرفيين القريبين ليك أو سجّل كحرفي</p>
+          <h2 className="text-black  font-bold tracking-tight">جاهز تبدا؟</h2>
+          <p className="mt-1 text-black/90">اكتشف الحرفيين القريبين ليك أو سجّل كحرفي</p>
           <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
             <motion.div whileHover={r ? undefined : { scale: 1.02 }}>
               <Link
                 to="/search"
-                className="inline-flex items-center justify-center px-5 py-2 rounded-2xl bg-white text-brand-700 shadow-sm hover:shadow-md"
+                className="inline-flex items-center justify-center px-5 py-2 rounded-2xl bg-black text-brand-700 shadow-sm hover:shadow-md"
               >
                 إلى صفحة البحث
               </Link>
@@ -217,7 +217,7 @@ export default function Home() {
             <motion.div whileHover={r ? undefined : { scale: 1.02 }}>
               <Link
                 to="/register?role=technicien"
-                className="inline-flex items-center justify-center px-5 py-2 rounded-2xl border border-white/80 text-white hover:bg-white/10"
+                className="inline-flex items-center justify-center px-5 py-2 rounded-2xl border border-white/80 text-black hover:bg-black/10"
               >
                 سجّل كحرفي
               </Link>
