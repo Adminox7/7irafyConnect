@@ -5,6 +5,7 @@ html {
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
     Ubuntu, Cantarell, Noto Sans, sans-serif, Apple Color Emoji,
     Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+  scroll-behavior: smooth;
 }
 
 body {
@@ -13,4 +14,9 @@ body {
 
 .container {
   max-width: 72rem; /* ~1152px */
+}
+
+/* تقليل الحركة لمستخدمي تفضيل تقليل الحركة */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
 }
