@@ -37,11 +37,11 @@ export default function Register() {
         <h1 className="text-xl font-semibold mb-4 text-slate-900">حساب جديد</h1>
         <form onSubmit={submit} className="space-y-3">
           <div className="flex gap-3">
-            <label className={`px-3 py-2 rounded-2xl border cursor-pointer transition-colors ${role === "client" ? "bg-brand-600 text-white border-brand-600" : "hover:bg-slate-50"}`}>
+            <label className={`px-3 py-2 rounded-2xl border cursor-pointer transition-colors ${role === "client" ? "bg-black text-white border-brand-600" : "hover:bg-slate-50"}`}>
               <input type="radio" name="role" value="client" className="hidden" checked={role === "client"} onChange={() => setRole("client")} />
               زبون
             </label>
-            <label className={`px-3 py-2 rounded-2xl border cursor-pointer transition-colors ${role === "technicien" ? "bg-brand-600 text-white border-brand-600" : "hover:bg-slate-50"}`}>
+            <label className={`px-3 py-2 rounded-2xl border cursor-pointer transition-colors ${role === "technicien" ? "bg-black text-white border-brand-600" : "hover:bg-slate-50"}`}>
               <input type="radio" name="role" value="technicien" className="hidden" checked={role === "technicien"} onChange={() => setRole("technicien")} />
               حرفي
             </label>
