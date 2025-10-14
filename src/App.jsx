@@ -23,7 +23,7 @@ export default function App() {
   const [compact, setCompact] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setCompact(window.scrollY > 80);
+    const onScroll = () => setCompact(window.scrollY > 8);
     onScroll();
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
