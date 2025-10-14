@@ -30,18 +30,18 @@ export default function Login() {
 
   return (
     <div className="max-w-md mx-auto">
-      <div className="rounded-2xl border bg-white p-6 shadow-sm">
-        <h1 className="text-xl font-semibold mb-4">تسجيل الدخول</h1>
+      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h1 className="text-xl font-semibold mb-4 text-slate-900">تسجيل الدخول</h1>
         <form onSubmit={submit} className="space-y-3" dir="rtl">
           <input
-            className="border rounded-lg px-3 py-2 w-full text-right"
+            className="border border-slate-300 rounded-2xl px-3 py-2 w-full text-right focus:outline-none focus:ring-2 focus:ring-brand-300/50"
             placeholder="البريد الإلكتروني"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
           <input
-            className="border rounded-lg px-3 py-2 w-full text-right"
+            className="border border-slate-300 rounded-2xl px-3 py-2 w-full text-right focus:outline-none focus:ring-2 focus:ring-brand-300/50"
             placeholder="كلمة المرور"
             type="password"
             value={password}
@@ -50,7 +50,7 @@ export default function Login() {
           <button
             type="submit"
             disabled={m.isPending}
-            className="w-full bg-brand text-white rounded-lg py-2 hover:bg-brand-700 disabled:opacity-60"
+            className="w-full bg-brand-600 text-white rounded-2xl py-2 hover:bg-brand-700 disabled:opacity-60 transition-colors"
           >
             {m.isPending ? "جارٍ الدخول…" : "دخول"}
           </button>
@@ -59,7 +59,7 @@ export default function Login() {
           )}
         </form>
         <div className="mt-3 text-sm text-slate-600 text-right">
-          ما عندكش حساب؟ <Link to="/register" className="text-brand underline">حساب جديد</Link>
+          ما عندكش حساب؟ <Link to="/register" className="text-brand-700 hover:text-brand-800 underline">حساب جديد</Link>
         </div>
       </div>
     </div>

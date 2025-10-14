@@ -15,12 +15,12 @@ export default function TechnicianProfile(){
 
   return (
     <div className="space-y-3">
-      <h2 className="text-xl font-semibold">{t.fullName}</h2>
+      <h2 className="text-xl font-semibold text-slate-900">{t.fullName}</h2>
       <div className="text-slate-600">{t.city} • {t.specialties?.join(", ")}</div>
       <div>⭐ {t.averageRating}</div>
 
       <Link to="/create-request" state={{ technician: t }}
-        className="px-4 py-2 bg-brand text-white rounded-lg hover:bg-brand-700">
+        className="px-4 py-2 bg-brand-600 text-white rounded-2xl hover:bg-brand-700 transition-colors">
         طلب خدمة
       </Link>
     </div>

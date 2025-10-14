@@ -65,14 +65,14 @@ export default function Home() {
       {/* HERO */}
       <section className="relative overflow-hidden">
         {/* background gradient band */}
-        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-brand-50 via-white to-white" />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-slate-50 via-white to-white" />
         {/* soft decor blobs */}
         <div aria-hidden className="pointer-events-none select-none">
           <div className="absolute -top-24 -left-20 h-56 w-56 rounded-full bg-brand-200/50 blur-3xl" />
           <div className="absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-brand-300/40 blur-3xl" />
         </div>
 
-        <div className="container max-w-6xl mx-auto text-center py-14 md:py-20">
+        <div className="container max-w-6xl mx-auto text-center py-16 md:py-24">
           <motion.div variants={parent} initial="hidden" animate="show">
             <motion.h1 variants={item} className="text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
               نقرّب ليك أحسن الحرفيين القريبين ليك
@@ -103,7 +103,7 @@ export default function Home() {
                 className="sm:w-44"
               />
               <motion.div whileHover={r ? undefined : { scale: 1.02 }}>
-                <Button type="submit" aria-label="ابدأ البحث" className="whitespace-nowrap text-black">بحث</Button>
+                <Button type="submit" aria-label="ابدأ البحث" className="whitespace-nowrap">بحث</Button>
               </motion.div>
             </motion.form>
 

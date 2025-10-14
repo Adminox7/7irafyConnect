@@ -3,6 +3,8 @@ import { useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Api } from "../api/endpoints";
 import TechCard from "../components/TechCard";
+import Input from "../components/Input";
+import Button from "../components/Button";
 
 export default function HomeSearch() {
   const [city, setCity] = useState("");
@@ -42,28 +44,24 @@ export default function HomeSearch() {
         لقَى الحرفي القريب ليك
       </h1>
 
-      <div className="flex gap-3 justify-center" dir="rtl">
-        <input
+      <div className="flex flex-col sm:flex-row gap-3 justify-center max-w-3xl mx-auto" dir="rtl">
+        <Input
           type="text"
           placeholder="مثال: كهربائي"
-          className="border px-3 py-2 rounded-md w-1/3 text-right"
+          className="flex-1"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
-        <input
+        <Input
           type="text"
           placeholder="المدينة"
-          className="border px-3 py-2 rounded-md w-1/5 text-right"
+          className="sm:w-44"
           value={city}
           onChange={(e) => setCity(e.target.value)}
         />
-        <button
-          onClick={handleSearch}
-          disabled={isFetching}
-          className="bg-brand text-white px-6 py-2 rounded-md hover:bg-brand-700 transition"
-        >
+        <Button onClick={handleSearch} disabled={isFetching} className="whitespace-nowrap">
           {isFetching ? "جارٍ البحث..." : "بحث"}
-        </button>
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -73,7 +71,7 @@ export default function HomeSearch() {
         {isFetching && (
           <>
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="h-28 bg-white rounded-xl border animate-pulse" />
+              <div key={i} className="h-28 bg-white rounded-2xl border border-slate-200 animate-pulse" />
             ))}
           </>
         )}
