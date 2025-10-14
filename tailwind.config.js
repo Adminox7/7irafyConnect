@@ -2,19 +2,15 @@
 export default {
   content: ["./index.html", "./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
-    // Container defaults per design spec
     container: {
       center: true,
       padding: "1rem",
-      screens: {
-        "2xl": "1200px",
-      },
+      screens: { "2xl": "1200px" },
     },
     extend: {
       colors: {
-        // Brand palette
         brand: {
-          50: "#ecfeff",
+          50:  "#ecfeff",
           100: "#cffafe",
           200: "#a5f3fc",
           300: "#67e8f9",
@@ -27,11 +23,18 @@ export default {
           DEFAULT: "#06b6d4",
         },
       },
-      // Make the default rounded radius generous across components
       borderRadius: {
         DEFAULT: "1rem",
+        xl: "1.25rem",
+        "2xl": "1.5rem",
+      },
+      boxShadow: {
+        sm: "0 1px 2px rgba(0,0,0,0.05)",
+        md: "0 4px 6px rgba(0,0,0,0.08)",
+        lg: "0 8px 16px rgba(0,0,0,0.1)",
+        inner: "inset 0 2px 4px rgba(0,0,0,0.06)",
       },
     },
   },
-  plugins: [],
+  plugins: [], // خليه فارغ دابا
 };
