@@ -95,4 +95,55 @@ export const handlers = [
     const list = status === "all" ? requests : requests.filter(x => x.status === status);
     return HttpResponse.json(list, { status: 200 });
   }),
+
+  /* ==============================
+     TECH REQUEST ACTIONS (mock)
+     ============================== */
+  http.post("/api/v1/tech/requests/:id/accept", ({ params }) => {
+    const idx = requests.findIndex(r => String(r.id) === params.id);
+    if (idx === -1) return HttpResponse.json({ message: "Not found" }, { status: 404 });
+    const current = requests[idx];
+    if (current.status !== "new") {
+      return HttpResponse.json({ message: "Invalid transition" }, { status: 400 });
+    }
+    const updated = { ...current, status: "accepted" };
+    requests[idx] = updated;
+    return HttpResponse.json(updated, { status: 200 });
+  }),
+
+  http.post("/api/v1/tech/requests/:id/start", ({ params }) => {
+    const idx = requests.findIndex(r => String(r.id) === params.id);
+    if (idx === -1) return HttpResponse.json({ message: "Not found" }, { status: 404 });
+    const current = requests[idx];
+    if (current.status !== "accepted") {
+      return HttpResponse.json({ message: "Invalid transition" }, { status: 400 });
+    }
+    const updated = { ...current, status: "in_progress" };
+    requests[idx] = updated;
+    return HttpResponse.json(updated, { status: 200 });
+  }),
+
+  http.post("/api/v1/tech/requests/:id/complete", ({ params }) => {
+    const idx = requests.findIndex(r => String(r.id) === params.id);
+    if (idx === -1) return HttpResponse.json({ message: "Not found" }, { status: 404 });
+    const current = requests[idx];
+    if (current.status !== "in_progress") {
+      return HttpResponse.json({ message: "Invalid transition" }, { status: 400 });
+    }
+    const updated = { ...current, status: "done" };
+    requests[idx] = updated;
+    return HttpResponse.json(updated, { status: 200 });
+  }),
+
+  http.post("/api/v1/tech/requests/:id/cancel", ({ params }) => {
+    const idx = requests.findIndex(r => String(r.id) === params.id);
+    if (idx === -1) return HttpResponse.json({ message: "Not found" }, { status: 404 });
+    const current = requests[idx];
+    if (current.status === "done" || current.status === "cancelled") {
+      return HttpResponse.json({ message: "Invalid transition" }, { status: 400 });
+    }
+    const updated = { ...current, status: "cancelled" };
+    requests[idx] = updated;
+    return HttpResponse.json(updated, { status: 200 });
+  }),
 ];
