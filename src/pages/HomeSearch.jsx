@@ -25,7 +25,7 @@ export default function HomeSearch() {
         لقَى الحرفي القريب ليك
       </h1>
 
-      <div className="flex gap-3 justify-center">
+      <div className="flex gap-3 justify-center" dir="rtl">
         <input
           type="text"
           placeholder="مثال: كهربائي"

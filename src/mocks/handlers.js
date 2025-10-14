@@ -168,7 +168,7 @@ export const handlers = [
   // 🔹 إنشاء طلب جديد
   http.post("/api/v1/requests", async ({ request }) => {
     const body = await request.json();
-    const r = { id: Date.now(), status: "new", ...body, createdAt: new Date().toISOString() };
+    const r = { id: Date.now(), status: "new", price: undefined, client: "", ...body, createdAt: new Date().toISOString() };
     requests.unshift(r);
     return HttpResponse.json(r, { status: 201 });
   }),
