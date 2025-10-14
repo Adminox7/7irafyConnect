@@ -45,8 +45,8 @@ export default function TechDashboard(){
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">لوحة الحرفي</h1>
-        <Link to="/" className="text-brand underline">البحث</Link>
+        <h1 className="text-2xl font-bold text-slate-900">لوحة الحرفي</h1>
+        <Link to="/" className="text-brand-700 hover:text-brand-800 underline">البحث</Link>
       </div>
 
       {/* KPIs */}
@@ -59,7 +59,7 @@ export default function TechDashboard(){
       </div>
 
       {/* Chart / or fallback */}
-      <div className="rounded-2xl border bg-white p-4 shadow-sm">
+      <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
         <div className="mb-2 text-sm text-slate-600">الطلبات خلال 7 أيام</div>
         {recharts?.LineChart ? (
           <div className="h-64">
@@ -79,7 +79,7 @@ export default function TechDashboard(){
       </div>
 
       {/* Recent Requests */}
-      <div className="rounded-2xl border bg-white p-4 shadow-sm">
+      <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
         <div className="mb-2 text-sm text-slate-600">آخر الطلبات</div>
         <div className="divide-y">
           {recent.map(r => (
@@ -98,7 +98,7 @@ export default function TechDashboard(){
       </div>
 
       {/* الفلاتر + الجدول */}
-      <div className="rounded-2xl border bg-white p-4 shadow-sm overflow-x-auto">
+      <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm overflow-x-auto">
         <div className="mb-3 flex flex-wrap gap-2">
           {[
             { key: "all", label: "الكل" },
@@ -111,7 +111,7 @@ export default function TechDashboard(){
               key={opt.key}
               onClick={() => setStatus(opt.key)}
               className={`px-3 py-1 rounded-full border text-sm transition ${
-                status === opt.key ? "bg-brand text-white border-brand" : "hover:bg-slate-50"
+                status === opt.key ? "bg-brand-600 text-white border-brand-600" : "hover:bg-slate-50"
               }`}
             >
               {opt.label}

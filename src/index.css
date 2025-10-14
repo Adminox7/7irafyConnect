@@ -8,10 +8,17 @@ html {
     Ubuntu, Cantarell, Noto Sans, sans-serif, Apple Color Emoji,
     Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
   scroll-behavior: smooth;
+  height: 100%;
 }
 
+body, #root {
+  min-height: 100%;
+}
+
+/* Soft app-wide gradient background (slate-50 → white) */
 body {
-  background-color: #ffffff; /* ensure sections are on white by default */
+  background-image: linear-gradient(to bottom, #f8fafc, #ffffff);
+  background-attachment: fixed;
 }
 
 /* تقليل الحركة لمستخدمي تفضيل تقليل الحركة */
