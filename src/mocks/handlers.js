@@ -10,6 +10,20 @@ const technicians = [
 ];
 
 /* ==============================
+   AUTH (مستخدمون تجريبياً)
+   ============================== */
+let users = [
+  // Admin مسبقاً للاختبار
+  { id: 999, role: "admin", name: "Admin", email: "admin@local", password: "admin", city: "Rabat", phone: "0000000000", verified: true },
+];
+
+function sanitizeUser(u) {
+  if (!u) return null;
+  const { password, ...rest } = u;
+  return rest;
+}
+
+/* ==============================
    REQUESTS (طلبات تجريبية)
    ============================== */
 let requests = [
@@ -46,6 +60,56 @@ function weeklySeries(items) {
    API HANDLERS
    ============================== */
 export const handlers = [
+  /* ==============================
+     AUTH ROUTES
+     ============================== */
+  http.post("/api/v1/auth/register", async ({ request }) => {
+    const body = await request.json();
+    const { name, email, password, city, phone, role } = body || {};
+    if (!name || !email || !password || !role) {
+      return HttpResponse.json({ message: "حقول ناقصة" }, { status: 400 });
+    }
+    if (!["client", "technicien"].includes(role)) {
+      return HttpResponse.json({ message: "دور غير صالح" }, { status: 400 });
+    }
+    const exists = users.find((u) => u.email.toLowerCase() === String(email).toLowerCase());
+    if (exists) {
+      return HttpResponse.json({ message: "البريد مسجل من قبل" }, { status: 409 });
+    }
+    const created = {
+      id: Date.now(),
+      role,
+      name,
+      email,
+      password,
+      city: city || "",
+      phone: phone || "",
+      verified: role === "technicien" ? false : true,
+    };
+    users.push(created);
+    return HttpResponse.json(sanitizeUser(created), { status: 201 });
+  }),
+
+  http.post("/api/v1/auth/login", async ({ request }) => {
+    const body = await request.json();
+    const { email, password } = body || {};
+    const u = users.find((x) => x.email.toLowerCase() === String(email).toLowerCase() && x.password === password);
+    if (!u) return HttpResponse.json({ message: "بيانات الدخول غير صحيحة" }, { status: 401 });
+    const token = `mock-${u.id}`;
+    return HttpResponse.json({ token, role: u.role, user: sanitizeUser(u) }, { status: 200 });
+  }),
+
+  http.get("/api/v1/auth/me", ({ request }) => {
+    const auth = request.headers.get("authorization") || request.headers.get("Authorization");
+    if (!auth) return HttpResponse.json({ message: "غير مصرح" }, { status: 401 });
+    const parts = auth.split(" ");
+    const token = parts[1] || "";
+    const id = Number(String(token).replace("mock-", ""));
+    const u = users.find((x) => x.id === id);
+    if (!u) return HttpResponse.json({ message: "غير مصرح" }, { status: 401 });
+    return HttpResponse.json(sanitizeUser(u), { status: 200 });
+  }),
+
   // 🔹 البحث عن الحرفيين
   http.get("/api/v1/technicians", ({ request }) => {
     const url = new URL(request.url);
