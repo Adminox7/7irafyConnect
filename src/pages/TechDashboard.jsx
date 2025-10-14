@@ -46,7 +46,7 @@ export default function TechDashboard(){
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">لوحة الحرفي</h1>
-        <Link to="/" className="text-cyan-700 underline">البحث</Link>
+        <Link to="/" className="text-brand underline">البحث</Link>
       </div>
 
       {/* KPIs */}

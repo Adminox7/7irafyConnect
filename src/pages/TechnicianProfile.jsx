@@ -20,7 +20,7 @@ export default function TechnicianProfile(){
       <div>⭐ {t.averageRating}</div>
 
       <Link to="/create-request" state={{ technician: t }}
-        className="px-4 py-2 bg-cyan-700 text-white rounded-lg">
+        className="px-4 py-2 bg-brand text-white rounded-lg hover:bg-brand-700">
         طلب خدمة
       </Link>
     </div>

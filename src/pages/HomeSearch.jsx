@@ -48,7 +48,7 @@ export default function HomeSearch() {
         <button
           onClick={handleSearch}
           disabled={isFetching}
-          className="bg-[var(--brand)] text-white px-6 py-2 rounded-md hover:bg-cyan-700 transition"
+          className="bg-brand text-white px-6 py-2 rounded-md hover:bg-brand-700 transition"
         >
           {isFetching ? "جارٍ البحث..." : "بحث"}
         </button>
