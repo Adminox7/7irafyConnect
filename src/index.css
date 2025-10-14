@@ -12,8 +12,6 @@ body {
   background-color: #ffffff; /* ensure sections are on white by default */
 }
 
-.container { max-width: 75rem; /* 1200px aligns with 2xl container */ }
-
 /* تقليل الحركة لمستخدمي تفضيل تقليل الحركة */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
