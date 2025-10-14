@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import DashboardCard from "../components/DashboardCard";
+import StatusBadge from "../components/StatusBadge";
 import { Link } from "react-router-dom";
 
 // رسم بياني بسيط (اختياري)
@@ -74,7 +75,7 @@ export default function TechDashboard(){
                 <div className="text-xs text-slate-500">{r.city} • {new Date(r.createdAt).toLocaleString()}</div>
               </div>
               <div className="text-sm">
-                <span className="px-2 py-1 rounded-full bg-slate-100">{r.status}</span>
+                <StatusBadge status={r.status} />
               </div>
             </div>
           ))}
@@ -102,7 +103,7 @@ export default function TechDashboard(){
                 <td className="py-2 pr-4">{r.id}</td>
                 <td className="py-2 pr-4">{r.title}</td>
                 <td className="py-2 pr-4">{r.city}</td>
-                <td className="py-2 pr-4"><span className="px-2 py-1 rounded-full bg-slate-100">{r.status}</span></td>
+                <td className="py-2 pr-4"><StatusBadge status={r.status} /></td>
                 <td className="py-2 pr-4">{r.price ?? "-"}</td>
                 <td className="py-2 pr-4">{r.client}</td>
               </tr>
