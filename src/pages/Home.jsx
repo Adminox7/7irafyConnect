@@ -18,14 +18,10 @@ export default function Home() {
     nav(`/search?${params.toString()}`);
   };
 
-  const containerVariants = prefersReducedMotion ? {} : {
-    hidden: { opacity: 0, y: 16 },
-    show: { opacity: 1, y: 0, transition: { staggerChildren: 0.08 } },
-  };
-  const itemVariants = prefersReducedMotion ? {} : {
-    hidden: { opacity: 0, y: 12 },
-    show: { opacity: 1, y: 0 },
-  };
+  const containerVariants = prefersReducedMotion
+    ? {}
+    : { hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { staggerChildren: 0.08 } } };
+  const itemVariants = prefersReducedMotion ? {} : { hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } };
 
   const features = [
     { t: "سريع", s: "تواصل فوري", icon: (
@@ -65,58 +61,57 @@ export default function Home() {
   const categories = ["كهربائي", "سبّاك", "نجّار", "صبّاغ", "حدّاد", "ألمنيوم"];
 
   return (
-    <div className="space-y-16" dir="rtl">
+    <div className="space-y-20" dir="rtl">
       {/* Hero */}
-      <section className="relative overflow-hidden rounded-2xl bg-gradient-to-b from-brand-50 to-white p-10">
-        {/* decorative */}
+      <section className="relative overflow-hidden rounded-2xl bg-gradient-to-b from-brand-50 via-white to-white">
+        {/* decorative blobs */}
         <div className="pointer-events-none select-none" aria-hidden="true">
-          <div className="absolute -top-10 -left-10 h-40 w-40 rounded-full bg-brand-200 blur-3xl opacity-60" />
-          <div className="absolute -bottom-10 -right-10 h-56 w-56 rounded-full bg-brand-300 blur-3xl opacity-60" />
+          <div className="absolute -top-10 -left-10 h-40 w-40 rounded-full bg-brand-100 blur-3xl opacity-60" />
+          <div className="absolute -bottom-10 -right-10 h-56 w-56 rounded-full bg-brand-200 blur-3xl opacity-60" />
         </div>
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="show"
-          className="text-center relative"
-        >
-          <motion.h1 variants={itemVariants} className="text-4xl sm:text-5xl font-extrabold mb-3">
-            <span className="bg-gradient-to-l from-brand-600 to-brand-400 bg-clip-text text-transparent">7irafyConnect</span>
-          </motion.h1>
-          <motion.p variants={itemVariants} className="text-slate-700 text-lg">
-            نقرّب ليك أحسن الحرفيين القريبين ليك
-          </motion.p>
-          <motion.form
-            variants={itemVariants}
-            onSubmit={go}
-            className="mt-8 flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto"
-            aria-label="محرك البحث"
-          >
-            <Input
-              aria-label="ابحث عن تخصص"
-              placeholder="مثال: كهربائي"
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-            />
-            <Input
-              aria-label="المدينة"
-              placeholder="المدينة"
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-              className="sm:w-40"
-            />
-            <motion.div whileHover={prefersReducedMotion ? undefined : { scale: 1.02 }}>
-              <Button type="submit" aria-label="ابدأ البحث">بحث</Button>
+        <div className="container max-w-6xl mx-auto text-center py-16 md:py-20">
+          <motion.div variants={containerVariants} initial="hidden" animate="show" className="relative">
+            <motion.h1 variants={itemVariants} className="text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900 mb-3">
+              <span className="underline decoration-4 decoration-transparent [text-decoration-skip-ink:none] bg-gradient-to-l from-brand-600 to-brand-400 bg-clip-text text-transparent">
+                7irafyConnect
+              </span>
+            </motion.h1>
+            <motion.p variants={itemVariants} className="text-slate-600 text-lg leading-relaxed max-w-2xl mx-auto">
+              نقرّب ليك أحسن الحرفيين القريبين ليك
+            </motion.p>
+            <motion.form
+              variants={itemVariants}
+              onSubmit={go}
+              className="mt-8 flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto"
+              aria-label="محرك البحث"
+            >
+              <Input
+                aria-label="ابحث عن تخصص"
+                placeholder="مثال: كهربائي"
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+              />
+              <Input
+                aria-label="المدينة"
+                placeholder="المدينة"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                className="sm:w-40"
+              />
+              <motion.div whileHover={prefersReducedMotion ? undefined : { scale: 1.02 }}>
+                <Button type="submit" aria-label="ابدأ البحث">بحث</Button>
+              </motion.div>
+            </motion.form>
+            <motion.div variants={itemVariants} className="mt-3 text-sm text-slate-600">
+              <Link to="/search" className="text-brand hover:underline">أو شوف الكل</Link>
             </motion.div>
-          </motion.form>
-          <motion.div variants={itemVariants} className="mt-3 text-sm text-slate-600">
-            <Link to="/search" className="text-brand hover:underline">أو شوف الكل</Link>
           </motion.div>
-        </motion.div>
+        </div>
       </section>
 
       {/* Features */}
-      <section>
-        <h2 className="text-2xl font-bold mb-6">ليش تختار منصّتنا؟</h2>
+      <section className="container max-w-6xl mx-auto">
+        <h2 className="text-2xl font-bold mb-6 text-right tracking-tight text-slate-800">ليش تختار منصّتنا؟</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {features.map((f, i) => (
             <motion.div
@@ -125,24 +120,25 @@ export default function Home() {
               whileInView={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
               transition={{ delay: i * 0.05 }}
-              whileHover={prefersReducedMotion ? undefined : { y: -4, rotate: 0.25 }}
-              className="rounded-2xl border bg-white p-6 shadow-sm hover:shadow-lg text-right"
+              whileHover={prefersReducedMotion ? undefined : { y: -6, scale: 1.01 }}
+              transition={{ type: "spring", stiffness: 260, damping: 18 }}
+              className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-lg text-right"
             >
               <div className="flex items-center gap-3">
                 <div className="h-10 w-10 flex items-center justify-center rounded-2xl bg-brand-50 text-brand-700">
                   {f.icon}
                 </div>
-                <div className="text-lg font-semibold">{f.t}</div>
+                <div className="text-lg font-semibold text-slate-800">{f.t}</div>
               </div>
-              <div className="text-slate-600 text-sm mt-2">{f.s}</div>
+              <div className="text-slate-600 text-sm mt-2 leading-relaxed">{f.s}</div>
             </motion.div>
           ))}
         </div>
       </section>
 
       {/* How it works */}
-      <section>
-        <h2 className="text-2xl font-bold mb-6">كيف خدامة؟</h2>
+      <section className="container max-w-6xl mx-auto">
+        <h2 className="text-2xl font-bold mb-6 text-right tracking-tight text-slate-800">كيف خدامة؟</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {["بحث", "اختيار", "تواصل"].map((step, i) => (
             <motion.div
@@ -150,7 +146,7 @@ export default function Home() {
               initial={prefersReducedMotion ? false : { opacity: 0, y: 12 }}
               whileInView={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
-              className="rounded-2xl border bg-white p-6 shadow-sm text-right"
+              className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm text-right"
             >
               <div className="flex items-center gap-3">
                 <div className="h-9 w-9 rounded-full bg-gradient-to-l from-brand-600 to-brand-400 text-white flex items-center justify-center font-semibold">
@@ -169,8 +165,8 @@ export default function Home() {
       </section>
 
       {/* Categories */}
-      <section>
-        <h2 className="text-2xl font-bold mb-4">أشهر التخصصات</h2>
+      <section className="container max-w-6xl mx-auto">
+        <h2 className="text-2xl font-bold mb-4 text-right tracking-tight text-slate-800">أشهر التخصصات</h2>
         <div className="relative">
           <div className="flex gap-2 overflow-x-auto snap-x snap-mandatory pb-2" role="list">
             {categories.map((c) => (
@@ -178,7 +174,8 @@ export default function Home() {
                 key={c}
                 role="listitem"
                 to={`/search?q=${encodeURIComponent(c)}`}
-                className="shrink-0 snap-start px-4 py-2 rounded-full border bg-white text-slate-700 hover:text-brand hover:border-brand/40 shadow-sm"
+                className="shrink-0 snap-start px-4 py-2 rounded-full bg-white border border-slate-300 text-slate-700 hover:bg-brand-50 shadow-sm"
+                aria-label={`تصنيف ${c}`}
               >
                 {c}
               </Link>
@@ -188,26 +185,28 @@ export default function Home() {
       </section>
 
       {/* CTA */}
-      <section className="rounded-2xl bg-gradient-to-l from-brand-600 to-brand-400 text-white p-8 text-center">
-        <h2 className="text-2xl font-bold mb-2">جاهز تبدا؟</h2>
-        <p className="text-brand-50/90">اكتشف الحرفيين القريبين ليك أو سجّل كحرفي</p>
-        <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
-          <motion.div whileHover={prefersReducedMotion ? undefined : { scale: 1.02 }}>
-            <Link
-              to="/search"
-              className="inline-flex items-center justify-center px-5 py-2 rounded-2xl bg-white text-brand-700 shadow-sm hover:shadow-md"
-            >
-              إلى صفحة البحث
-            </Link>
-          </motion.div>
-          <motion.div whileHover={prefersReducedMotion ? undefined : { scale: 1.02 }}>
-            <Link
-              to="/register?role=technicien"
-              className="inline-flex items-center justify-center px-5 py-2 rounded-2xl border border-white/70 text-white hover:bg-white/10"
-            >
-              سجّل كحرفي
-            </Link>
-          </motion.div>
+      <section className="container max-w-6xl mx-auto">
+        <div className="rounded-3xl bg-gradient-to-l from-brand-700 to-brand-600 text-white p-8 text-center shadow-inner">
+          <h2 className="text-2xl font-bold mb-2 tracking-tight">جاهز تبدا؟</h2>
+          <p className="text-brand-50/90">اكتشف الحرفيين القريبين ليك أو سجّل كحرفي</p>
+          <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <motion.div whileHover={prefersReducedMotion ? undefined : { scale: 1.02 }}>
+              <Link
+                to="/search"
+                className="inline-flex items-center justify-center px-5 py-2 rounded-2xl bg-white text-brand-700 shadow-sm hover:shadow-md"
+              >
+                إلى صفحة البحث
+              </Link>
+            </motion.div>
+            <motion.div whileHover={prefersReducedMotion ? undefined : { scale: 1.02 }}>
+              <Link
+                to="/register?role=technicien"
+                className="inline-flex items-center justify-center px-5 py-2 rounded-2xl border border-white/70 text-white hover:bg-white/10"
+              >
+                سجّل كحرفي
+              </Link>
+            </motion.div>
+          </div>
         </div>
       </section>
     </div>

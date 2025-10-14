@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Link, NavLink } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
+import Logo from "./components/Logo";
 import Home from "./pages/Home";
 import HomeSearch from "./pages/HomeSearch";
 import TechnicianProfile from "./pages/TechnicianProfile";
@@ -22,7 +23,7 @@ export default function App() {
   const [compact, setCompact] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setCompact(window.scrollY > 80);
+    const onScroll = () => setCompact(window.scrollY > 8);
     onScroll();
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
@@ -35,13 +36,11 @@ export default function App() {
         initial={prefersReducedMotion ? false : { y: -24, opacity: 0 }}
         animate={prefersReducedMotion ? undefined : { y: 0, opacity: 1 }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        className={`sticky top-0 z-50 border-b backdrop-blur ${
-          compact ? "bg-white/80 border-slate-200/80 shadow-sm" : "bg-white/50 border-slate-200/60"
-        }`}
+        className={`sticky top-0 z-50 border-b backdrop-blur ${compact ? "bg-white/90 border-slate-200/90 shadow-sm" : "bg-white/70 border-slate-200/70"}`}
       >
         <div className={`container flex items-center justify-between transition-all ${compact ? "py-2" : "py-3"}`}>
-          <Link to="/" className="text-xl font-semibold">
-            <span className="bg-gradient-to-l from-brand-600 to-brand-400 bg-clip-text text-transparent">7irafyConnect</span>
+          <Link to="/" className="shrink-0" aria-label="الصفحة الرئيسية">
+            <Logo />
           </Link>
           <nav className="text-sm text-slate-700 flex items-center gap-5">
             <NavItem to="/search">البحث</NavItem>
@@ -115,12 +114,9 @@ export default function App() {
           <Route path="/register" element={<Register />} />
         </Routes>
       </main>
-      <footer dir="rtl" className="border-t bg-white/80">
+      <footer dir="rtl" className="border-t bg-white">
         <div className="container px-4 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-slate-600">
-          <div className="flex items-center gap-2">
-            <div className="h-6 w-6 rounded-full bg-gradient-to-l from-brand-600 to-brand-400" aria-hidden="true" />
-            <span className="font-semibold">7irafyConnect</span>
-          </div>
+          <Logo className="opacity-90" />
           <nav className="flex items-center gap-5 text-sm">
             <Link className="hover:text-slate-900" to="#">حول المنصة</Link>
             <Link className="hover:text-slate-900" to="#">سياسة الخصوصية</Link>

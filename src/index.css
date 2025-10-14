@@ -9,11 +9,7 @@ html {
 }
 
 body {
-  background-color: #f8fafc; /* slate-50 */
-}
-
-.container {
-  max-width: 72rem; /* ~1152px */
+  background-color: #ffffff; /* ensure sections are on white by default */
 }
 
 /* تقليل الحركة لمستخدمي تفضيل تقليل الحركة */

@@ -1,12 +1,18 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,jsx,ts,tsx}",
-  ],
+  content: ["./index.html", "./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
+    // Container defaults per design spec
+    container: {
+      center: true,
+      padding: "1rem",
+      screens: {
+        "2xl": "1200px",
+      },
+    },
     extend: {
       colors: {
+        // Brand palette
         brand: {
           50: "#ecfeff",
           100: "#cffafe",
@@ -21,17 +27,11 @@ export default {
           DEFAULT: "#06b6d4",
         },
       },
+      // Make the default rounded radius generous across components
       borderRadius: {
-        DEFAULT: '1rem', // rounded -> rounded-2xl by default
-      },
-      container: {
-        center: true,
-        padding: '1rem',
-        screens: {
-          '2xl': '1200px',
-        },
+        DEFAULT: "1rem",
       },
     },
   },
   plugins: [],
-}
+};
