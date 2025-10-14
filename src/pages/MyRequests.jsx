@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import { http } from "../api/http";
+import { Api } from "../api/endpoints";
 import StatusBadge from "../components/StatusBadge";
 
 export default function MyRequests(){
   const { data:list = [], isLoading, isError } = useQuery({
     queryKey:["my-requests"],
-    queryFn: async () => (await http.get("/requests/me")).data
+    queryFn: () => Api.getMyRequests()
   });
 
   if (isLoading) return <div className="text-slate-500">جارٍ التحميل…</div>;

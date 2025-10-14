@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { http } from "../api/http";
+import { Api } from "../api/endpoints";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import Button from "../components/Button";
@@ -16,7 +16,7 @@ export default function CreateRequest(){
   const qc = useQueryClient();
 
   const m = useMutation({
-    mutationFn: (body)=> http.post("/requests", body).then(r=>r.data),
+    mutationFn: (body)=> Api.createRequest(body),
     onMutate: async (body) => {
       await qc.cancelQueries({ queryKey: ["my-requests"] });
       const previous = qc.getQueryData(["my-requests"]);

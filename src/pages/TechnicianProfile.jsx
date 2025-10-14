@@ -1,12 +1,12 @@
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { http } from "../api/http";
+import { Api } from "../api/endpoints";
 
 export default function TechnicianProfile(){
   const { id } = useParams();
   const { data:t, isLoading, isError } = useQuery({
     queryKey:["tech", id],
-    queryFn: async () => (await http.get(`/technicians/${id}`)).data
+    queryFn: () => Api.getTechnician(id)
   });
 
   if (isLoading) return <div className="text-slate-500">جارٍ التحميل…</div>;
