@@ -1,11 +1,9 @@
 import axios from "axios";
 import { useAuthStore } from "../stores/auth";
 
-// Read baseURL from env; default to '/api/v1'
-const baseURL = import.meta?.env?.VITE_API_URL || "/api/v1";
-
+// Keep axios baseURL fixed for dev/MSW; switch via README when needed
 export const http = axios.create({
-  baseURL,
+  baseURL: "/api/v1",
 });
 
 // Attach Authorization header from auth store

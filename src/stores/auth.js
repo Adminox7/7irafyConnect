@@ -16,7 +16,8 @@ export const useAuthStore = create(
       },
     }),
     {
-      name: "auth-store",
+      // Persist under the requested key
+      name: "7rify-auth",
       partialize: (state) => ({ user: state.user, token: state.token, role: state.role }),
     }
   )
