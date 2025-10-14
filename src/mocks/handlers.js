@@ -13,8 +13,10 @@ const technicians = [
    AUTH (مستخدمون تجريبياً)
    ============================== */
 let users = [
-  // Admin مسبقاً للاختبار
-  { id: 999, role: "admin", name: "Admin", email: "admin@local", password: "admin", city: "Rabat", phone: "0000000000", verified: true },
+  // حسابات اختبار حسب المواصفات
+  { id: 1, role: "admin", name: "Admin", email: "admin@site.com", password: "admin123", city: "Rabat", phone: "0600000000", verified: true },
+  { id: 2, role: "technicien", name: "Tech Pro", email: "tech@site.com", password: "tech123", city: "Rabat", phone: "0611111111", verified: true },
+  { id: 3, role: "client", name: "Client Test", email: "client@site.com", password: "client123", city: "Salé", phone: "0622222222", verified: true },
 ];
 
 function sanitizeUser(u) {
@@ -87,7 +89,8 @@ export const handlers = [
       verified: role === "technicien" ? false : true,
     };
     users.push(created);
-    return HttpResponse.json(sanitizeUser(created), { status: 201 });
+    const token = `mock-${created.id}`;
+    return HttpResponse.json({ user: sanitizeUser(created), token, role: created.role }, { status: 201 });
   }),
 
   http.post("/api/v1/auth/login", async ({ request }) => {
@@ -107,7 +110,39 @@ export const handlers = [
     const id = Number(String(token).replace("mock-", ""));
     const u = users.find((x) => x.id === id);
     if (!u) return HttpResponse.json({ message: "غير مصرح" }, { status: 401 });
-    return HttpResponse.json(sanitizeUser(u), { status: 200 });
+    return HttpResponse.json({ user: sanitizeUser(u), role: u.role }, { status: 200 });
+  }),
+
+  /* ==============================
+     ADMIN ROUTES
+     ============================== */
+  http.get("/api/v1/admin/metrics", () => {
+    const technicians = users.filter((u) => u.role === "technicien");
+    const pendingTechnicians = technicians.filter((t) => !t.verified);
+    const metrics = {
+      users: users.length,
+      technicians: technicians.length,
+      pendingTechnicians: pendingTechnicians.length,
+      totalRequests: requests.length,
+      revenue: kpiFromRequests(requests).revenue,
+    };
+    return HttpResponse.json(metrics, { status: 200 });
+  }),
+
+  http.get("/api/v1/admin/technicians", ({ request }) => {
+    const url = new URL(request.url);
+    const status = url.searchParams.get("status") || "pending";
+    const technicians = users.filter((u) => u.role === "technicien");
+    const filtered = status === "pending" ? technicians.filter((t) => !t.verified) : technicians;
+    return HttpResponse.json(filtered.map(sanitizeUser), { status: 200 });
+  }),
+
+  http.patch("/api/v1/admin/technicians/:id/verify", ({ params }) => {
+    const id = Number(params.id);
+    const idx = users.findIndex((u) => u.id === id && u.role === "technicien");
+    if (idx === -1) return HttpResponse.json({ message: "Not found" }, { status: 404 });
+    users[idx] = { ...users[idx], verified: true };
+    return HttpResponse.json(sanitizeUser(users[idx]), { status: 200 });
   }),
 
   // 🔹 البحث عن الحرفيين

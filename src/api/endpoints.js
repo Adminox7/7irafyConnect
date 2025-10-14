@@ -57,6 +57,13 @@ export const Api = {
   login: (body) => http.post("auth/login", body).then((r) => r.data),
   me: () => http.get("auth/me").then((r) => r.data),
 
+  // ========== ADMIN ==========
+  getAdminMetrics: () => http.get("admin/metrics").then((r) => r.data),
+  getAdminTechnicians: (params) =>
+    http.get("admin/technicians", { params }).then((r) => r.data),
+  verifyTechnician: (id) =>
+    http.patch(`admin/technicians/${id}/verify`).then((r) => r.data),
+
   /**
    * البحث عن الحرفيين
    * @param {{ city?: string, q?: string }} params
