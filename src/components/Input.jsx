@@ -1,7 +1,7 @@
 export default function Input({ className = "", ...props }) {
   const base = [
     "w-full text-right",
-    "rounded-2xl border border-slate-300 bg-white text-slate-800",
+    "rounded-2xl border border-slate-300 bg-white text-slate-900",
     "px-4 py-2.5 placeholder-slate-400",
     "shadow-sm",
     "transition-colors duration-200",

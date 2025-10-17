@@ -126,13 +126,14 @@ export default function Home() {
       </section>
 
       {/* WHY US */}
-      <section className="container max-w-6xl mx-auto">
+      <section className="py-16 md:py-24 bg-slate-50">
+        <div className="container max-w-6xl mx-auto">
         <div className="flex items-end justify-between gap-4 mb-6">
           <h2 className="text-2xl font-bold tracking-tight text-slate-900">ليش تختار منصّتنا؟</h2>
           <span className="hidden md:block text-sm text-slate-500">موثوقية عالية، تجربة سهلة وسريعة</span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
           {features.map((f, i) => (
             <motion.div
               key={f.t}
@@ -153,12 +154,14 @@ export default function Home() {
             </motion.div>
           ))}
         </div>
+        </div>
       </section>
 
       {/* HOW IT WORKS */}
-      <section className="container max-w-6xl mx-auto">
+      <section className="py-16 md:py-24">
+        <div className="container max-w-6xl mx-auto">
         <h2 className="text-2xl font-bold mb-6 text-slate-900">كيف خدامة؟</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
           {["بحث", "اختيار", "تواصل"].map((step, i) => (
             <motion.div
               key={step}
@@ -181,10 +184,12 @@ export default function Home() {
             </motion.div>
           ))}
         </div>
+        </div>
       </section>
 
       {/* CATEGORIES */}
-      <section className="container max-w-6xl mx-auto">
+      <section className="py-16 md:py-24">
+        <div className="container max-w-6xl mx-auto">
         <h2 className="text-2xl font-bold mb-4 text-slate-900">أشهر التخصصات</h2>
         <div className="flex gap-2 overflow-x-auto snap-x snap-mandatory pb-2" role="list">
           {categories.map((c) => (
@@ -192,17 +197,19 @@ export default function Home() {
               key={c}
               role="listitem"
               to={`/search?q=${encodeURIComponent(c)}`}
-              className="shrink-0 snap-start px-4 py-2 rounded-full bg-white border border-slate-300 text-slate-700 hover:bg-brand-50 hover:border-brand-300 shadow-sm"
+              className="shrink-0 snap-start px-4 py-2 rounded-full bg-white border border-slate-300 text-slate-700 hover:bg-brand-50 hover:border-brand-300 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300"
               aria-label={`تصنيف ${c}`}
             >
               {c}
             </Link>
           ))}
         </div>
+        </div>
       </section>
 
       {/* CTA */}
-      <section className="container max-w-6xl mx-auto">
+      <section className="py-16 md:py-24">
+        <div className="container max-w-6xl mx-auto">
         <div className="rounded-3xl bg-gradient-to-l from-brand-700 to-brand-600 text-white p-8 md:p-10 text-center shadow-md">
           <h2 className="text-white font-bold tracking-tight text-2xl">جاهز تبدا؟</h2>
           <p className="mt-1 text-white/90">اكتشف الحرفيين القريبين ليك أو سجّل كحرفي</p>
@@ -224,6 +231,7 @@ export default function Home() {
               </Link>
             </motion.div>
           </div>
+        </div>
         </div>
       </section>
     </div>
