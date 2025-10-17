@@ -4,6 +4,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import Input from "../components/Input";
 import Button from "../components/Button";
 
+
 export default function Home() {
   const [q, setQ] = useState("");
   const [city, setCity] = useState("");
@@ -61,7 +62,7 @@ export default function Home() {
 
   return (
     
-    <div className="space-y-20" dir="rtl">
+    <div className="space-y-20" dir="rtl" >
       {/* HERO */}
       <section className="relative overflow-hidden">
         {/* background gradient band */}
