@@ -59,7 +59,7 @@ export default function HomeSearch() {
           value={city}
           onChange={(e) => setCity(e.target.value)}
         />
-        <Button onClick={handleSearch} disabled={isFetching} className="whitespace-nowrap bg-black">
+        <Button onClick={handleSearch} disabled={isFetching} className="whitespace-nowrap">
           {isFetching ? "جارٍ البحث..." : "بحث"}
         </Button>
       </div>
