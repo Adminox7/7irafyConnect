@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Link, NavLink } from "react-router-dom";
 import Logo from "./components/Logo";
 import Home from "./pages/Home";
 import HomeSearch from "./pages/HomeSearch";
@@ -20,36 +20,90 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      <header className="sticky top-0 z-40 border-b border-white/20 bg-white/70 backdrop-blur supports-[backdrop-filter]:bg-white/60" dir="rtl">
+      <header className="sticky top-0 z-40 border-b border-white/20 bg-white/70 backdrop-blur supports-[backdrop-filter]:bg-white/60 shadow-sm" dir="rtl">
         <div className="container max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
           <Link to="/" aria-label="الرئيسية" className="flex items-center gap-2">
             <Logo className="!gap-2" />
           </Link>
           <nav className="text-sm text-slate-700 flex items-center gap-5">
-            <Link to="/search" className="hover:text-brand-600">البحث</Link>
+            <NavLink
+              to="/search"
+              className={({ isActive }) =>
+                `group relative pb-1 transition-colors ${
+                  isActive ? "text-brand-700" : "hover:text-brand-700"
+                } after:absolute after:inset-x-0 after:-bottom-0.5 after:h-0.5 after:origin-right rtl:after:origin-left after:scale-x-0 ${
+                  isActive ? "after:scale-x-100" : "group-hover:after:scale-x-100"
+                } after:rounded-full after:bg-brand-500 motion-safe:after:transition-transform`
+              }
+            >
+              البحث
+            </NavLink>
             {(role === "technicien" || role === "client") && (
-              <Link to="/requests" className="hover:text-brand-600">طلباتي</Link>
+              <NavLink
+                to="/requests"
+                className={({ isActive }) =>
+                  `group relative pb-1 transition-colors ${
+                    isActive ? "text-brand-700" : "hover:text-brand-700"
+                  } after:absolute after:inset-x-0 after:-bottom-0.5 after:h-0.5 after:origin-right rtl:after:origin-left after:scale-x-0 ${
+                    isActive ? "after:scale-x-100" : "group-hover:after:scale-x-100"
+                  } after:rounded-full after:bg-brand-500 motion-safe:after:transition-transform`
+                }
+              >
+                طلباتي
+              </NavLink>
             )}
             {role === "technicien" && (
-              <Link to="/dashboard" className="hover:text-brand-600">لوحة الحرفي</Link>
+              <NavLink
+                to="/dashboard"
+                className={({ isActive }) =>
+                  `group relative pb-1 transition-colors ${
+                    isActive ? "text-brand-700" : "hover:text-brand-700"
+                  } after:absolute after:inset-x-0 after:-bottom-0.5 after:h-0.5 after:origin-right rtl:after:origin-left after:scale-x-0 ${
+                    isActive ? "after:scale-x-100" : "group-hover:after:scale-x-100"
+                  } after:rounded-full after:bg-brand-500 motion-safe:after:transition-transform`
+                }
+              >
+                لوحة الحرفي
+              </NavLink>
             )}
             {role === "admin" && (
-              <Link to="/admin" className="hover:text-brand-600">الإدارة</Link>
+              <NavLink
+                to="/admin"
+                className={({ isActive }) =>
+                  `group relative pb-1 transition-colors ${
+                    isActive ? "text-brand-700" : "hover:text-brand-700"
+                  } after:absolute after:inset-x-0 after:-bottom-0.5 after:h-0.5 after:origin-right rtl:after:origin-left after:scale-x-0 ${
+                    isActive ? "after:scale-x-100" : "group-hover:after:scale-x-100"
+                  } after:rounded-full after:bg-brand-500 motion-safe:after:transition-transform`
+                }
+              >
+                الإدارة
+              </NavLink>
             )}
           </nav>
           <div className="flex items-center gap-3">
             {!token ? (
               <>
-                <Link to="/login" className="text-sm hover:text-brand-600">دخول</Link>
-                <Link to="/register" className="text-sm text-white bg-black px-3 py-1.5 rounded-lg hover:bg-brand-700">حساب جديد</Link>
+                <Link to="/login" className="text-sm hover:text-brand-700">دخول</Link>
+                <Link
+                  to="/register"
+                  className="text-sm text-white bg-brand-600 px-3 py-1.5 rounded-2xl hover:bg-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300"
+                >
+                  حساب جديد
+                </Link>
               </>
             ) : (
-              <button onClick={logout} className="text-sm text-white bg-slate-700 px-3 py-1.5 rounded-lg hover:bg-slate-800">خروج</button>
+              <button
+                onClick={logout}
+                className="text-sm text-white bg-slate-700 px-3 py-1.5 rounded-2xl hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300"
+              >
+                خروج
+              </button>
             )}
           </div>
         </div>
       </header>
-      <main className="container max-w-7xl mx-auto px-4 py-8" dir="rtl">
+      <main className="container max-w-7xl mx-auto px-4 py-10 md:py-12" dir="rtl">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/search" element={<HomeSearch />} />
@@ -95,9 +149,9 @@ export default function App() {
           <div>
             <div className="font-semibold text-slate-900 mb-2">روابط</div>
             <nav className="flex flex-col gap-1 text-sm text-slate-700">
-              <Link to="/search" className="hover:text-brand-600">البحث</Link>
-              <Link to="/register" className="hover:text-brand-600">حساب جديد</Link>
-              <Link to="/login" className="hover:text-brand-600">تسجيل الدخول</Link>
+              <Link to="/search" className="hover:text-brand-700">البحث</Link>
+              <Link to="/register" className="hover:text-brand-700">حساب جديد</Link>
+              <Link to="/login" className="hover:text-brand-700">تسجيل الدخول</Link>
             </nav>
           </div>
           <div>
