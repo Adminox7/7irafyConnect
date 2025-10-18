@@ -17,11 +17,36 @@ body, #root {
 
 /* Soft app-wide gradient background (slate-50 → white) */
 body {
-  background-image: linear-gradient(to bottom, #f8fafc, #ffffff);
+  background-image: radial-gradient(1200px 400px at 100% -50%, rgba(14,165,233,0.06), transparent),
+                    radial-gradient(900px 300px at 0% 120%, rgba(2,132,199,0.05), transparent),
+                    linear-gradient(to bottom, #f8fafc, #ffffff);
   background-attachment: fixed;
+  color: #0f172a; /* slate-900 default text */
+}
+
+/* Typography defaults for better readability */
+:root {
+  --text-strong: #0f172a; /* slate-900 */
+  --text: #334155;        /* slate-700 */
+  --text-muted: #475569;  /* slate-600 */
+}
+
+h1, h2, h3, h4 {
+  color: var(--text-strong);
+}
+
+p, li, span, label {
+  color: var(--text);
 }
 
 /* تقليل الحركة لمستخدمي تفضيل تقليل الحركة */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
+}
+
+/* Focus ring defaults for accessibility */
+:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(14,165,233,0.35);
+  border-radius: 0.75rem;
 }

@@ -5,8 +5,10 @@ import { Api } from "../api/endpoints";
 import TechCard from "../components/TechCard";
 import Input from "../components/Input";
 import Button from "../components/Button";
+import { motion, useReducedMotion } from "framer-motion";
 
 export default function HomeSearch() {
+  const r = useReducedMotion();
   const [city, setCity] = useState("");
   const [query, setQuery] = useState("");
   const [params] = useSearchParams();
@@ -78,8 +80,15 @@ export default function HomeSearch() {
         {!isFetching && data?.length === 0 && searching === false && (
           <p className="text-center text-gray-500 col-span-full">ما كاين حتى تقني بهذ المواصفات.</p>
         )}
-        {!isFetching && data?.map((t) => (
-          <TechCard t={t} key={t.id} />
+        {!isFetching && data?.map((t, i) => (
+          <motion.div
+            key={t.id}
+            initial={r ? false : { opacity: 0, y: 8 }}
+            animate={r ? undefined : { opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.03 }}
+          >
+            <TechCard t={t} />
+          </motion.div>
         ))}
       </div>
     </div>

@@ -8,6 +8,10 @@ export default function AdminDashboard() {
     queryKey: ["admin-metrics"],
     queryFn: () => Api.getAdminMetrics(),
   });
+  const { data: stats } = useQuery({
+    queryKey: ["admin-stats"],
+    queryFn: () => Api.getAdminStats(),
+  });
   const { data: pending = [], isLoading: tLoading, isError: tError } = useQuery({
     queryKey: ["admin-technicians", { status: "pending" }],
     queryFn: () => Api.getAdminTechnicians({ status: "pending" }),
@@ -19,6 +23,11 @@ export default function AdminDashboard() {
       qc.invalidateQueries({ queryKey: ["admin-metrics"] });
       qc.invalidateQueries({ queryKey: ["admin-technicians"] });
     },
+  });
+
+  const { data: adminRequests = [], isLoading: rLoading, isError: rError } = useQuery({
+    queryKey: ["admin-requests"],
+    queryFn: () => Api.getAdminRequests(),
   });
 
   return (
@@ -35,6 +44,12 @@ export default function AdminDashboard() {
             <DashboardCard title="بانتظار التحقق" value={metrics.pendingTechnicians} />
             <DashboardCard title="عدد الطلبات" value={metrics.totalRequests} />
             <DashboardCard title="المداخيل" value={metrics.revenue} />
+          </>
+        )}
+        {stats && (
+          <>
+            <DashboardCard title="الطلبات الجديدة هذا الأسبوع" value={stats.newRequestsWeek} />
+            <DashboardCard title="متوسط التقييم" value={stats.avgRating} />
           </>
         )}
       </div>
@@ -74,6 +89,41 @@ export default function AdminDashboard() {
             {!tLoading && pending.length === 0 && (
               <tr>
                 <td colSpan="5" className="py-6 text-center text-slate-500">لا يوجد طلبات تحقق معلقة</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="rounded-2xl border bg-white p-4 shadow-sm">
+        <div className="mb-2 flex items-center justify-between">
+          <div className="text-sm text-slate-600">الطلبات</div>
+        </div>
+        {rLoading && <div className="text-slate-500">جارٍ التحميل…</div>}
+        {rError && <div className="text-red-600">تعذر تحميل الطلبات</div>}
+        <table className="min-w-full text-sm">
+          <thead className="text-left text-slate-500">
+            <tr>
+              <th className="py-2 pr-4">ID</th>
+              <th className="py-2 pr-4">الزبون</th>
+              <th className="py-2 pr-4">الحرفي</th>
+              <th className="py-2 pr-4">الحالة</th>
+              <th className="py-2 pr-4">التاريخ</th>
+            </tr>
+          </thead>
+          <tbody>
+            {adminRequests.map((r) => (
+              <tr key={r.id} className="border-t">
+                <td className="py-2 pr-4">{r.id}</td>
+                <td className="py-2 pr-4">{r.client || "-"}</td>
+                <td className="py-2 pr-4">{r.technician || "-"}</td>
+                <td className="py-2 pr-4">{r.status}</td>
+                <td className="py-2 pr-4">{new Date(r.createdAt).toLocaleString()}</td>
+              </tr>
+            ))}
+            {!rLoading && adminRequests.length === 0 && (
+              <tr>
+                <td colSpan="5" className="py-6 text-center text-slate-500">لا توجد طلبات</td>
               </tr>
             )}
           </tbody>
