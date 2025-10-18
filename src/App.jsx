@@ -9,6 +9,8 @@ import TechDashboard from "./pages/TechDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import ChatWindow from "./components/ChatWindow";
+import UserProfile from "./pages/UserProfile";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./stores/auth";
@@ -93,12 +95,26 @@ export default function App() {
                 </Link>
               </>
             ) : (
-              <button
-                onClick={logout}
-                className="text-sm text-white bg-slate-700 px-3 py-1.5 rounded-2xl hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300 shadow-sm"
-              >
-                خروج
-              </button>
+              <div className="flex items-center gap-2">
+                <NavLink
+                  to="/me"
+                  className={({ isActive }) => `text-sm px-3 py-1.5 rounded-2xl border ${isActive ? "border-brand-300 text-brand-700" : "border-slate-300 text-slate-700 hover:bg-slate-50"}`}
+                >
+                  ملفي
+                </NavLink>
+                <NavLink
+                  to="/chat"
+                  className={({ isActive }) => `text-sm px-3 py-1.5 rounded-2xl border ${isActive ? "border-brand-300 text-brand-700" : "border-slate-300 text-slate-700 hover:bg-slate-50"}`}
+                >
+                  دردشة
+                </NavLink>
+                <button
+                  onClick={logout}
+                  className="text-sm text-white bg-slate-700 px-3 py-1.5 rounded-2xl hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300 shadow-sm"
+                >
+                  خروج
+                </button>
+              </div>
             )}
           </div>
         </div>
@@ -109,6 +125,15 @@ export default function App() {
           <Route path="/search" element={<HomeSearch />} />
           <Route path="/technicians/:id" element={<TechnicianProfile />} />
           <Route path="/create-request" element={<CreateRequest />} />
+          <Route path="/chat/:threadId?" element={<ChatWindow />} />
+          <Route
+            path="/me"
+            element={
+              <ProtectedRoute>
+                <UserProfile />
+              </ProtectedRoute>
+            }
+          />
 
           <Route
             path="/requests"

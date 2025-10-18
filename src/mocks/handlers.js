@@ -4,9 +4,42 @@ import { http, HttpResponse } from "msw";
    TECHNICIANS (حرفيين تجريبياً)
    ============================== */
 const technicians = [
-  { id: 1, fullName: "Youssef El Elec", city: "Rabat", specialties: ["electricien"], isPremium: true, averageRating: 4.8, lat: 34.02, lng: -6.83 },
-  { id: 2, fullName: "Hicham Plomb", city: "Salé", specialties: ["plombier"], isPremium: false, averageRating: 4.5, lat: 34.05, lng: -6.78 },
-  { id: 3, fullName: "Khalid Deco", city: "Temara", specialties: ["peintre"], isPremium: false, averageRating: 4.6, lat: 33.93, lng: -6.91 },
+  { id: 1, fullName: "Youssef El Elec", city: "Rabat", specialties: ["كهربائي", "تركيب ثريات"], isPremium: true, averageRating: 4.8, lat: 34.02, lng: -6.83, avatarUrl: "", bio: "خبرة 8 سنوات في حلول الكهرباء المنزلية" },
+  { id: 2, fullName: "Hicham Plomb", city: "Salé", specialties: ["سباكة"], isPremium: false, averageRating: 4.5, lat: 34.05, lng: -6.78, avatarUrl: "", bio: "تصليح و تركيب مواسير الماء" },
+  { id: 3, fullName: "Khalid Deco", city: "Temara", specialties: ["صباغة", "ديكور"], isPremium: false, averageRating: 4.6, lat: 33.93, lng: -6.91, avatarUrl: "", bio: "ديكور و صباغة داخلية أنيقة" },
+];
+
+// Technician related mock maps
+const technicianReviews = {
+  1: [
+    { id: "r1", author: "Amine L.", rating: 5, comment: "خدمة ممتازة و سريع", date: new Date().toISOString() },
+    { id: "r2", author: "Sara B.", rating: 4, comment: "دقيق فالمواعيد", date: new Date(Date.now()-86400000).toISOString() },
+  ],
+  2: [
+    { id: "r3", author: "Yassine T.", rating: 5, comment: "حل المشكل فالساعة", date: new Date().toISOString() },
+  ],
+  3: [],
+};
+
+const technicianServices = {
+  1: [
+    { id: "s1", title: "تصليح كهرباء خفيفة", priceFrom: 150, priceTo: 300 },
+    { id: "s2", title: "تركيب ثريا", priceFrom: 200, priceTo: 400 },
+  ],
+  2: [
+    { id: "s3", title: "تصليح تسريب ماء", priceFrom: 120, priceTo: 280 },
+  ],
+  3: [
+    { id: "s4", title: "صباغة غرفة", priceFrom: 400, priceTo: 800 },
+  ],
+};
+
+// Top services catalog (for Home "Top Services")
+const topServices = [
+  { id: "ts1", title: "تركيب ثريا", ordersCount: 82, avgPrice: 320, icon: "💡" },
+  { id: "ts2", title: "تصليح تسريب ماء", ordersCount: 65, avgPrice: 250, icon: "🚰" },
+  { id: "ts3", title: "صباغة غرفة", ordersCount: 41, avgPrice: 650, icon: "🎨" },
+  { id: "ts4", title: "تركيب محبس ماء", ordersCount: 23, avgPrice: 180, icon: "🔧" },
 ];
 
 /* ==============================
@@ -58,6 +91,33 @@ function weeklySeries(items) {
     return { date: key.slice(5), requests: count };
   });
   return days;
+}
+
+// ============ CHAT MOCK DATA ============
+// Store participants to derive peer per "me"; messages keyed by thread id
+const chatThreads = [
+  { id: "t1", participants: [2, 3], updatedAt: new Date().toISOString(), lastMessage: "مرحبا! واش ممكن اليوم؟" },
+  { id: "t2", participants: [1, 3], updatedAt: new Date(Date.now() - 3600_000).toISOString(), lastMessage: "تم التحقق من الحساب" },
+];
+
+/** @type {Record<string, Array<{id:string, threadId:string, fromUserId:number, text:string, createdAt:string, read?:boolean}>>} */
+const chatMessages = {
+  t1: [
+    { id: "m1", threadId: "t1", fromUserId: 3, text: "السلام عليكم! بغيت موعد", createdAt: new Date(Date.now() - 7200_000).toISOString(), read: true },
+    { id: "m2", threadId: "t1", fromUserId: 2, text: "وعليكم السلام! واش ممكن اليوم؟", createdAt: new Date(Date.now() - 7100_000).toISOString(), read: true },
+  ],
+  t2: [
+    { id: "m3", threadId: "t2", fromUserId: 1, text: "مرحبا، تم قبولك كحرفي مميز", createdAt: new Date(Date.now() - 4000_000).toISOString(), read: true },
+  ],
+};
+
+function getAuthUserIdFromHeaders(headers) {
+  const auth = headers.get("authorization") || headers.get("Authorization");
+  if (!auth) return null;
+  const parts = auth.split(" ");
+  const token = parts[1] || "";
+  const id = Number(String(token).replace("mock-", ""));
+  return Number.isFinite(id) ? id : null;
 }
 
 /* ==============================
@@ -131,6 +191,20 @@ export const handlers = [
     return HttpResponse.json(metrics, { status: 200 });
   }),
 
+  // New: Admin stats per contract { technicians, users, newRequestsWeek, avgRating }
+  http.get("/api/v1/admin/stats", () => {
+    const techniciansUsers = users.filter((u) => u.role === "technicien");
+    const newRequestsWeek = weeklySeries(requests).reduce((s, x) => s + x.requests, 0);
+    const ratings = technicians.map((t) => t.averageRating).filter((x) => Number.isFinite(x));
+    const avgRating = ratings.length ? Number((ratings.reduce((s, x) => s + x, 0) / ratings.length).toFixed(2)) : 0;
+    return HttpResponse.json({
+      technicians: techniciansUsers.length,
+      users: users.length,
+      newRequestsWeek,
+      avgRating,
+    });
+  }),
+
   http.get("/api/v1/admin/technicians", ({ request }) => {
     const url = new URL(request.url);
     const status = url.searchParams.get("status") || "pending";
@@ -144,6 +218,16 @@ export const handlers = [
     const idx = users.findIndex((u) => u.id === id && u.role === "technicien");
     if (idx === -1) return HttpResponse.json({ message: "Not found" }, { status: 404 });
     users[idx] = { ...users[idx], verified: true };
+    return HttpResponse.json(sanitizeUser(users[idx]), { status: 200 });
+  }),
+
+  // New: General PATCH to update technician record (verified/status)
+  http.patch("/api/v1/admin/technicians/:id", async ({ params, request }) => {
+    const id = Number(params.id);
+    const body = await request.json().catch(() => ({}));
+    const idx = users.findIndex((u) => u.id === id && u.role === "technicien");
+    if (idx === -1) return HttpResponse.json({ message: "Not found" }, { status: 404 });
+    users[idx] = { ...users[idx], ...body };
     return HttpResponse.json(sanitizeUser(users[idx]), { status: 200 });
   }),
 
@@ -167,6 +251,25 @@ export const handlers = [
       : HttpResponse.json({ message: "Not found" }, { status: 404 });
   }),
 
+  // 🔹 خدمات و مراجعات الحرفي
+  http.get("/api/v1/technicians/:id/reviews", ({ params }) => {
+    const list = technicianReviews[params.id] || [];
+    return HttpResponse.json(list, { status: 200 });
+  }),
+  http.get("/api/v1/technicians/:id/services", ({ params }) => {
+    const list = technicianServices[params.id] || [];
+    return HttpResponse.json(list, { status: 200 });
+  }),
+
+  // 🔹 Top Technicians & Services
+  http.get("/api/v1/technicians/top", () => {
+    const sorted = [...technicians].sort((a, b) => b.averageRating - a.averageRating).slice(0, 6);
+    return HttpResponse.json(sorted, { status: 200 });
+  }),
+  http.get("/api/v1/services/top", () => {
+    return HttpResponse.json(topServices, { status: 200 });
+  }),
+
   // 🔹 إنشاء طلب جديد
   http.post("/api/v1/requests", async ({ request }) => {
     const body = await request.json();
@@ -177,6 +280,11 @@ export const handlers = [
 
   // 🔹 عرض جميع الطلبات ديال المستخدم
   http.get("/api/v1/requests/me", () => {
+    return HttpResponse.json(requests, { status: 200 });
+  }),
+
+  // Admin: list requests table
+  http.get("/api/v1/admin/requests", () => {
     return HttpResponse.json(requests, { status: 200 });
   }),
 
@@ -246,5 +354,51 @@ export const handlers = [
     const updated = { ...current, status: "cancelled" };
     requests[idx] = updated;
     return HttpResponse.json(updated, { status: 200 });
+  }),
+
+  /* ==============================
+     CHAT ROUTES (Front-only)
+     ============================== */
+  http.get("/api/v1/chat/threads", ({ request }) => {
+    const url = new URL(request.url);
+    const me = Number(url.searchParams.get("me") || getAuthUserIdFromHeaders(request.headers) || 0);
+    const list = chatThreads
+      .filter((t) => t.participants.includes(me))
+      .map((t) => {
+        const peerId = t.participants.find((p) => p !== me);
+        const peerUser = users.find((u) => u.id === peerId) || technicians.find((tc) => tc.id === peerId);
+        return {
+          id: t.id,
+          peer: { id: String(peerId), name: peerUser?.name || peerUser?.fullName || "مستخدم", avatarUrl: peerUser?.avatarUrl || "" },
+          lastMessage: t.lastMessage,
+          updatedAt: t.updatedAt,
+        };
+      });
+    return HttpResponse.json(list, { status: 200 });
+  }),
+
+  http.get("/api/v1/chat/threads/:id/messages", ({ params, request }) => {
+    const list = chatMessages[params.id] || [];
+    return HttpResponse.json(list, { status: 200 });
+  }),
+
+  http.post("/api/v1/chat/threads/:id/messages", async ({ params, request }) => {
+    const body = await request.json().catch(() => ({}));
+    const fromUserId = getAuthUserIdFromHeaders(request.headers) || body.fromUserId || 0;
+    const created = {
+      id: String(Date.now()),
+      threadId: params.id,
+      fromUserId,
+      text: body.text || "",
+      createdAt: new Date().toISOString(),
+      read: false,
+    };
+    chatMessages[params.id] = chatMessages[params.id] || [];
+    chatMessages[params.id].push(created);
+    const tIdx = chatThreads.findIndex((t) => t.id === params.id);
+    if (tIdx !== -1) {
+      chatThreads[tIdx] = { ...chatThreads[tIdx], lastMessage: created.text, updatedAt: created.createdAt };
+    }
+    return HttpResponse.json(created, { status: 201 });
   }),
 ];

@@ -1,8 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import Input from "../components/Input";
 import Button from "../components/Button";
+import ServiceCard from "../components/ServiceCard";
+import TechCard from "../components/TechCard";
+import { useQuery } from "@tanstack/react-query";
+import { Api } from "../api/endpoints";
 
 
 export default function Home() {
@@ -59,6 +63,16 @@ export default function Home() {
   ];
 
   const categories = ["كهربائي", "سبّاك", "نجّار", "صبّاغ", "حدّاد", "ألمنيوم"];
+
+  // Top sections data
+  const { data: topTechs = [], isFetching: loadingTopTechs } = useQuery({
+    queryKey: ["top-techs"],
+    queryFn: Api.getTopTechnicians,
+  });
+  const { data: topServices = [], isFetching: loadingTopServices } = useQuery({
+    queryKey: ["top-services"],
+    queryFn: Api.getTopServices,
+  });
 
   return (
     
@@ -184,6 +198,42 @@ export default function Home() {
             </motion.div>
           ))}
         </div>
+        </div>
+      </section>
+
+      {/* Top Technicians */}
+      <section className="py-16 md:py-24">
+        <div className="container max-w-6xl mx-auto">
+          <div className="flex items-end justify-between gap-4 mb-6">
+            <h2 className="text-2xl font-bold tracking-tight text-slate-900">أعلى الحرفيين تقييماً</h2>
+            <span className="hidden md:block text-sm text-slate-500">أفضل خبراء قريبين منك</span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {loadingTopTechs && Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="h-24 rounded-2xl border border-slate-200 bg-white animate-pulse" />
+            ))}
+            {!loadingTopTechs && topTechs.map((t) => (
+              <TechCard key={t.id} t={t} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Top Services */}
+      <section className="py-16 md:py-24 bg-slate-50">
+        <div className="container max-w-6xl mx-auto">
+          <div className="flex items-end justify-between gap-4 mb-6">
+            <h2 className="text-2xl font-bold tracking-tight text-slate-900">خدمات مطلوبة</h2>
+            <span className="hidden md:block text-sm text-slate-500">ابحث بسرعة بالخدمة</span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {loadingTopServices && Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="h-28 rounded-2xl border border-slate-200 bg-white animate-pulse" />
+            ))}
+            {!loadingTopServices && topServices.map((s) => (
+              <ServiceCard key={s.id} s={s} />
+            ))}
+          </div>
         </div>
       </section>
 
