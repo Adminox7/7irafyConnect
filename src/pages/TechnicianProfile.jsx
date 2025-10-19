@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Api } from "../api/endpoints";
 import Tabs from "../components/Tabs";
@@ -6,9 +6,11 @@ import RatingStars from "../components/RatingStars";
 import Chip from "../components/Chip";
 import { useState } from "react";
 import AvatarUpload from "../components/AvatarUpload";
+import toast from "react-hot-toast";
 
 export default function TechnicianProfile(){
   const { id } = useParams();
+  const nav = useNavigate();
   const { data:t, isLoading, isError } = useQuery({
     queryKey:["tech", id],
     queryFn: () => Api.getTechnician(id)
@@ -55,7 +57,19 @@ export default function TechnicianProfile(){
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <a href={`/chat`} className="px-3 py-2 rounded-2xl border border-slate-300 text-slate-700 hover:bg-slate-50">دردشة</a>
+            <button
+              onClick={async () => {
+                try {
+                  const th = await Api.createThread(t.id);
+                  nav(`/chat/${th.id}`);
+                } catch {
+                  toast.error("تعذر فتح الدردشة");
+                }
+              }}
+              className="px-3 py-2 rounded-2xl border border-slate-300 text-slate-700 hover:bg-slate-50"
+            >
+              مراسلة
+            </button>
             <a href={`tel:0600000000`} className="px-3 py-2 rounded-2xl border border-slate-300 text-slate-700 hover:bg-slate-50">اتصال</a>
             <Link to={`/create-request?technicianId=${t.id}`} className="px-3 py-2 rounded-2xl bg-brand-600 text-white hover:bg-brand-700">حجز خدمة</Link>
           </div>

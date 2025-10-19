@@ -34,6 +34,13 @@ const technicianServices = {
   ],
 };
 
+// Technician portfolio mock store
+const technicianPortfolio = {
+  1: [ { id: "p1", url: "https://picsum.photos/seed/p1/600/400" } ],
+  2: [],
+  3: [],
+};
+
 // Top services catalog (for Home "Top Services")
 const topServices = [
   { id: "ts1", title: "تركيب ثريا", ordersCount: 82, avgPrice: 320, icon: "💡" },
@@ -221,7 +228,7 @@ export const handlers = [
   http.post("/api/v1/auth/register", async ({ request }) => {
     await delay(120);
     const body = await request.json();
-    const { name, email, password, city, phone, role } = body || {};
+    const { name, email, password, city, phone, role, specialties = [], bio = "", isPremium = false } = body || {};
     if (!name || !email || !password || !role) {
       return HttpResponse.json({ message: "حقول ناقصة" }, { status: 400 });
     }
@@ -244,6 +251,23 @@ export const handlers = [
     };
     users.push(created);
     const token = `mock-${created.id}`;
+    // If technicien, also create technician profile record for public endpoints
+    if (role === "technicien") {
+      technicians.push({
+        id: created.id,
+        fullName: name,
+        city: created.city,
+        specialties: Array.isArray(specialties) ? specialties : [],
+        isPremium: Boolean(isPremium),
+        averageRating: 0,
+        lat: 34.02,
+        lng: -6.83,
+        avatarUrl: "",
+        bio: String(bio || ""),
+      });
+      technicianServices[String(created.id)] = technicianServices[String(created.id)] || [];
+      technicianPortfolio[String(created.id)] = technicianPortfolio[String(created.id)] || [];
+    }
     return HttpResponse.json({ user: sanitizeUser(created), token, role: created.role }, { status: 201 });
   }),
 
@@ -359,6 +383,28 @@ export const handlers = [
     await delay(120);
     const list = technicianServices[params.id] || [];
     return HttpResponse.json(list, { status: 200 });
+  }),
+
+  // 🔹 Portfolio endpoints (mock)
+  http.get("/api/v1/technicians/:id/portfolio", async ({ params }) => {
+    await delay(100);
+    return HttpResponse.json(technicianPortfolio[params.id] || [], { status: 200 });
+  }),
+  http.post("/api/v1/technicians/:id/portfolio", async ({ params, request }) => {
+    await delay(120);
+    const body = await request.json().catch(() => ({}));
+    const id = String(Date.now());
+    const item = { id, url: body?.url || body?.imageUrl || `https://picsum.photos/seed/${id}/600/400` };
+    technicianPortfolio[params.id] = technicianPortfolio[params.id] || [];
+    technicianPortfolio[params.id].push(item);
+    return HttpResponse.json(item, { status: 201 });
+  }),
+  http.delete("/api/v1/technicians/:id/portfolio/:imageId", async ({ params }) => {
+    await delay(100);
+    const list = technicianPortfolio[params.id] || [];
+    const idx = list.findIndex((x) => String(x.id) === params.imageId);
+    if (idx !== -1) list.splice(idx, 1);
+    return HttpResponse.json({ ok: true });
   }),
 
   // 🔹 Top Technicians & Services
@@ -515,6 +561,22 @@ export const handlers = [
     return HttpResponse.json(created, { status: 201 });
   }),
 
+  // Create or fetch thread between me and peer
+  http.post("/api/v1/chat/threads", async ({ request }) => {
+    await delay(120);
+    const body = await request.json().catch(() => ({}));
+    const me = body?.me || 3;
+    const peer = Number(body?.peerUserId);
+    if (!peer) return HttpResponse.json({ message: "peerUserId مطلوب" }, { status: 400 });
+    let existing = chatThreads.find((t) => t.participants.includes(me) && t.participants.includes(peer));
+    if (!existing) {
+      existing = { id: `t${Date.now()}`, participants: [me, peer], updatedAt: new Date().toISOString(), lastMessage: "" };
+      chatThreads.push(existing);
+      chatMessages[existing.id] = [];
+    }
+    return HttpResponse.json(existing, { status: 201 });
+  }),
+
   /* ==============================
      UPLOAD (Mock)
      ============================== */
@@ -536,6 +598,50 @@ export const handlers = [
     const seed = encodeURIComponent(`${fileName}-${Date.now()}`);
     const url = `https://picsum.photos/seed/${seed}/600/400`;
     return HttpResponse.json({ url }, { status: 201 });
+  }),
+
+  // ===== Technician self update & services CRUD (mock) =====
+  http.patch("/api/v1/technicians/:id", async ({ params, request }) => {
+    await delay(120);
+    const id = Number(params.id);
+    const body = await request.json().catch(() => ({}));
+    // update in technicians array
+    const tIdx = technicians.findIndex((t) => t.id === id);
+    if (tIdx === -1) return HttpResponse.json({ message: "Not found" }, { status: 404 });
+    technicians[tIdx] = { ...technicians[tIdx], ...body };
+    return HttpResponse.json(technicians[tIdx], { status: 200 });
+  }),
+
+  http.post("/api/v1/technicians/:id/services", async ({ params, request }) => {
+    await delay(120);
+    const id = String(params.id);
+    const body = await request.json().catch(() => ({}));
+    const service = { id: `s${Date.now()}`, title: body?.title || "خدمة", priceFrom: body?.priceFrom, priceTo: body?.priceTo, unit: body?.unit || "خدمة", shortDesc: body?.shortDesc || "" };
+    technicianServices[id] = technicianServices[id] || [];
+    technicianServices[id].push(service);
+    return HttpResponse.json(service, { status: 201 });
+  }),
+
+  http.patch("/api/v1/technicians/:id/services/:sid", async ({ params, request }) => {
+    await delay(120);
+    const id = String(params.id);
+    const sid = String(params.sid);
+    const body = await request.json().catch(() => ({}));
+    const list = technicianServices[id] || [];
+    const idx = list.findIndex((x) => String(x.id) === sid);
+    if (idx === -1) return HttpResponse.json({ message: "Not found" }, { status: 404 });
+    list[idx] = { ...list[idx], ...body };
+    return HttpResponse.json(list[idx], { status: 200 });
+  }),
+
+  http.delete("/api/v1/technicians/:id/services/:sid", async ({ params }) => {
+    await delay(120);
+    const id = String(params.id);
+    const sid = String(params.sid);
+    const list = technicianServices[id] || [];
+    const idx = list.findIndex((x) => String(x.id) === sid);
+    if (idx !== -1) list.splice(idx, 1);
+    return HttpResponse.json({ ok: true });
   }),
 
   // Prevent MSW warning for GET /
