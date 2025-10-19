@@ -5,10 +5,11 @@ import Input from "../components/Input";
 import Button from "../components/Button";
 import ServiceCard from "../components/ServiceCard";
 import TechCard from "../components/TechCard";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Api } from "../api/endpoints";
 
 export default function Home() {
+  const queryClient = useQueryClient();
   const [q, setQ] = useState("");
   const [city, setCity] = useState("");
   const nav = useNavigate();
@@ -196,26 +197,52 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Top Technicians — boxed */}
-      <section className="bg-white border-t border-slate-100">
-        <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 md:pt-14 pb-6 md:pb-8">
+      {/* Top Technicians */}
+      <section className="full-bleed bg-white border-t border-slate-100">
+        <div className="mx-auto max-w-screen-2xl pt-10 md:pt-14 pb-6 md:pb-8 px-4 sm:px-6 lg:px-8">
           <div className="flex items-end justify-between gap-4 mb-6">
             <h2 className="text-2xl font-bold tracking-tight text-slate-900">أعلى الحرفيين تقييماً</h2>
             <span className="hidden md:block text-sm text-slate-500">أفضل خبراء قريبين منك</span>
           </div>
+
+          {/* Error state */}
+          {errTopTechs && !loadingTopTechs && (
+            <div className="rounded-2xl border border-red-200 bg-red-50 text-red-700 p-4 text-right">
+              تعذّر تحميل القائمة.
+              <button
+                onClick={() => queryClient.invalidateQueries({ queryKey: ["top-techs"] })}
+                className="ms-3 underline"
+              >
+                إعادة المحاولة
+              </button>
+            </div>
+          )}
+
+          {/* Empty state */}
+          {!errTopTechs && !loadingTopTechs && Array.isArray(topTechs) && topTechs.length === 0 && (
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 text-slate-600 text-center">
+              لا توجد بيانات متاحة.
+            </div>
+          )}
+
+          {/* Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {loadingTopTechs && Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="h-24 rounded-2xl border border-slate-200 bg-white animate-pulse" />
-            ))}
-            {!loadingTopTechs && !errTopTechs && (Array.isArray(topTechs) ? topTechs : []).map((t) => (
-              <TechCard key={t.id} t={t} />
-            ))}
-            {!loadingTopTechs && (Array.isArray(topTechs) ? topTechs.length === 0 : true) && !errTopTechs && (
-              <div className="col-span-full text-center text-slate-500">لا توجد بيانات متاحة</div>
-            )}
-            {errTopTechs && !loadingTopTechs && (
-              <div className="col-span-full text-center text-red-600">تعذر تحميل القائمة</div>
-            )}
+            {/* Skeletons */}
+            {loadingTopTechs &&
+              Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="rounded-2xl border border-slate-200 bg-white p-4 animate-pulse">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-full bg-slate-200" />
+                    <div className="h-3 w-24 bg-slate-200 rounded" />
+                  </div>
+                  <div className="mt-3 h-3 w-40 bg-slate-200 rounded" />
+                  <div className="mt-4 h-8 w-full bg-slate-200 rounded" />
+                </div>
+              ))}
+
+            {/* Cards */}
+            {!loadingTopTechs && !errTopTechs &&
+              (Array.isArray(topTechs) ? topTechs : []).map((t) => <TechCard key={t.id} t={t} />)}
           </div>
         </div>
       </section>
