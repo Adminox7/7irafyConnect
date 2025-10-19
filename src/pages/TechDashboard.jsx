@@ -82,7 +82,7 @@ export default function TechDashboard(){
       <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
         <div className="mb-2 text-sm text-slate-600">آخر الطلبات</div>
         <div className="divide-y">
-          {recent.map(r => (
+          {(Array.isArray(recent) ? recent : []).map(r => (
             <div key={r.id} className="py-3 flex items-center justify-between">
               <div>
                 <div className="font-medium">{r.title}</div>
@@ -93,7 +93,7 @@ export default function TechDashboard(){
               </div>
             </div>
           ))}
-          {recent.length === 0 && <div className="text-slate-500 text-sm py-6 text-center">لا توجد طلبات بعد.</div>}
+          {(Array.isArray(recent) ? recent.length === 0 : true) && <div className="text-slate-500 text-sm py-6 text-center">لا توجد طلبات بعد.</div>}
         </div>
       </div>
 
@@ -133,7 +133,7 @@ export default function TechDashboard(){
             </tr>
           </thead>
           <tbody>
-            {listAll.map(r => (
+            {(Array.isArray(listAll) ? listAll : []).map(r => (
               <tr key={r.id} className="border-t">
                 <td className="py-2 pr-4">{r.id}</td>
                 <td className="py-2 pr-4">{r.title}</td>
@@ -143,7 +143,7 @@ export default function TechDashboard(){
                 <td className="py-2 pr-4">{r.client}</td>
               </tr>
             ))}
-            {!isLoadingList && listAll.length === 0 && (
+            {!isLoadingList && (Array.isArray(listAll) ? listAll.length === 0 : true) && (
               <tr>
                 <td colSpan="6" className="py-6 text-center text-slate-500">لا توجد بيانات</td>
               </tr>

@@ -11,11 +11,11 @@ export default function TechnicianProfile(){
     queryKey:["tech", id],
     queryFn: () => Api.getTechnician(id)
   });
-  const { data: reviews = [] } = useQuery({
+  const { data: reviews = [], isError: errReviews } = useQuery({
     queryKey: ["tech", id, "reviews"],
     queryFn: () => Api.getTechnicianReviews(id),
   });
-  const { data: services = [] } = useQuery({
+  const { data: services = [], isError: errServices } = useQuery({
     queryKey: ["tech", id, "services"],
     queryFn: () => Api.getTechnicianServices(id),
   });
@@ -91,7 +91,7 @@ export default function TechnicianProfile(){
             content: (
               <div className="rounded-2xl border bg-white p-4 shadow-sm">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {services.map((s) => (
+                  {(Array.isArray(services) ? services : []).map((s) => (
                     <div key={s.id} className="rounded-xl border p-3">
                       <div className="font-medium text-slate-900">{s.title}</div>
                       {s.priceFrom && (
@@ -99,8 +99,11 @@ export default function TechnicianProfile(){
                       )}
                     </div>
                   ))}
-                  {services.length === 0 && (
+                  {(Array.isArray(services) ? services.length === 0 : true) && !errServices && (
                     <div className="text-sm text-slate-500">لا خدمات معلنة</div>
+                  )}
+                  {errServices && (
+                    <div className="text-sm text-red-600">تعذر تحميل الخدمات</div>
                   )}
                 </div>
               </div>
@@ -111,7 +114,7 @@ export default function TechnicianProfile(){
             label: "الآراء",
             content: (
               <div className="rounded-2xl border bg-white p-4 shadow-sm space-y-3">
-                {reviews.map((r) => (
+                {(Array.isArray(reviews) ? reviews : []).map((r) => (
                   <div key={r.id} className="border rounded-xl p-3">
                     <div className="flex items-center justify-between">
                       <div className="font-medium text-slate-900">{r.author}</div>
@@ -121,8 +124,11 @@ export default function TechnicianProfile(){
                     <div className="text-xs text-slate-500 mt-1">{new Date(r.date).toLocaleDateString()}</div>
                   </div>
                 ))}
-                {reviews.length === 0 && (
+                {(Array.isArray(reviews) ? reviews.length === 0 : true) && !errReviews && (
                   <div className="text-sm text-slate-500">لا توجد آراء بعد</div>
+                )}
+                {errReviews && (
+                  <div className="text-sm text-red-600">تعذر تحميل الآراء</div>
                 )}
               </div>
             ),

@@ -14,6 +14,7 @@ import UserProfile from "./pages/UserProfile";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./stores/auth";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 export default function App() {
   const role = useAuthStore((s) => s.role);
@@ -148,6 +149,7 @@ export default function App() {
 
       {/* MAIN — بدون padding باش مايبقاش الفراغ الأبيض */}
       <main className="p-0 min-h-[60vh]" dir="rtl">
+        <ErrorBoundary>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/search" element={<HomeSearch />} />
@@ -194,6 +196,7 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
         </Routes>
+        </ErrorBoundary>
       </main>
 
       {/* FOOTER — حيدنا mt-10 باش يلصق من التحت */}
