@@ -401,4 +401,6 @@ export const handlers = [
     }
     return HttpResponse.json(created, { status: 201 });
   }),
+  // Prevent MSW warning for GET /
+  http.get("/", () => new HttpResponse("OK", { status: 200 })),
 ];

@@ -43,7 +43,7 @@ export default function TechDashboard(){
   const weekly = data?.weekly || [];
 
   return (
-    <div className="space-y-6">
+    <div className="page-shell container max-w-7xl mx-auto px-4 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-slate-900">لوحة الحرفي</h1>
         <Link to="/" className="text-brand-700 hover:text-brand-800 underline">البحث</Link>

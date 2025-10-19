@@ -12,7 +12,7 @@ export default function MyRequests(){
   if (isError) return <div className="text-red-600">وقع خطأ فالإسترجاع. حاول لاحقاً.</div>;
 
   return (
-    <div className="space-y-3">
+    <div className="page-shell container max-w-7xl mx-auto px-4 space-y-3">
       <h2 className="text-xl font-semibold">طلباتي</h2>
       {list.length === 0 && <div className="text-slate-500">ما عندك حتى طلب.</div>}
       {(Array.isArray(list) ? list : []).map(r => (

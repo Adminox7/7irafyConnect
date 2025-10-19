@@ -41,7 +41,7 @@ export default function HomeSearch() {
   }, []);
 
   return (
-    <div className="space-y-6">
+    <div className="page-shell container max-w-7xl mx-auto px-4 space-y-6">
       <h1 className="text-2xl font-bold text-slate-800 text-center">
         لقَى الحرفي القريب ليك
       </h1>

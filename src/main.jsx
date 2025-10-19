@@ -7,19 +7,21 @@ import "./index.css";
 
 const qc = new QueryClient();
 
-if (import.meta.env.DEV) {
-  import("./mocks/browser")
-    .then(({ worker }) =>
-      worker.start({ serviceWorker: { url: "/mockServiceWorker.js" } })
-    );
+async function bootstrap() {
+  if (import.meta.env.DEV) {
+    const { worker } = await import("./mocks/browser");
+    await worker.start({ serviceWorker: { url: "/mockServiceWorker.js" } });
+  }
+
+  ReactDOM.createRoot(document.getElementById("root")).render(
+    <React.StrictMode>
+      <QueryClientProvider client={qc}>
+        <ErrorBoundary>
+          <App />
+        </ErrorBoundary>
+      </QueryClientProvider>
+    </React.StrictMode>
+  );
 }
 
-ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <QueryClientProvider client={qc}>
-      <ErrorBoundary>
-        <App />
-      </ErrorBoundary>
-    </QueryClientProvider>
-  </React.StrictMode>
-);
+bootstrap();

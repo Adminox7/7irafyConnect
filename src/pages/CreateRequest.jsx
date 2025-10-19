@@ -55,7 +55,8 @@ export default function CreateRequest(){
   };
 
   return (
-    <div className="max-w-xl space-y-4">
+    <div className="page-shell container max-w-7xl mx-auto px-4">
+      <div className="max-w-xl space-y-4">
       <h2 className="text-xl font-semibold">إنشاء طلب خدمة</h2>
       <Card className="space-y-3">
         <Input value={title} onChange={(e)=>setTitle(e.target.value)} placeholder="العنوان" />
@@ -68,6 +69,7 @@ export default function CreateRequest(){
           </Button>
         </div>
       </Card>
+      </div>
     </div>
   );
 }

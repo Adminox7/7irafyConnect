@@ -4,6 +4,8 @@ import { Api } from "../api/endpoints";
 import Tabs from "../components/Tabs";
 import RatingStars from "../components/RatingStars";
 import Chip from "../components/Chip";
+import { useState } from "react";
+import AvatarUpload from "../components/AvatarUpload";
 
 export default function TechnicianProfile(){
   const { id } = useParams();
@@ -24,15 +26,24 @@ export default function TechnicianProfile(){
   if (isError) return <div className="text-red-600">وقع خطأ. حاول لاحقاً.</div>;
   if (!t) return <div>ما لقايناهش</div>;
 
+  const [portfolio, setPortfolio] = useState([]);
+
+  function addImage(file) {
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    setPortfolio((prev) => [...prev, url]);
+  }
+  function removeImage(index) {
+    setPortfolio((prev) => prev.filter((_, i) => i !== index));
+  }
+
   return (
-    <div className="space-y-6" dir="rtl">
+    <div className="page-shell container max-w-7xl mx-auto px-4 space-y-6" dir="rtl">
       {/* Header */}
       <section className="rounded-2xl border bg-white p-4 shadow-sm">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-14 w-14 rounded-full bg-brand-100 grid place-items-center text-brand-700 font-bold">
-              {t.fullName?.[0]}
-            </div>
+            <AvatarUpload value={t.avatarUrl} placeholder={t.fullName?.[0] || "ح"} />
             <div>
               <h1 className="text-xl font-semibold text-slate-900">{t.fullName}</h1>
               <div className="text-sm text-slate-600">{t.city} • {t.specialties?.join(", ")}</div>
@@ -138,14 +149,33 @@ export default function TechnicianProfile(){
             label: "الصور",
             content: (
               <div className="rounded-2xl border bg-white p-4 shadow-sm">
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                  {(t.portfolio || []).map((p) => (
-                    <img key={p.id} src={p.url} alt="work" className="rounded-xl object-cover aspect-[4/3]" />
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                  {portfolio.map((src, i) => (
+                    <div key={i} className="relative group rounded-xl overflow-hidden border">
+                      {/* eslint-disable-next-line jsx-a11y/alt-text */}
+                      <img src={src} className="h-40 w-full object-cover" />
+                      <button
+                        onClick={() => removeImage(i)}
+                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition text-white bg-black/50 rounded-full p-1"
+                        aria-label="حذف الصورة"
+                      >
+                        ✕
+                      </button>
+                    </div>
                   ))}
-                  {(!t.portfolio || t.portfolio.length === 0) && (
-                    <div className="text-sm text-slate-500">لا توجد صور</div>
-                  )}
+                  <label className="h-40 border rounded-xl flex items-center justify-center cursor-pointer hover:bg-slate-50">
+                    + إضافة صورة
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="sr-only"
+                      onChange={(e) => addImage(e.target.files?.[0])}
+                    />
+                  </label>
                 </div>
+                {portfolio.length === 0 && (
+                  <div className="text-sm text-slate-500 mt-2">لا توجد صور بعد</div>
+                )}
               </div>
             ),
           },
