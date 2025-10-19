@@ -113,7 +113,7 @@ export default function Home() {
                 className="sm:w-44"
               />
               <motion.div whileHover={r ? undefined : { scale: 1.02 }}>
-                <Button type="submit" aria-label="ابدأ البحث" className="whitespace-nowrap bg-brand-600 hover:bg-brand-700 text-white shadow-soft">
+                <Button type="submit" aria-label="ابدأ البحث" className="mt-2 whitespace-nowrap bg-brand-600 hover:bg-brand-700 text-white shadow-soft">
                   بحث
                 </Button>
               </motion.div>
