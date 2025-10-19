@@ -72,20 +72,17 @@ export default function Home() {
   });
 
   return (
-    <div
-      className="bg-app hero-rings space-y-0 [&>section]:scroll-mt-24"
-      dir="rtl"
-    >
+    <div className="space-y-0 [&>section]:scroll-mt-24" dir="rtl">
 
-      {/* HERO (full-bleed) */}
-      <section className="relative overflow-hidden full-bleed">
+      {/* HERO — خلفية ممتدة + محتوى boxed + طول أكبر */}
+      <section className="relative overflow-hidden">
         <div className="absolute inset-0 -z-10 bg-gradient-to-b from-[#EEF5FF] via-white to-[#F7FBFF]" />
         <div aria-hidden className="pointer-events-none select-none">
           <div className="absolute -top-24 -left-20 h-56 w-56 rounded-full bg-brand-300/35 blur-3xl" />
           <div className="absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-accent-300/35 blur-3xl" />
         </div>
 
-        <div className="mx-auto max-w-screen-2xl text-center pt-20 md:pt-28 pb-10 md:pb-12 px-4 sm:px-6 lg:px-8">
+        <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-24 md:py-36 lg:py-40">
           <motion.div variants={parent} initial="hidden" animate="show">
             <motion.h1 variants={item} className="text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
               نقرّب ليك أحسن الحرفيين القريبين ليك
@@ -137,9 +134,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* WHY US */}
-      <section className="full-bleed bg-slate-50 border-t border-slate-200/60">
-        <div className="mx-auto max-w-screen-2xl pt-10 md:pt-14 pb-6 md:pb-8 px-4 sm:px-6 lg:px-8">
+      {/* WHY US — محتوى boxed داخل خلفية رمادية */}
+      <section className="bg-slate-50 border-t border-slate-200/60">
+        <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 md:pt-14 pb-6 md:pb-8">
           <div className="flex items-end justify-between gap-4 mb-6">
             <h2 className="text-2xl font-bold tracking-tight text-slate-900">ليش تختار منصّتنا؟</h2>
             <span className="hidden md:block text-sm text-slate-500">موثوقية عالية، تجربة سهلة وسريعة</span>
@@ -169,9 +166,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* HOW IT WORKS */}
-      <section className="full-bleed bg-white border-t border-slate-100">
-        <div className="mx-auto max-w-screen-2xl pt-10 md:pt-14 pb-6 md:pb-8 px-4 sm:px-6 lg:px-8">
+      {/* HOW IT WORKS — boxed */}
+      <section className="bg-white border-t border-slate-100">
+        <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 md:pt-14 pb-6 md:pb-8">
           <h2 className="text-2xl font-bold mb-6 text-slate-900">كيف خدامة؟</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
             {["بحث", "اختيار", "تواصل"].map((step, i) => (
@@ -199,9 +196,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Top Technicians */}
-      <section className="full-bleed bg-white border-t border-slate-100">
-        <div className="mx-auto max-w-screen-2xl pt-10 md:pt-14 pb-6 md:pb-8 px-4 sm:px-6 lg:px-8">
+      {/* Top Technicians — boxed */}
+      <section className="bg-white border-t border-slate-100">
+        <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 md:pt-14 pb-6 md:pb-8">
           <div className="flex items-end justify-between gap-4 mb-6">
             <h2 className="text-2xl font-bold tracking-tight text-slate-900">أعلى الحرفيين تقييماً</h2>
             <span className="hidden md:block text-sm text-slate-500">أفضل خبراء قريبين منك</span>
@@ -223,9 +220,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Top Services */}
-      <section className="full-bleed bg-slate-50 border-t border-slate-200/60">
-        <div className="mx-auto max-w-screen-2xl pt-10 md:pt-14 pb-6 md:pb-8 px-4 sm:px-6 lg:px-8">
+      {/* Top Services — boxed */}
+      <section className="bg-slate-50 border-t border-slate-200/60">
+        <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 md:pt-14 pb-6 md:pb-8">
           <div className="flex items-end justify-between gap-4 mb-6">
             <h2 className="text-2xl font-bold tracking-tight text-slate-900">خدمات مطلوبة</h2>
             <span className="hidden md:block text-sm text-slate-500">ابحث بسرعة بالخدمة</span>
@@ -247,12 +244,12 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CATEGORIES */}
-      <section className="full-bleed bg-white border-t border-slate-100">
-        <div className="mx-auto max-w-screen-2xl pt-10 md:pt-14 pb-6 md:pb-8 px-4 sm:px-6 lg:px-8">
+      {/* CATEGORIES — boxed */}
+      <section className="bg-white border-t border-slate-100">
+        <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 md:pt-14 pb-6 md:pb-8">
           <h2 className="text-2xl font-bold mb-4 text-slate-900">أشهر التخصصات</h2>
           <div className="flex gap-2 overflow-x-auto snap-x snap-mandatory pb-2" role="list">
-            {categories.map((c) => (
+            {["كهربائي","سبّاك","نجّار","صبّاغ","حدّاد","ألمنيوم"].map((c) => (
               <Link
                 key={c}
                 role="listitem"
@@ -267,9 +264,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="full-bleed border-t border-slate-100">
-        <div className="mx-auto max-w-screen-2xl pt-10 md:pt-14 pb-10 md:pb-12 px-4 sm:px-6 lg:px-8">
+      {/* CTA — boxed داخل خلفية ممتدة */}
+      <section className="border-t border-slate-100">
+        <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 md:pt-14 pb-10 md:pb-12">
           <div className="rounded-3xl bg-gradient-to-l from-brand-700 to-brand-600 text-white p-8 md:p-10 text-center shadow-md">
             <h2 className="text-white font-bold tracking-tight text-2xl">جاهز تبدا؟</h2>
             <p className="mt-1 text-white/90">اكتشف الحرفيين القريبين ليك أو سجّل كحرفي</p>

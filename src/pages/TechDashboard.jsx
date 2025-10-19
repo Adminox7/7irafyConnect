@@ -122,7 +122,7 @@ export default function TechDashboard(){
         {isLoadingList && <div className="text-slate-500">جارٍ التحميل…</div>}
         {isErrorList && <div className="text-red-600">تعذر تحميل الجدول.</div>}
         <table className="min-w-full text-sm">
-          <thead className="text-left text-slate-500">
+          <thead className="text-right text-slate-500">
             <tr>
               <th className="py-2 pr-4">#</th>
               <th className="py-2 pr-4">العنوان</th>
