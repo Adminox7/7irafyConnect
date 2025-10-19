@@ -45,6 +45,93 @@ const topServices = [
 ];
 
 /* ==============================
+   TOP TECHNICIANS (للقسم الرئيسي)
+   مطابق لـ typedef Technician
+   ============================== */
+const topTechnicians = [
+  {
+    id: 1,
+    fullName: "Tech Pro",
+    city: "الرباط",
+    specialties: ["كهرباء", "تركيب مصابيح"],
+    isPremium: true,
+    averageRating: 4.9,
+    lat: 34.020882,
+    lng: -6.84165,
+  },
+  {
+    id: 2,
+    fullName: "Hassan Fix",
+    city: "الدار البيضاء",
+    specialties: ["سباكة", "تسريب ماء"],
+    isPremium: false,
+    averageRating: 4.7,
+    lat: 33.589886,
+    lng: -7.603869,
+  },
+  {
+    id: 3,
+    fullName: "Mouad Craft",
+    city: "طنجة",
+    specialties: ["نجارة", "ألمنيوم"],
+    isPremium: false,
+    averageRating: 4.6,
+    lat: 35.7595,
+    lng: -5.83395,
+  },
+  {
+    id: 4,
+    fullName: "Fatima Pro",
+    city: "أكادير",
+    specialties: ["صباغة", "ديكور"],
+    isPremium: true,
+    averageRating: 4.8,
+    lat: 30.4278,
+    lng: -9.5981,
+  },
+  {
+    id: 5,
+    fullName: "Said Electro",
+    city: "فاس",
+    specialties: ["كهرباء"],
+    isPremium: false,
+    averageRating: 4.5,
+    lat: 34.0331,
+    lng: -5.0003,
+  },
+  {
+    id: 6,
+    fullName: "Nadia Steel",
+    city: "مراكش",
+    specialties: ["حدادة", "لحام"],
+    isPremium: true,
+    averageRating: 4.7,
+    lat: 31.6295,
+    lng: -7.9811,
+  },
+  {
+    id: 7,
+    fullName: "Youssef Pipes",
+    city: "وجدة",
+    specialties: ["سباكة"],
+    isPremium: false,
+    averageRating: 4.4,
+    lat: 34.6814,
+    lng: -1.9086,
+  },
+  {
+    id: 8,
+    fullName: "Imane Deco",
+    city: "القنيطرة",
+    specialties: ["صباغة", "ديكور"],
+    isPremium: false,
+    averageRating: 4.6,
+    lat: 34.261,
+    lng: -6.58,
+  },
+];
+
+/* ==============================
    AUTH (مستخدمون تجريبياً)
    ============================== */
 let users = [
@@ -276,9 +363,8 @@ export const handlers = [
 
   // 🔹 Top Technicians & Services
   http.get("/api/v1/technicians/top", async () => {
-    await delay(120);
-    const sorted = [...technicians].sort((a, b) => b.averageRating - a.averageRating).slice(0, 8);
-    return HttpResponse.json(sorted, { status: 200 });
+    await delay(250);
+    return HttpResponse.json(topTechnicians, { status: 200 });
   }),
   http.get("/api/v1/services/top", async () => {
     await delay(120);
