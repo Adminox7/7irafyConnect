@@ -199,7 +199,7 @@ export default function Home() {
 
       {/* Top Technicians */}
       <section className="full-bleed bg-white border-t border-slate-100">
-        <div className="mx-auto max-w-screen-2xl pt-10 md:pt-14 pb-6 md:pb-8 px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl pt-10 md:pt-14 pb-6 md:pb-8 px-4 sm:px-6 lg:px-8">
           <div className="flex items-end justify-between gap-4 mb-6">
             <h2 className="text-2xl font-bold tracking-tight text-slate-900">أعلى الحرفيين تقييماً</h2>
             <span className="hidden md:block text-sm text-slate-500">أفضل خبراء قريبين منك</span>
