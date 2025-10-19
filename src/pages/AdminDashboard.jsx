@@ -59,7 +59,7 @@ export default function AdminDashboard() {
         {tLoading && <div className="text-slate-500">جارٍ التحميل…</div>}
         {tError && <div className="text-red-600">تعذر تحميل القائمة</div>}
         <table className="min-w-full text-sm">
-          <thead className="text-left text-slate-500">
+          <thead className="text-right text-slate-500">
             <tr>
               <th className="py-2 pr-4">#</th>
               <th className="py-2 pr-4">الإسم</th>
@@ -102,7 +102,7 @@ export default function AdminDashboard() {
         {rLoading && <div className="text-slate-500">جارٍ التحميل…</div>}
         {rError && <div className="text-red-600">تعذر تحميل الطلبات</div>}
         <table className="min-w-full text-sm">
-          <thead className="text-left text-slate-500">
+          <thead className="text-right text-slate-500">
             <tr>
               <th className="py-2 pr-4">ID</th>
               <th className="py-2 pr-4">الزبون</th>
