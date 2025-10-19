@@ -1,4 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 import { Api } from "../api/endpoints";
 import DashboardCard from "../components/DashboardCard";
 import StatusBadge from "../components/StatusBadge";
@@ -23,6 +24,7 @@ function useRecharts() {
 }
 
 export default function TechDashboard(){
+  const qc = useQueryClient();
   const recharts = useRecharts();
   const { data, isLoading, isError } = useQuery({
     queryKey: ["tech-dashboard"],
@@ -34,6 +36,38 @@ export default function TechDashboard(){
     queryKey: ["tech-requests", status],
     queryFn: () => Api.getTechRequests({ status })
   });
+
+  const makeAction = (kind) => useMutation({
+    mutationFn: (id) => {
+      if (kind === "accept") return Api.acceptRequest(id);
+      if (kind === "start") return Api.startRequest(id);
+      if (kind === "complete") return Api.completeRequest(id);
+      if (kind === "cancel") return Api.cancelRequest(id);
+    },
+    onMutate: async (id) => {
+      await qc.cancelQueries({ queryKey: ["tech-requests"] });
+      const previous = qc.getQueryData(["tech-requests", status]);
+      qc.setQueryData(["tech-requests", status], (prev = []) => {
+        return (prev || []).map((r) => r.id === id ? { ...r, status: kind === "accept" ? "accepted" : kind === "start" ? "in_progress" : kind === "complete" ? "done" : "cancelled" } : r);
+      });
+      return { previous };
+    },
+    onError: (_e, _id, ctx) => {
+      if (ctx?.previous) qc.setQueryData(["tech-requests", status], ctx.previous);
+      toast.error("فشل تنفيذ العملية");
+    },
+    onSuccess: () => {
+      const msg = kind === "accept" ? "تم القبول" : kind === "start" ? "تم البدء" : kind === "complete" ? "تم الإنهاء" : "تم الإلغاء";
+      toast.success(msg);
+      qc.invalidateQueries({ queryKey: ["tech-dashboard"] });
+      qc.invalidateQueries({ queryKey: ["tech-requests"] });
+    }
+  });
+
+  const accept = makeAction("accept");
+  const start = makeAction("start");
+  const complete = makeAction("complete");
+  const cancel = makeAction("cancel");
 
   if (isLoading) return <div>جارٍ التحميل…</div>;
   if (isError) return <div className="text-red-600">وقع خطأ أثناء تحميل اللوحة.</div>;
@@ -130,6 +164,7 @@ export default function TechDashboard(){
               <th className="py-2 pr-4">الحالة</th>
               <th className="py-2 pr-4">السعر (درهم)</th>
               <th className="py-2 pr-4">الزبون</th>
+              <th className="py-2 pr-4">إجراءات</th>
             </tr>
           </thead>
           <tbody>
@@ -141,6 +176,22 @@ export default function TechDashboard(){
                 <td className="py-2 pr-4"><StatusBadge status={r.status} /></td>
                 <td className="py-2 pr-4">{r.price ?? "-"}</td>
                 <td className="py-2 pr-4">{r.client}</td>
+                <td className="py-2 pr-4">
+                  <div className="flex flex-wrap gap-2">
+                    {r.status === "new" && (
+                      <>
+                        <button className="px-3 py-1 rounded-full border text-xs" onClick={() => accept.mutate(r.id)}>قبول</button>
+                        <button className="px-3 py-1 rounded-full border text-xs" onClick={() => cancel.mutate(r.id)}>إلغاء</button>
+                      </>
+                    )}
+                    {r.status === "accepted" && (
+                      <button className="px-3 py-1 rounded-full border text-xs" onClick={() => start.mutate(r.id)}>بدء</button>
+                    )}
+                    {r.status === "in_progress" && (
+                      <button className="px-3 py-1 rounded-full border text-xs" onClick={() => complete.mutate(r.id)}>إنهاء</button>
+                    )}
+                  </div>
+                </td>
               </tr>
             ))}
             {!isLoadingList && (Array.isArray(listAll) ? listAll.length === 0 : true) && (

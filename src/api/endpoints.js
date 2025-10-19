@@ -97,6 +97,9 @@ export const Api = {
     http.get(`technicians/${id}/reviews`).then((r) => r.data),
   getTechnicianServices: (id) =>
     http.get(`technicians/${id}/services`).then((r) => r.data),
+  // Portfolio
+  getTechnicianPortfolio: (id) =>
+    http.get(`technicians/${id}/portfolio`).then((r) => r.data),
 
   /** ✅ ديما Array */
   getTopTechnicians: () =>
@@ -155,4 +158,30 @@ export const Api = {
     http.get(`chat/threads/${threadId}/messages`).then((r) => r.data),
   sendMessage: (threadId, body) =>
     http.post(`chat/threads/${threadId}/messages`, body).then((r) => r.data),
+  createThread: (peerUserId) =>
+    http.post(`chat/threads`, { peerUserId }).then((r) => r.data),
+
+  // ========== TECH (SELF) ==========
+  updateTechnicianProfile: (id, body) =>
+    http.patch(`technicians/${id}`, body).then((r) => r.data),
+  createTechnicianService: (id, body) =>
+    http.post(`technicians/${id}/services`, body).then((r) => r.data),
+  updateTechnicianService: (id, serviceId, body) =>
+    http.patch(`technicians/${id}/services/${serviceId}`, body).then((r) => r.data),
+  deleteTechnicianService: (id, serviceId) =>
+    http.delete(`technicians/${id}/services/${serviceId}`).then((r) => r.data),
+  addPortfolioImage: (id, body) =>
+    http.post(`technicians/${id}/portfolio`, body).then((r) => r.data),
+  deletePortfolioImage: (id, imageId) =>
+    http.delete(`technicians/${id}/portfolio/${imageId}`).then((r) => r.data),
+
+  // Upload helper
+  upload: (fileOrName) => {
+    if (fileOrName instanceof File) {
+      const fd = new FormData();
+      fd.append("file", fileOrName);
+      return http.post("upload", fd, { headers: { "Content-Type": "multipart/form-data" } }).then((r) => r.data);
+    }
+    return http.post("upload", { name: String(fileOrName || "img") }).then((r) => r.data);
+  },
 };

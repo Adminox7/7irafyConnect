@@ -10,7 +10,10 @@ const qc = new QueryClient();
 async function bootstrap() {
   if (import.meta.env.DEV) {
     const { worker } = await import("./mocks/browser");
-    await worker.start({ serviceWorker: { url: "/mockServiceWorker.js" } });
+    await worker.start({
+      serviceWorker: { url: "/mockServiceWorker.js" },
+      onUnhandledRequest: "bypass",
+    });
   }
 
   ReactDOM.createRoot(document.getElementById("root")).render(

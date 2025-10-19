@@ -11,6 +11,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ChatWindow from "./components/ChatWindow";
 import UserProfile from "./pages/UserProfile";
+import TechSelfProfile from "./pages/TechSelfProfile";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./stores/auth";
@@ -160,8 +161,8 @@ export default function App() {
           <Route
             path="/me"
             element={
-              <ProtectedRoute>
-                <UserProfile />
+              <ProtectedRoute role="technicien">
+                <TechSelfProfile />
               </ProtectedRoute>
             }
           />
