@@ -69,7 +69,7 @@ export default function AdminDashboard() {
             </tr>
           </thead>
           <tbody>
-            {pending.map((t) => (
+            {(Array.isArray(pending) ? pending : []).map((t) => (
               <tr key={t.id} className="border-t">
                 <td className="py-2 pr-4">{t.id}</td>
                 <td className="py-2 pr-4">{t.name}</td>
@@ -86,7 +86,7 @@ export default function AdminDashboard() {
                 </td>
               </tr>
             ))}
-            {!tLoading && pending.length === 0 && (
+            {!tLoading && (Array.isArray(pending) ? pending.length === 0 : true) && (
               <tr>
                 <td colSpan="5" className="py-6 text-center text-slate-500">لا يوجد طلبات تحقق معلقة</td>
               </tr>
@@ -112,7 +112,7 @@ export default function AdminDashboard() {
             </tr>
           </thead>
           <tbody>
-            {adminRequests.map((r) => (
+            {(Array.isArray(adminRequests) ? adminRequests : []).map((r) => (
               <tr key={r.id} className="border-t">
                 <td className="py-2 pr-4">{r.id}</td>
                 <td className="py-2 pr-4">{r.client || "-"}</td>
@@ -121,7 +121,7 @@ export default function AdminDashboard() {
                 <td className="py-2 pr-4">{new Date(r.createdAt).toLocaleString()}</td>
               </tr>
             ))}
-            {!rLoading && adminRequests.length === 0 && (
+            {!rLoading && (Array.isArray(adminRequests) ? adminRequests.length === 0 : true) && (
               <tr>
                 <td colSpan="5" className="py-6 text-center text-slate-500">لا توجد طلبات</td>
               </tr>

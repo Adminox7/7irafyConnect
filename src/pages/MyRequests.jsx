@@ -15,7 +15,7 @@ export default function MyRequests(){
     <div className="space-y-3">
       <h2 className="text-xl font-semibold">طلباتي</h2>
       {list.length === 0 && <div className="text-slate-500">ما عندك حتى طلب.</div>}
-      {list.map(r => (
+      {(Array.isArray(list) ? list : []).map(r => (
         <div key={r.id} className="border rounded-lg p-3">
           <div className="font-medium">{r.title}</div>
           <div className="text-sm text-slate-600 flex items-center gap-2">

@@ -62,11 +62,11 @@ export default function Home() {
 
   const categories = ["كهربائي", "سبّاك", "نجّار", "صبّاغ", "حدّاد", "ألمنيوم"];
 
-  const { data: topTechs = [], isFetching: loadingTopTechs } = useQuery({
+  const { data: topTechs = [], isFetching: loadingTopTechs, isError: errTopTechs } = useQuery({
     queryKey: ["top-techs"],
     queryFn: Api.getTopTechnicians,
   });
-  const { data: topServices = [], isFetching: loadingTopServices } = useQuery({
+  const { data: topServices = [], isFetching: loadingTopServices, isError: errTopServices } = useQuery({
     queryKey: ["top-services"],
     queryFn: Api.getTopServices,
   });
@@ -210,9 +210,15 @@ export default function Home() {
             {loadingTopTechs && Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="h-24 rounded-2xl border border-slate-200 bg-white animate-pulse" />
             ))}
-            {!loadingTopTechs && topTechs.map((t) => (
+            {!loadingTopTechs && !errTopTechs && (Array.isArray(topTechs) ? topTechs : []).map((t) => (
               <TechCard key={t.id} t={t} />
             ))}
+            {!loadingTopTechs && (Array.isArray(topTechs) ? topTechs.length === 0 : true) && !errTopTechs && (
+              <div className="col-span-full text-center text-slate-500">لا توجد بيانات متاحة</div>
+            )}
+            {errTopTechs && !loadingTopTechs && (
+              <div className="col-span-full text-center text-red-600">تعذر تحميل القائمة</div>
+            )}
           </div>
         </div>
       </section>
@@ -228,9 +234,15 @@ export default function Home() {
             {loadingTopServices && Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="h-28 rounded-2xl border border-slate-200 bg-white animate-pulse" />
             ))}
-            {!loadingTopServices && topServices.map((s) => (
+            {!loadingTopServices && !errTopServices && (Array.isArray(topServices) ? topServices : []).map((s) => (
               <ServiceCard key={s.id} s={s} />
             ))}
+            {!loadingTopServices && (Array.isArray(topServices) ? topServices.length === 0 : true) && !errTopServices && (
+              <div className="col-span-full text-center text-slate-500">لا توجد بيانات متاحة</div>
+            )}
+            {errTopServices && !loadingTopServices && (
+              <div className="col-span-full text-center text-red-600">تعذر تحميل القائمة</div>
+            )}
           </div>
         </div>
       </section>

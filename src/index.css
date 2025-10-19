@@ -24,6 +24,13 @@ body, #root { min-height: 100%; }
   padding-inline: max(1rem, calc(50vw - 50%));
 }
 
+/* Ensure containers are consistent across sections */
+.section-container {
+  max-width: 1536px; /* tailwind 2xl */
+  margin-inline: auto;
+  padding-inline: clamp(1rem, 4vw, 2rem);
+}
+
 .hero-rings {
   background:
     radial-gradient(1200px 500px at 90% -10%, rgba(14,165,233,.08), transparent 60%),
