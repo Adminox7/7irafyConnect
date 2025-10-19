@@ -29,7 +29,8 @@ export default function Login() {
   };
 
   return (
-    <div className="max-w-md mx-auto">
+    <div className="page-shell container max-w-7xl mx-auto px-4">
+      <div className="max-w-md mx-auto">
       <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <h1 className="text-xl font-semibold mb-4 text-slate-900">تسجيل الدخول</h1>
         <form onSubmit={submit} className="space-y-3" dir="rtl">
@@ -61,6 +62,7 @@ export default function Login() {
         <div className="mt-3 text-sm text-slate-600 text-right">
           ما عندكش حساب؟ <Link to="/register" className="text-brand-700 hover:text-brand-800 underline">حساب جديد</Link>
         </div>
+      </div>
       </div>
     </div>
   );

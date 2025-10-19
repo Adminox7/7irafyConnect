@@ -7,6 +7,16 @@ export const http = axios.create({
   baseURL: "/api/v1",
 });
 
+// Show a single error toast per message id to avoid spam
+export function showErrorOnce(message, id) {
+  try {
+    const key = id || `err:${String(message || "").slice(0, 80)}`;
+    if (!toast.isActive(key)) {
+      toast.error(message, { id: key });
+    }
+  } catch {}
+}
+
 // Attach Authorization header from auth store
 http.interceptors.request.use((config) => {
   try {
@@ -19,7 +29,7 @@ http.interceptors.request.use((config) => {
   return config;
 });
 
-// Normalize error responses and show friendly message
+// Normalize error responses and show friendly message (de-duplicated)
 http.interceptors.response.use(
   (r) => r,
   (error) => {
@@ -30,9 +40,9 @@ http.interceptors.response.use(
     // Non-spammy toast: only for network or 5xx/4xx (excluding 401 on auth pages)
     if (!error?.config?.suppressToast) {
       if (!status || status >= 500 || status === 0) {
-        toast.error(message);
+        showErrorOnce(message);
       } else if (status >= 400 && status !== 401) {
-        toast.error(message);
+        showErrorOnce(message);
       }
     }
     // Reject with a normalized error object

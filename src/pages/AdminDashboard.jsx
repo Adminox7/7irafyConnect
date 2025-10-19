@@ -31,7 +31,7 @@ export default function AdminDashboard() {
   });
 
   return (
-    <div className="space-y-6" dir="rtl">
+    <div className="page-shell container max-w-7xl mx-auto px-4 space-y-6" dir="rtl">
       <h1 className="text-2xl font-bold">لوحة الإدارة</h1>
 
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">

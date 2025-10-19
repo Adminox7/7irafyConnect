@@ -24,6 +24,16 @@ body, #root { min-height: 100%; }
   padding-inline: max(1rem, calc(50vw - 50%));
 }
 
+/* صفحة بقشرة موحّدة لفراغ رأسي نظيف عبر الصفحات */
+.page-shell {
+  padding-block: 2.5rem;
+}
+@media (min-width: 768px) {
+  .page-shell {
+    padding-block: 3.5rem;
+  }
+}
+
 /* Ensure containers are consistent across sections */
 .section-container {
   max-width: 1536px; /* tailwind 2xl */

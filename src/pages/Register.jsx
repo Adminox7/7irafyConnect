@@ -32,8 +32,8 @@ export default function Register() {
   };
 
   return (
-    <div className="max-w-md mx-auto">
-      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm" dir="rtl">
+    <div className="page-shell container max-w-7xl mx-auto px-4">
+      <div className="max-w-md mx-auto rounded-2xl border border-slate-200 bg-white p-6 shadow-sm" dir="rtl">
         <h1 className="text-xl font-semibold mb-4 text-slate-900">حساب جديد</h1>
         <form onSubmit={submit} className="space-y-3">
           <div className="flex gap-3">

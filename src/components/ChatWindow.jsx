@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Api } from "../api/endpoints";
+import { showErrorOnce } from "../api/http";
 import toast from "react-hot-toast";
 
 function MessageBubble({ m, meId, onRetry }) {
@@ -74,7 +75,7 @@ export default function ChatWindow() {
       qc.setQueryData(["threads", meId], (prev = []) => prev.map((t) => t.id === currentThreadId ? { ...t, lastMessage: created.text, updatedAt: created.createdAt } : t));
     },
     onError: () => {
-      toast.error("تعذر إرسال الرسالة");
+      showErrorOnce("تعذر إرسال الرسالة", "send-fail");
       // Mark last optimistic as failed for retry UI
       qc.setQueryData(["messages", currentThreadId], (prev = []) => {
         const copy = [...prev];
@@ -132,9 +133,10 @@ export default function ChatWindow() {
   const [showSidebar, setShowSidebar] = useState(false);
 
   return (
-    <div className="grid md:grid-cols-[260px_1fr] gap-4" dir="rtl">
+    <div className="page-shell container max-w-7xl mx-auto px-4">
+      <div className="grid gap-4 md:grid-cols-[260px_1fr]" dir="rtl">
       {/* Sidebar */}
-      <aside className={`rounded-2xl border bg-white p-3 shadow-sm h-[70vh] overflow-auto md:block ${showSidebar ? "block" : "hidden"}`}>
+      <aside className={`rounded-2xl border bg-white p-3 shadow-sm h-[70vh] overflow-auto ${showSidebar ? "block" : "hidden md:block"}`}>
         <div className="text-sm text-slate-600 mb-2">الدردشات</div>
         <div className="space-y-2">
           {(Array.isArray(threads) ? threads : []).map((t) => (
@@ -219,6 +221,7 @@ export default function ChatWindow() {
           <div className="text-[10px] text-slate-500 mt-1">Enter للإرسال — Shift+Enter لسطر جديد</div>
         </footer>
       </section>
+      </div>
     </div>
   );
 }
