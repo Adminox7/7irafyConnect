@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import Input from "../components/Input";
@@ -7,7 +7,6 @@ import ServiceCard from "../components/ServiceCard";
 import TechCard from "../components/TechCard";
 import { useQuery } from "@tanstack/react-query";
 import { Api } from "../api/endpoints";
-
 
 export default function Home() {
   const [q, setQ] = useState("");
@@ -23,9 +22,8 @@ export default function Home() {
     nav(`/search?${p.toString()}`);
   };
 
-  // animations
-  const parent = r ? {} : { hidden: {opacity:0, y:14}, show: {opacity:1, y:0, transition:{staggerChildren:.06}} };
-  const item   = r ? {} : { hidden: {opacity:0, y:10}, show: {opacity:1, y:0} };
+  const parent = r ? {} : { hidden: { opacity: 0, y: 14 }, show: { opacity: 1, y: 0, transition: { staggerChildren: .06 } } };
+  const item   = r ? {} : { hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } };
 
   const features = [
     { t: "سريع", s: "تواصل فوري", icon: (
@@ -64,7 +62,6 @@ export default function Home() {
 
   const categories = ["كهربائي", "سبّاك", "نجّار", "صبّاغ", "حدّاد", "ألمنيوم"];
 
-  // Top sections data
   const { data: topTechs = [], isFetching: loadingTopTechs } = useQuery({
     queryKey: ["top-techs"],
     queryFn: Api.getTopTechnicians,
@@ -75,19 +72,20 @@ export default function Home() {
   });
 
   return (
-    
-    <div className="space-y-20" dir="rtl" >
-      {/* HERO */}
-      <section className="relative overflow-hidden">
-        {/* background gradient band */}
-        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-slate-50 via-white to-white" />
-        {/* soft decor blobs */}
+    <div
+      className="bg-app hero-rings space-y-0 [&>section]:scroll-mt-24"
+      dir="rtl"
+    >
+
+      {/* HERO (full-bleed) */}
+      <section className="relative overflow-hidden full-bleed">
+        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-[#EEF5FF] via-white to-[#F7FBFF]" />
         <div aria-hidden className="pointer-events-none select-none">
-          <div className="absolute -top-24 -left-20 h-56 w-56 rounded-full bg-brand-200/50 blur-3xl" />
-          <div className="absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-brand-300/40 blur-3xl" />
+          <div className="absolute -top-24 -left-20 h-56 w-56 rounded-full bg-brand-300/35 blur-3xl" />
+          <div className="absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-accent-300/35 blur-3xl" />
         </div>
 
-        <div className="container max-w-6xl mx-auto text-center py-16 md:py-24">
+        <div className="mx-auto max-w-screen-2xl text-center pt-20 md:pt-28 pb-10 md:pb-12 px-4 sm:px-6 lg:px-8">
           <motion.div variants={parent} initial="hidden" animate="show">
             <motion.h1 variants={item} className="text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
               نقرّب ليك أحسن الحرفيين القريبين ليك
@@ -96,7 +94,6 @@ export default function Home() {
               بحث ذكي حسب التخصص والمدينة، وشوف التقييمات قبل ما تتواصل.
             </motion.p>
 
-            {/* search */}
             <motion.form
               variants={item}
               onSubmit={go}
@@ -118,7 +115,9 @@ export default function Home() {
                 className="sm:w-44"
               />
               <motion.div whileHover={r ? undefined : { scale: 1.02 }}>
-                <Button type="submit" aria-label="ابدأ البحث" className="whitespace-nowrap">بحث</Button>
+                <Button type="submit" aria-label="ابدأ البحث" className="whitespace-nowrap bg-brand-600 hover:bg-brand-700 text-white shadow-soft">
+                  بحث
+                </Button>
               </motion.div>
             </motion.form>
 
@@ -128,10 +127,9 @@ export default function Home() {
               </Link>
             </motion.div>
 
-            {/* trust strip */}
-            <motion.div variants={item} className="mt-10">
+            <motion.div variants={item} className="mt-6">
               <div className="mx-auto inline-flex items-center gap-3 rounded-full bg-white/80 backdrop-blur px-4 py-2 border border-slate-200 shadow-sm">
-                <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                <span className="h-2 w-2 rounded-full bg-accent-500" />
                 <span className="text-sm text-slate-700">+1,000 زبون راضين خلال آخر 30 يوم</span>
               </div>
             </motion.div>
@@ -140,76 +138,76 @@ export default function Home() {
       </section>
 
       {/* WHY US */}
-      <section className="py-16 md:py-24 bg-slate-50">
-        <div className="container max-w-6xl mx-auto">
-        <div className="flex items-end justify-between gap-4 mb-6">
-          <h2 className="text-2xl font-bold tracking-tight text-slate-900">ليش تختار منصّتنا؟</h2>
-          <span className="hidden md:block text-sm text-slate-500">موثوقية عالية، تجربة سهلة وسريعة</span>
-        </div>
+      <section className="full-bleed bg-slate-50 border-t border-slate-200/60">
+        <div className="mx-auto max-w-screen-2xl pt-10 md:pt-14 pb-6 md:pb-8 px-4 sm:px-6 lg:px-8">
+          <div className="flex items-end justify-between gap-4 mb-6">
+            <h2 className="text-2xl font-bold tracking-tight text-slate-900">ليش تختار منصّتنا؟</h2>
+            <span className="hidden md:block text-sm text-slate-500">موثوقية عالية، تجربة سهلة وسريعة</span>
+          </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-          {features.map((f, i) => (
-            <motion.div
-              key={f.t}
-              initial={r ? false : { opacity: 0, y: 8 }}
-              whileInView={r ? undefined : { opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: .2 }}
-              whileHover={r ? undefined : { y: -6, scale: 1.01 }}
-              transition={{ type:"spring", stiffness:260, damping:18, delay:i*0.03 }}
-              className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-lg text-right"
-            >
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 flex items-center justify-center rounded-2xl bg-brand-50 text-brand-700">
-                  {f.icon}
+          <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+            {features.map((f, i) => (
+              <motion.div
+                key={f.t}
+                initial={r ? false : { opacity: 0, y: 8 }}
+                whileInView={r ? undefined : { opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: .2 }}
+                whileHover={r ? undefined : { y: -6, scale: 1.01 }}
+                transition={{ type:"spring", stiffness:260, damping:18, delay:i*0.03 }}
+                className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-lg text-right"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 flex items-center justify-center rounded-2xl bg-brand-50 text-brand-700">
+                    {f.icon}
+                  </div>
+                  <div className="text-lg font-semibold text-slate-900">{f.t}</div>
                 </div>
-                <div className="text-lg font-semibold text-slate-900">{f.t}</div>
-              </div>
-              <div className="text-slate-600 text-sm mt-2 leading-relaxed">{f.s}</div>
-            </motion.div>
-          ))}
-        </div>
+                <div className="text-slate-600 text-sm mt-2 leading-relaxed">{f.s}</div>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* HOW IT WORKS */}
-      <section className="py-16 md:py-24">
-        <div className="container max-w-6xl mx-auto">
-        <h2 className="text-2xl font-bold mb-6 text-slate-900">كيف خدامة؟</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-          {["بحث", "اختيار", "تواصل"].map((step, i) => (
-            <motion.div
-              key={step}
-              initial={r ? false : { opacity: 0, y: 10 }}
-              whileInView={r ? undefined : { opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: .2 }}
-              className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
-            >
-              <div className="flex items-center gap-3">
-                <div className="h-9 w-9 rounded-full bg-gradient-to-l from-brand-600 to-brand-400 text-white flex items-center justify-center font-semibold">
-                  {i + 1}
+      <section className="full-bleed bg-white border-t border-slate-100">
+        <div className="mx-auto max-w-screen-2xl pt-10 md:pt-14 pb-6 md:pb-8 px-4 sm:px-6 lg:px-8">
+          <h2 className="text-2xl font-bold mb-6 text-slate-900">كيف خدامة؟</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+            {["بحث", "اختيار", "تواصل"].map((step, i) => (
+              <motion.div
+                key={step}
+                initial={r ? false : { opacity: 0, y: 10 }}
+                whileInView={r ? undefined : { opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: .2 }}
+                className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="h-9 w-9 rounded-full bg-gradient-to-l from-brand-600 to-brand-400 text-white flex items-center justify-center font-semibold">
+                    {i + 1}
+                  </div>
+                  <h3 className="text-lg font-semibold text-slate-900">{step}</h3>
                 </div>
-                <h3 className="text-lg font-semibold text-slate-900">{step}</h3>
-              </div>
-              <p className="text-slate-600 text-sm mt-2">
-                {i === 0 && "كتب التخصص والمدينة"} 
-                {i === 1 && "قارن الملفات والتقييمات"} 
-                {i === 2 && "تواصل مباشرة وخذ موعد"}
-              </p>
-            </motion.div>
-          ))}
-        </div>
+                <p className="text-slate-600 text-sm mt-2">
+                  {i === 0 && "كتب التخصص والمدينة"}
+                  {i === 1 && "قارن الملفات والتقييمات"}
+                  {i === 2 && "تواصل مباشرة وخذ موعد"}
+                </p>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* Top Technicians */}
-      <section className="py-16 md:py-24">
-        <div className="container max-w-6xl mx-auto">
+      <section className="full-bleed bg-white border-t border-slate-100">
+        <div className="mx-auto max-w-screen-2xl pt-10 md:pt-14 pb-6 md:pb-8 px-4 sm:px-6 lg:px-8">
           <div className="flex items-end justify-between gap-4 mb-6">
             <h2 className="text-2xl font-bold tracking-tight text-slate-900">أعلى الحرفيين تقييماً</h2>
             <span className="hidden md:block text-sm text-slate-500">أفضل خبراء قريبين منك</span>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {loadingTopTechs && Array.from({ length: 3 }).map((_, i) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {loadingTopTechs && Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="h-24 rounded-2xl border border-slate-200 bg-white animate-pulse" />
             ))}
             {!loadingTopTechs && topTechs.map((t) => (
@@ -220,14 +218,14 @@ export default function Home() {
       </section>
 
       {/* Top Services */}
-      <section className="py-16 md:py-24 bg-slate-50">
-        <div className="container max-w-6xl mx-auto">
+      <section className="full-bleed bg-slate-50 border-t border-slate-200/60">
+        <div className="mx-auto max-w-screen-2xl pt-10 md:pt-14 pb-6 md:pb-8 px-4 sm:px-6 lg:px-8">
           <div className="flex items-end justify-between gap-4 mb-6">
             <h2 className="text-2xl font-bold tracking-tight text-slate-900">خدمات مطلوبة</h2>
             <span className="hidden md:block text-sm text-slate-500">ابحث بسرعة بالخدمة</span>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {loadingTopServices && Array.from({ length: 3 }).map((_, i) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {loadingTopServices && Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="h-28 rounded-2xl border border-slate-200 bg-white animate-pulse" />
             ))}
             {!loadingTopServices && topServices.map((s) => (
@@ -238,52 +236,53 @@ export default function Home() {
       </section>
 
       {/* CATEGORIES */}
-      <section className="py-16 md:py-24">
-        <div className="container max-w-6xl mx-auto">
-        <h2 className="text-2xl font-bold mb-4 text-slate-900">أشهر التخصصات</h2>
-        <div className="flex gap-2 overflow-x-auto snap-x snap-mandatory pb-2" role="list">
-          {categories.map((c) => (
-            <Link
-              key={c}
-              role="listitem"
-              to={`/search?q=${encodeURIComponent(c)}`}
-              className="shrink-0 snap-start px-4 py-2 rounded-full bg-white border border-slate-300 text-slate-700 hover:bg-brand-50 hover:border-brand-300 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300"
-              aria-label={`تصنيف ${c}`}
-            >
-              {c}
-            </Link>
-          ))}
-        </div>
+      <section className="full-bleed bg-white border-t border-slate-100">
+        <div className="mx-auto max-w-screen-2xl pt-10 md:pt-14 pb-6 md:pb-8 px-4 sm:px-6 lg:px-8">
+          <h2 className="text-2xl font-bold mb-4 text-slate-900">أشهر التخصصات</h2>
+          <div className="flex gap-2 overflow-x-auto snap-x snap-mandatory pb-2" role="list">
+            {categories.map((c) => (
+              <Link
+                key={c}
+                role="listitem"
+                to={`/search?q=${encodeURIComponent(c)}`}
+                className="shrink-0 snap-start px-4 py-2 rounded-full bg-white border border-slate-300 text-slate-700 hover:bg-brand-50 hover:border-brand-300 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300"
+                aria-label={`تصنيف ${c}`}
+              >
+                {c}
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="py-16 md:py-24">
-        <div className="container max-w-6xl mx-auto">
-        <div className="rounded-3xl bg-gradient-to-l from-brand-700 to-brand-600 text-white p-8 md:p-10 text-center shadow-md">
-          <h2 className="text-white font-bold tracking-tight text-2xl">جاهز تبدا؟</h2>
-          <p className="mt-1 text-white/90">اكتشف الحرفيين القريبين ليك أو سجّل كحرفي</p>
-          <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
-            <motion.div whileHover={r ? undefined : { scale: 1.02 }}>
-              <Link
-                to="/search"
-                className="inline-flex items-center justify-center px-5 py-2 rounded-2xl bg-white text-brand-700 shadow-sm hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
-              >
-                إلى صفحة البحث
-              </Link>
-            </motion.div>
-            <motion.div whileHover={r ? undefined : { scale: 1.02 }}>
-              <Link
-                to="/register?role=technicien"
-                className="inline-flex items-center justify-center px-5 py-2 rounded-2xl border border-white/80 text-white hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
-              >
-                سجّل كحرفي
-              </Link>
-            </motion.div>
+      <section className="full-bleed border-t border-slate-100">
+        <div className="mx-auto max-w-screen-2xl pt-10 md:pt-14 pb-10 md:pb-12 px-4 sm:px-6 lg:px-8">
+          <div className="rounded-3xl bg-gradient-to-l from-brand-700 to-brand-600 text-white p-8 md:p-10 text-center shadow-md">
+            <h2 className="text-white font-bold tracking-tight text-2xl">جاهز تبدا؟</h2>
+            <p className="mt-1 text-white/90">اكتشف الحرفيين القريبين ليك أو سجّل كحرفي</p>
+            <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
+              <motion.div whileHover={r ? undefined : { scale: 1.02 }}>
+                <Link
+                  to="/search"
+                  className="inline-flex items-center justify-center px-5 py-2 rounded-2xl bg-white text-brand-700 shadow-sm hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+                >
+                  إلى صفحة البحث
+                </Link>
+              </motion.div>
+              <motion.div whileHover={r ? undefined : { scale: 1.02 }}>
+                <Link
+                  to="/register?role=technicien"
+                  className="inline-flex items-center justify-center px-5 py-2 rounded-2xl border border-white/80 text-white hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+                >
+                  سجّل كحرفي
+                </Link>
+              </motion.div>
+            </div>
           </div>
         </div>
-        </div>
       </section>
+
     </div>
   );
 }

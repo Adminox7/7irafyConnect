@@ -1,5 +1,16 @@
 import { http } from "./http";
 
+/** ===== Helpers: normalize payloads ===== */
+const toArray = (payload) => {
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.data)) return payload.data;
+  if (Array.isArray(payload?.items)) return payload.items;
+  if (Array.isArray(payload?.results)) return payload.results;
+  if (Array.isArray(payload?.technicians)) return payload.technicians;
+  if (Array.isArray(payload?.services)) return payload.services;
+  return [];
+};
+
 /**
  * @typedef {Object} Technician
  * @property {number} id
@@ -59,7 +70,6 @@ export const Api = {
 
   // ========== ADMIN ==========
   getAdminMetrics: () => http.get("admin/metrics").then((r) => r.data),
-  // New: compact admin stats card
   getAdminStats: () => http.get("admin/stats").then((r) => r.data),
   getAdminTechnicians: (params) =>
     http.get("admin/technicians", { params }).then((r) => r.data),
@@ -83,17 +93,26 @@ export const Api = {
    * @returns {Promise<Technician>}
    */
   getTechnician: (id) => http.get(`technicians/${id}`).then((r) => r.data),
-  getTechnicianReviews: (id) => http.get(`technicians/${id}/reviews`).then((r) => r.data),
-  getTechnicianServices: (id) => http.get(`technicians/${id}/services`).then((r) => r.data),
-  getTopTechnicians: () => http.get("technicians/top").then((r) => r.data),
-  getTopServices: () => http.get("services/top").then((r) => r.data),
+  getTechnicianReviews: (id) =>
+    http.get(`technicians/${id}/reviews`).then((r) => r.data),
+  getTechnicianServices: (id) =>
+    http.get(`technicians/${id}/services`).then((r) => r.data),
+
+  /** ✅ ديما Array */
+  getTopTechnicians: () =>
+    http.get("technicians/top").then((r) => toArray(r.data)),
+
+  /** ✅ ديما Array */
+  getTopServices: () =>
+    http.get("services/top").then((r) => toArray(r.data)),
 
   /**
    * إنشاء طلب خدمة جديد
    * @param {{ title: string, city: string, description: string, technicianId?: number }} body
    * @returns {Promise<ServiceRequest>}
    */
-  createRequest: (body) => http.post("requests", body).then((r) => r.data),
+  createRequest: (body) =>
+    http.post("requests", body).then((r) => r.data),
 
   /**
    * طلباتي (الزبون)
@@ -120,13 +139,20 @@ export const Api = {
    * @param {number|string} id
    * @returns {Promise<ServiceRequest>}
    */
-  acceptRequest: (id) => http.post(`tech/requests/${id}/accept`).then((r) => r.data),
-  startRequest: (id) => http.post(`tech/requests/${id}/start`).then((r) => r.data),
-  completeRequest: (id) => http.post(`tech/requests/${id}/complete`).then((r) => r.data),
-  cancelRequest: (id) => http.post(`tech/requests/${id}/cancel`).then((r) => r.data),
+  acceptRequest: (id) =>
+    http.post(`tech/requests/${id}/accept`).then((r) => r.data),
+  startRequest: (id) =>
+    http.post(`tech/requests/${id}/start`).then((r) => r.data),
+  completeRequest: (id) =>
+    http.post(`tech/requests/${id}/complete`).then((r) => r.data),
+  cancelRequest: (id) =>
+    http.post(`tech/requests/${id}/cancel`).then((r) => r.data),
 
   // ========== CHAT ==========
-  getChatThreads: (me) => http.get("chat/threads", { params: { me } }).then((r) => r.data),
-  getThreadMessages: (threadId) => http.get(`chat/threads/${threadId}/messages`).then((r) => r.data),
-  sendMessage: (threadId, body) => http.post(`chat/threads/${threadId}/messages`, body).then((r) => r.data),
+  getChatThreads: (me) =>
+    http.get("chat/threads", { params: { me } }).then((r) => r.data),
+  getThreadMessages: (threadId) =>
+    http.get(`chat/threads/${threadId}/messages`).then((r) => r.data),
+  sendMessage: (threadId, body) =>
+    http.post(`chat/threads/${threadId}/messages`, body).then((r) => r.data),
 };
