@@ -1,4 +1,4 @@
-import { http, HttpResponse } from "msw";
+import { http, HttpResponse, delay } from "msw";
 
 /* ==============================
    TECHNICIANS (حرفيين تجريبياً)
@@ -13,7 +13,7 @@ const technicians = [
 const technicianReviews = {
   1: [
     { id: "r1", author: "Amine L.", rating: 5, comment: "خدمة ممتازة و سريع", date: new Date().toISOString() },
-    { id: "r2", author: "Sara B.", rating: 4, comment: "دقيق فالمواعيد", date: new Date(Date.now()-86400000).toISOString() },
+    { id: "r2", author: "Sara B.", rating: 4, comment: "دقيق فالمواعيد", date: new Date(Date.now() - 86400000).toISOString() },
   ],
   2: [
     { id: "r3", author: "Yassine T.", rating: 5, comment: "حل المشكل فالساعة", date: new Date().toISOString() },
@@ -23,14 +23,14 @@ const technicianReviews = {
 
 const technicianServices = {
   1: [
-    { id: "s1", title: "تصليح كهرباء خفيفة", priceFrom: 150, priceTo: 300 },
-    { id: "s2", title: "تركيب ثريا", priceFrom: 200, priceTo: 400 },
+    { id: "s1", title: "تصليح كهرباء خفيفة", priceFrom: 150, priceTo: 300, unit: "خدمة", shortDesc: "إصلاح أعطال بسيطة" },
+    { id: "s2", title: "تركيب ثريا", priceFrom: 200, priceTo: 400, unit: "خدمة", shortDesc: "تركيب آمن ومنظم" },
   ],
   2: [
-    { id: "s3", title: "تصليح تسريب ماء", priceFrom: 120, priceTo: 280 },
+    { id: "s3", title: "تصليح تسريب ماء", priceFrom: 120, priceTo: 280, unit: "خدمة", shortDesc: "كشف و إصلاح التسريب" },
   ],
   3: [
-    { id: "s4", title: "صباغة غرفة", priceFrom: 400, priceTo: 800 },
+    { id: "s4", title: "صباغة غرفة", priceFrom: 400, priceTo: 800, unit: "خدمة", shortDesc: "صباغة نظيفة وسريعة" },
   ],
 };
 
@@ -40,6 +40,8 @@ const topServices = [
   { id: "ts2", title: "تصليح تسريب ماء", ordersCount: 65, avgPrice: 250, icon: "🚰" },
   { id: "ts3", title: "صباغة غرفة", ordersCount: 41, avgPrice: 650, icon: "🎨" },
   { id: "ts4", title: "تركيب محبس ماء", ordersCount: 23, avgPrice: 180, icon: "🔧" },
+  { id: "ts5", title: "تركيب ستالايت", ordersCount: 51, avgPrice: 220, icon: "📡" },
+  { id: "ts6", title: "تنظيف مكيف", ordersCount: 37, avgPrice: 200, icon: "❄️" },
 ];
 
 /* ==============================
@@ -74,11 +76,13 @@ let requests = [
    HELPERS
    ============================== */
 function kpiFromRequests(items) {
-  const newC = items.filter(x => x.status === "new").length;
-  const accC = items.filter(x => x.status === "accepted").length;
-  const progC = items.filter(x => x.status === "in_progress").length;
-  const doneC = items.filter(x => x.status === "done").length;
-  const revenue = items.filter(x => x.status === "done").reduce((s, x) => s + (x.price || 0), 0);
+  const newC = items.filter((x) => x.status === "new").length;
+  const accC = items.filter((x) => x.status === "accepted").length;
+  const progC = items.filter((x) => x.status === "in_progress").length;
+  const doneC = items.filter((x) => x.status === "done").length;
+  const revenue = items
+    .filter((x) => x.status === "done")
+    .reduce((s, x) => s + (x.price || 0), 0);
   return { newC, accC, progC, doneC, revenue };
 }
 
@@ -87,7 +91,7 @@ function weeklySeries(items) {
     const d = new Date();
     d.setDate(d.getDate() - (6 - i));
     const key = d.toISOString().slice(0, 10);
-    const count = items.filter(x => x.createdAt.slice(0, 10) === key).length;
+    const count = items.filter((x) => x.createdAt.slice(0, 10) === key).length;
     return { date: key.slice(5), requests: count };
   });
   return days;
@@ -128,6 +132,7 @@ export const handlers = [
      AUTH ROUTES
      ============================== */
   http.post("/api/v1/auth/register", async ({ request }) => {
+    await delay(120);
     const body = await request.json();
     const { name, email, password, city, phone, role } = body || {};
     if (!name || !email || !password || !role) {
@@ -156,6 +161,7 @@ export const handlers = [
   }),
 
   http.post("/api/v1/auth/login", async ({ request }) => {
+    await delay(120);
     const body = await request.json();
     const { email, password } = body || {};
     const u = users.find((x) => x.email.toLowerCase() === String(email).toLowerCase() && x.password === password);
@@ -164,7 +170,8 @@ export const handlers = [
     return HttpResponse.json({ token, role: u.role, user: sanitizeUser(u) }, { status: 200 });
   }),
 
-  http.get("/api/v1/auth/me", ({ request }) => {
+  http.get("/api/v1/auth/me", async ({ request }) => {
+    await delay(120);
     const auth = request.headers.get("authorization") || request.headers.get("Authorization");
     if (!auth) return HttpResponse.json({ message: "غير مصرح" }, { status: 401 });
     const parts = auth.split(" ");
@@ -178,12 +185,13 @@ export const handlers = [
   /* ==============================
      ADMIN ROUTES
      ============================== */
-  http.get("/api/v1/admin/metrics", () => {
-    const technicians = users.filter((u) => u.role === "technicien");
-    const pendingTechnicians = technicians.filter((t) => !t.verified);
+  http.get("/api/v1/admin/metrics", async () => {
+    await delay(120);
+    const techniciansUsers = users.filter((u) => u.role === "technicien");
+    const pendingTechnicians = techniciansUsers.filter((t) => !t.verified);
     const metrics = {
       users: users.length,
-      technicians: technicians.length,
+      technicians: techniciansUsers.length,
       pendingTechnicians: pendingTechnicians.length,
       totalRequests: requests.length,
       revenue: kpiFromRequests(requests).revenue,
@@ -191,8 +199,9 @@ export const handlers = [
     return HttpResponse.json(metrics, { status: 200 });
   }),
 
-  // New: Admin stats per contract { technicians, users, newRequestsWeek, avgRating }
-  http.get("/api/v1/admin/stats", () => {
+  // Admin stats
+  http.get("/api/v1/admin/stats", async () => {
+    await delay(120);
     const techniciansUsers = users.filter((u) => u.role === "technicien");
     const newRequestsWeek = weeklySeries(requests).reduce((s, x) => s + x.requests, 0);
     const ratings = technicians.map((t) => t.averageRating).filter((x) => Number.isFinite(x));
@@ -205,15 +214,17 @@ export const handlers = [
     });
   }),
 
-  http.get("/api/v1/admin/technicians", ({ request }) => {
+  http.get("/api/v1/admin/technicians", async ({ request }) => {
+    await delay(120);
     const url = new URL(request.url);
     const status = url.searchParams.get("status") || "pending";
-    const technicians = users.filter((u) => u.role === "technicien");
-    const filtered = status === "pending" ? technicians.filter((t) => !t.verified) : technicians;
+    const techniciansUsers = users.filter((u) => u.role === "technicien");
+    const filtered = status === "pending" ? techniciansUsers.filter((t) => !t.verified) : techniciansUsers;
     return HttpResponse.json(filtered.map(sanitizeUser), { status: 200 });
   }),
 
-  http.patch("/api/v1/admin/technicians/:id/verify", ({ params }) => {
+  http.patch("/api/v1/admin/technicians/:id/verify", async ({ params }) => {
+    await delay(120);
     const id = Number(params.id);
     const idx = users.findIndex((u) => u.id === id && u.role === "technicien");
     if (idx === -1) return HttpResponse.json({ message: "Not found" }, { status: 404 });
@@ -221,8 +232,9 @@ export const handlers = [
     return HttpResponse.json(sanitizeUser(users[idx]), { status: 200 });
   }),
 
-  // New: General PATCH to update technician record (verified/status)
+  // General PATCH to update technician record (verified/status)
   http.patch("/api/v1/admin/technicians/:id", async ({ params, request }) => {
+    await delay(120);
     const id = Number(params.id);
     const body = await request.json().catch(() => ({}));
     const idx = users.findIndex((u) => u.id === id && u.role === "technicien");
@@ -232,46 +244,50 @@ export const handlers = [
   }),
 
   // 🔹 البحث عن الحرفيين
-  http.get("/api/v1/technicians", ({ request }) => {
+  http.get("/api/v1/technicians", async ({ request }) => {
+    await delay(120);
     const url = new URL(request.url);
     const city = (url.searchParams.get("city") || "").toLowerCase();
     const q = (url.searchParams.get("q") || "").toLowerCase();
-    const res = technicians.filter(t =>
-      (!city || t.city.toLowerCase().includes(city)) &&
-      (!q || t.fullName.toLowerCase().includes(q) || t.specialties.join(",").includes(q))
+    const res = technicians.filter(
+      (t) => (!city || t.city.toLowerCase().includes(city)) && (!q || t.fullName.toLowerCase().includes(q) || t.specialties.join(",").includes(q))
     );
     return HttpResponse.json(res);
   }),
 
   // 🔹 جلب تفاصيل الحرفي
-  http.get("/api/v1/technicians/:id", ({ params }) => {
-    const t = technicians.find(x => String(x.id) === params.id);
-    return t
-      ? HttpResponse.json(t)
-      : HttpResponse.json({ message: "Not found" }, { status: 404 });
+  http.get("/api/v1/technicians/:id", async ({ params }) => {
+    await delay(120);
+    const t = technicians.find((x) => String(x.id) === params.id);
+    return t ? HttpResponse.json(t) : HttpResponse.json({ message: "Not found" }, { status: 404 });
   }),
 
   // 🔹 خدمات و مراجعات الحرفي
-  http.get("/api/v1/technicians/:id/reviews", ({ params }) => {
+  http.get("/api/v1/technicians/:id/reviews", async ({ params }) => {
+    await delay(120);
     const list = technicianReviews[params.id] || [];
     return HttpResponse.json(list, { status: 200 });
   }),
-  http.get("/api/v1/technicians/:id/services", ({ params }) => {
+  http.get("/api/v1/technicians/:id/services", async ({ params }) => {
+    await delay(120);
     const list = technicianServices[params.id] || [];
     return HttpResponse.json(list, { status: 200 });
   }),
 
   // 🔹 Top Technicians & Services
-  http.get("/api/v1/technicians/top", () => {
-    const sorted = [...technicians].sort((a, b) => b.averageRating - a.averageRating).slice(0, 6);
+  http.get("/api/v1/technicians/top", async () => {
+    await delay(120);
+    const sorted = [...technicians].sort((a, b) => b.averageRating - a.averageRating).slice(0, 8);
     return HttpResponse.json(sorted, { status: 200 });
   }),
-  http.get("/api/v1/services/top", () => {
+  http.get("/api/v1/services/top", async () => {
+    await delay(120);
     return HttpResponse.json(topServices, { status: 200 });
   }),
 
   // 🔹 إنشاء طلب جديد
   http.post("/api/v1/requests", async ({ request }) => {
+    await delay(120);
     const body = await request.json();
     const r = { id: Date.now(), status: "new", price: undefined, client: "", ...body, createdAt: new Date().toISOString() };
     requests.unshift(r);
@@ -279,17 +295,20 @@ export const handlers = [
   }),
 
   // 🔹 عرض جميع الطلبات ديال المستخدم
-  http.get("/api/v1/requests/me", () => {
+  http.get("/api/v1/requests/me", async () => {
+    await delay(120);
     return HttpResponse.json(requests, { status: 200 });
   }),
 
   // Admin: list requests table
-  http.get("/api/v1/admin/requests", () => {
+  http.get("/api/v1/admin/requests", async () => {
+    await delay(120);
     return HttpResponse.json(requests, { status: 200 });
   }),
 
   // 🔹 Dashboard KPIs و آخر الطلبات
-  http.get("/api/v1/tech/dashboard", () => {
+  http.get("/api/v1/tech/dashboard", async () => {
+    await delay(120);
     return HttpResponse.json({
       kpi: kpiFromRequests(requests),
       recent: requests.slice(0, 5),
@@ -298,18 +317,20 @@ export const handlers = [
   }),
 
   // 🔹 عرض الطلبات حسب الحالة
-  http.get("/api/v1/tech/requests", ({ request }) => {
+  http.get("/api/v1/tech/requests", async ({ request }) => {
+    await delay(120);
     const url = new URL(request.url);
     const status = url.searchParams.get("status") || "all";
-    const list = status === "all" ? requests : requests.filter(x => x.status === status);
+    const list = status === "all" ? requests : requests.filter((x) => x.status === status);
     return HttpResponse.json(list, { status: 200 });
   }),
 
   /* ==============================
      TECH REQUEST ACTIONS (mock)
      ============================== */
-  http.post("/api/v1/tech/requests/:id/accept", ({ params }) => {
-    const idx = requests.findIndex(r => String(r.id) === params.id);
+  http.post("/api/v1/tech/requests/:id/accept", async ({ params }) => {
+    await delay(120);
+    const idx = requests.findIndex((r) => String(r.id) === params.id);
     if (idx === -1) return HttpResponse.json({ message: "Not found" }, { status: 404 });
     const current = requests[idx];
     if (current.status !== "new") {
@@ -320,8 +341,9 @@ export const handlers = [
     return HttpResponse.json(updated, { status: 200 });
   }),
 
-  http.post("/api/v1/tech/requests/:id/start", ({ params }) => {
-    const idx = requests.findIndex(r => String(r.id) === params.id);
+  http.post("/api/v1/tech/requests/:id/start", async ({ params }) => {
+    await delay(120);
+    const idx = requests.findIndex((r) => String(r.id) === params.id);
     if (idx === -1) return HttpResponse.json({ message: "Not found" }, { status: 404 });
     const current = requests[idx];
     if (current.status !== "accepted") {
@@ -332,8 +354,9 @@ export const handlers = [
     return HttpResponse.json(updated, { status: 200 });
   }),
 
-  http.post("/api/v1/tech/requests/:id/complete", ({ params }) => {
-    const idx = requests.findIndex(r => String(r.id) === params.id);
+  http.post("/api/v1/tech/requests/:id/complete", async ({ params }) => {
+    await delay(120);
+    const idx = requests.findIndex((r) => String(r.id) === params.id);
     if (idx === -1) return HttpResponse.json({ message: "Not found" }, { status: 404 });
     const current = requests[idx];
     if (current.status !== "in_progress") {
@@ -344,8 +367,9 @@ export const handlers = [
     return HttpResponse.json(updated, { status: 200 });
   }),
 
-  http.post("/api/v1/tech/requests/:id/cancel", ({ params }) => {
-    const idx = requests.findIndex(r => String(r.id) === params.id);
+  http.post("/api/v1/tech/requests/:id/cancel", async ({ params }) => {
+    await delay(120);
+    const idx = requests.findIndex((r) => String(r.id) === params.id);
     if (idx === -1) return HttpResponse.json({ message: "Not found" }, { status: 404 });
     const current = requests[idx];
     if (current.status === "done" || current.status === "cancelled") {
@@ -359,7 +383,8 @@ export const handlers = [
   /* ==============================
      CHAT ROUTES (Front-only)
      ============================== */
-  http.get("/api/v1/chat/threads", ({ request }) => {
+  http.get("/api/v1/chat/threads", async ({ request }) => {
+    await delay(120);
     const url = new URL(request.url);
     const me = Number(url.searchParams.get("me") || getAuthUserIdFromHeaders(request.headers) || 0);
     const list = chatThreads
@@ -377,12 +402,14 @@ export const handlers = [
     return HttpResponse.json(list, { status: 200 });
   }),
 
-  http.get("/api/v1/chat/threads/:id/messages", ({ params, request }) => {
+  http.get("/api/v1/chat/threads/:id/messages", async ({ params }) => {
+    await delay(120);
     const list = chatMessages[params.id] || [];
     return HttpResponse.json(list, { status: 200 });
   }),
 
   http.post("/api/v1/chat/threads/:id/messages", async ({ params, request }) => {
+    await delay(120);
     const body = await request.json().catch(() => ({}));
     const fromUserId = getAuthUserIdFromHeaders(request.headers) || body.fromUserId || 0;
     const created = {
@@ -401,6 +428,30 @@ export const handlers = [
     }
     return HttpResponse.json(created, { status: 201 });
   }),
+
+  /* ==============================
+     UPLOAD (Mock)
+     ============================== */
+  http.post("/api/v1/upload", async ({ request }) => {
+    await delay(180);
+    // Support both JSON and multipart; generate a mock URL
+    let fileName = "img";
+    try {
+      const ctype = request.headers.get("content-type") || "";
+      if (ctype.includes("multipart/form-data")) {
+        const fd = await request.formData();
+        const f = fd.get("file");
+        if (typeof f === "object" && f && "name" in f) fileName = f.name || fileName;
+      } else {
+        const body = await request.json().catch(() => ({}));
+        fileName = body?.name || fileName;
+      }
+    } catch {}
+    const seed = encodeURIComponent(`${fileName}-${Date.now()}`);
+    const url = `https://picsum.photos/seed/${seed}/600/400`;
+    return HttpResponse.json({ url }, { status: 201 });
+  }),
+
   // Prevent MSW warning for GET /
   http.get("/", () => new HttpResponse("OK", { status: 200 })),
 ];
