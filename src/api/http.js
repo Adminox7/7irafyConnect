@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 // Keep axios baseURL fixed for dev/MSW; switch via README when needed
 export const http = axios.create({
   baseURL: "/api/v1",
+   withCredentials: false,
 });
 
 // Show a single error toast per message id to avoid spam

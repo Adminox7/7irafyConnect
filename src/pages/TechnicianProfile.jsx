@@ -8,35 +8,77 @@ import { useState } from "react";
 import AvatarUpload from "../components/AvatarUpload";
 import toast from "react-hot-toast";
 
-export default function TechnicianProfile(){
+export default function TechnicianProfile() {
   const { id } = useParams();
   const nav = useNavigate();
-  const { data:t, isLoading, isError } = useQuery({
-    queryKey:["tech", id],
-    queryFn: () => Api.getTechnician(id)
-  });
-  const { data: reviews = [], isError: errReviews } = useQuery({
-    queryKey: ["tech", id, "reviews"],
-    queryFn: () => Api.getTechnicianReviews(id),
-  });
-  const { data: services = [], isError: errServices } = useQuery({
-    queryKey: ["tech", id, "services"],
-    queryFn: () => Api.getTechnicianServices(id),
-  });
 
-  if (isLoading) return <div className="text-slate-500">جارٍ التحميل…</div>;
-  if (isError) return <div className="text-red-600">وقع خطأ. حاول لاحقاً.</div>;
-  if (!t) return <div>ما لقايناهش</div>;
-
+  // ✅ Hooks لازم يكونو ديما قبل أي return مشروط
   const [portfolio, setPortfolio] = useState([]);
 
+  const {
+    data: t,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["tech", id],
+    queryFn: () => Api.getTechnician(id),
+    enabled: !!id,
+  });
+
+  const {
+    data: reviews = [],
+    isError: errReviews,
+  } = useQuery({
+    queryKey: ["tech", id, "reviews"],
+    queryFn: () => Api.getTechnicianReviews(id),
+    enabled: !!id,
+  });
+
+  const {
+    data: services = [],
+    isError: errServices,
+  } = useQuery({
+    queryKey: ["tech", id, "services"],
+    queryFn: () => Api.getTechnicianServices(id),
+    enabled: !!id,
+  });
+
+  // Handlers
   function addImage(file) {
     if (!file) return;
     const url = URL.createObjectURL(file);
     setPortfolio((prev) => [...prev, url]);
   }
+
   function removeImage(index) {
     setPortfolio((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  // Early returns آمنة دابا حيث جميع الHooks فوق
+  if (isLoading) {
+    return (
+      <div className="page-shell container max-w-7xl mx-auto px-4" dir="rtl">
+        <div className="h-28 rounded-2xl border border-slate-200 bg-white animate-pulse mt-6" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="page-shell container max-w-7xl mx-auto px-4" dir="rtl">
+        <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-700 mt-6">
+          وقع خطأ. حاول لاحقاً.
+        </div>
+      </div>
+    );
+  }
+
+  if (!t) {
+    return (
+      <div className="page-shell container max-w-7xl mx-auto px-4" dir="rtl">
+        <div className="rounded-2xl border bg-white p-6 mt-6">ما لقايناهش</div>
+      </div>
+    );
   }
 
   return (
@@ -48,10 +90,16 @@ export default function TechnicianProfile(){
             <AvatarUpload value={t.avatarUrl} placeholder={t.fullName?.[0] || "ح"} />
             <div>
               <h1 className="text-xl font-semibold text-slate-900">{t.fullName}</h1>
-              <div className="text-sm text-slate-600">{t.city} • {t.specialties?.join(", ")}</div>
+              <div className="text-sm text-slate-600">
+                {t.city} • {Array.isArray(t.specialties) ? t.specialties.join(", ") : ""}
+              </div>
               <div className="flex items-center gap-2 mt-1">
                 <RatingStars value={t.averageRating || 0} />
-                <span className="text-xs text-slate-600">{t.averageRating?.toFixed ? t.averageRating.toFixed(1) : t.averageRating}</span>
+                <span className="text-xs text-slate-600">
+                  {typeof t.averageRating === "number"
+                    ? t.averageRating.toFixed(1)
+                    : t.averageRating}
+                </span>
                 {t.isPremium && <span className="text-amber-600 text-xs">★ بريميوم</span>}
               </div>
             </div>
@@ -70,8 +118,18 @@ export default function TechnicianProfile(){
             >
               مراسلة
             </button>
-            <a href={`tel:0600000000`} className="px-3 py-2 rounded-2xl border border-slate-300 text-slate-700 hover:bg-slate-50">اتصال</a>
-            <Link to={`/create-request?technicianId=${t.id}`} className="px-3 py-2 rounded-2xl bg-brand-600 text-white hover:bg-brand-700">حجز خدمة</Link>
+            <a
+              href={`tel:0600000000`}
+              className="px-3 py-2 rounded-2xl border border-slate-300 text-slate-700 hover:bg-slate-50"
+            >
+              اتصال
+            </a>
+            <Link
+              to={`/create-request?technicianId=${t.id}`}
+              className="px-3 py-2 rounded-2xl bg-brand-600 text-white hover:bg-brand-700"
+            >
+              حجز خدمة
+            </Link>
           </div>
         </div>
       </section>
@@ -81,9 +139,13 @@ export default function TechnicianProfile(){
         <div className="rounded-2xl border bg-white p-4 shadow-sm">
           <div className="text-sm text-slate-600 mb-2">التوفر هذا الأسبوع</div>
           <div className="flex flex-wrap gap-2">
-            {"الأحد الإثنين الثلاثاء الأربعاء الخميس الجمعة السبت".split(" ").map((d, i) => (
-              <Chip key={d} selected={i % 2 === 0}>{d}</Chip>
-            ))}
+            {"الأحد الإثنين الثلاثاء الأربعاء الخميس الجمعة السبت"
+              .split(" ")
+              .map((d, i) => (
+                <Chip key={d} selected={i % 2 === 0}>
+                  {d}
+                </Chip>
+              ))}
           </div>
         </div>
         <div className="rounded-2xl border bg-white p-4 shadow-sm">
@@ -100,10 +162,12 @@ export default function TechnicianProfile(){
             label: "نبذة",
             content: (
               <div className="rounded-2xl border bg-white p-4 shadow-sm space-y-2">
-                <div className="text-slate-700 leading-relaxed">{t.bio || "حرفي محترف يقدم خدمات بجودة عالية"}</div>
+                <div className="text-slate-700 leading-relaxed">
+                  {t.bio || "حرفي محترف يقدم خدمات بجودة عالية"}
+                </div>
                 <div className="text-sm text-slate-600">يغطي المدن: {t.city}</div>
                 <div className="flex flex-wrap gap-2 mt-2">
-                  {t.specialties?.map((s) => (
+                  {(Array.isArray(t.specialties) ? t.specialties : []).map((s) => (
                     <Chip key={s}>{s}</Chip>
                   ))}
                 </div>
@@ -120,10 +184,13 @@ export default function TechnicianProfile(){
                     <div key={s.id} className="rounded-xl border p-3">
                       <div className="font-medium text-slate-900">{s.title}</div>
                       {s.priceFrom && (
-                        <div className="text-sm text-slate-600 mt-1">{s.priceFrom} - {s.priceTo || s.priceFrom} درهم</div>
+                        <div className="text-sm text-slate-600 mt-1">
+                          {s.priceFrom} - {s.priceTo || s.priceFrom} درهم
+                        </div>
                       )}
                     </div>
                   ))}
+
                   {(Array.isArray(services) ? services.length === 0 : true) && !errServices && (
                     <div className="text-sm text-slate-500">لا خدمات معلنة</div>
                   )}
@@ -146,9 +213,12 @@ export default function TechnicianProfile(){
                       <RatingStars value={r.rating} />
                     </div>
                     <div className="text-sm text-slate-700 mt-1">{r.comment}</div>
-                    <div className="text-xs text-slate-500 mt-1">{new Date(r.date).toLocaleDateString()}</div>
+                    <div className="text-xs text-slate-500 mt-1">
+                      {new Date(r.date).toLocaleDateString()}
+                    </div>
                   </div>
                 ))}
+
                 {(Array.isArray(reviews) ? reviews.length === 0 : true) && !errReviews && (
                   <div className="text-sm text-slate-500">لا توجد آراء بعد</div>
                 )}
@@ -183,7 +253,10 @@ export default function TechnicianProfile(){
                       type="file"
                       accept="image/*"
                       className="sr-only"
-                      onChange={(e) => addImage(e.target.files?.[0])}
+                      onChange={(e) => {
+                        const file = (e.target.files && e.target.files[0]) || null;
+                        if (file) addImage(file);
+                      }}
                     />
                   </label>
                 </div>

@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Link, NavLink } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Link, NavLink, Navigate } from "react-router-dom";
 import Logo from "./components/Logo";
 import Home from "./pages/Home";
 import HomeSearch from "./pages/HomeSearch";
@@ -48,7 +48,7 @@ export default function App() {
               البحث
             </NavLink>
 
-            {(role === "technicien" || role === "client") && (
+            {(role === "technicien" || role === "client" || role === "admin") && (
               <NavLink
                 to="/requests"
                 className={({ isActive }) =>
@@ -112,8 +112,9 @@ export default function App() {
               </>
             ) : (
               <div className="flex items-center gap-2">
+                {/* 👇 هنا التعديل: إذا كان Technicien نمشيو مباشرة لـ /me/tech */}
                 <NavLink
-                  to="/me"
+                  to={role === "technicien" ? "/me/tech" : "/me"}
                   className={({ isActive }) =>
                     `text-sm px-3 py-1.5 rounded-2xl border ${
                       isActive
@@ -148,59 +149,70 @@ export default function App() {
         </div>
       </header>
 
-      {/* MAIN — بدون padding باش مايبقاش الفراغ الأبيض */}
+      {/* MAIN */}
       <main className="p-0 min-h-[60vh]" dir="rtl">
         <ErrorBoundary>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/search" element={<HomeSearch />} />
-          <Route path="/technicians/:id" element={<TechnicianProfile />} />
-          <Route path="/create-request" element={<CreateRequest />} />
-          <Route path="/chat/:threadId?" element={<ChatWindow />} />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/search" element={<HomeSearch />} />
+            <Route path="/technicians/:id" element={<TechnicianProfile />} />
+            <Route path="/create-request" element={<CreateRequest />} />
+            <Route path="/chat/:threadId?" element={<ChatWindow />} />
 
-          <Route
-            path="/me"
-            element={
-              <ProtectedRoute role="technicien">
-                <TechSelfProfile />
-              </ProtectedRoute>
-            }
-          />
+            {/* /me: متاح لأي مستخدم مسجّل. إذا كان Technicien نحولوه أوتوماتيكياً لـ /me/tech */}
+            <Route
+              path="/me"
+              element={
+                <ProtectedRoute>
+                  {role === "technicien" ? <Navigate to="/me/tech" replace /> : <UserProfile />}
+                </ProtectedRoute>
+              }
+            />
 
-          <Route
-            path="/requests"
-            element={
-              <ProtectedRoute>
-                <MyRequests />
-              </ProtectedRoute>
-            }
-          />
+            {/* بروفايل الحرفي الذاتي */}
+            <Route
+              path="/me/tech"
+              element={
+                <ProtectedRoute role="technicien">
+                  <TechSelfProfile />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute role="technicien">
-                <TechDashboard />
-              </ProtectedRoute>
-            }
-          />
+            <Route
+              path="/requests"
+              element={
+                <ProtectedRoute>
+                  <MyRequests />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute role="admin">
-                <AdminDashboard />
-              </ProtectedRoute>
-            }
-          />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute role="technicien">
+                  <TechDashboard />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-        </Routes>
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute role="admin">
+                  <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+          </Routes>
         </ErrorBoundary>
       </main>
 
-      {/* FOOTER — حيدنا mt-10 باش يلصق من التحت */}
+      {/* FOOTER */}
       <footer className="border-t border-slate-200 bg-slate-50" dir="rtl">
         <div className="container max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-3 gap-6 text-right text-slate-600">
           <div>
