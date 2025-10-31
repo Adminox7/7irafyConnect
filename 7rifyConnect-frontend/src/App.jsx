@@ -1,3 +1,4 @@
+// src/App.jsx
 import { BrowserRouter, Routes, Route, Link, NavLink, Navigate } from "react-router-dom";
 import Logo from "./components/Logo";
 import Home from "./pages/Home";
@@ -18,9 +19,11 @@ import { useAuthStore } from "./stores/auth";
 import ErrorBoundary from "./components/ErrorBoundary";
 
 export default function App() {
-  const role = useAuthStore((s) => s.role);
-  const token = useAuthStore((s) => s.token);
+  // استخدم selectors منفصلة (أكثر استقراراً)
+  const user   = useAuthStore((s) => s.user);
+  const token  = useAuthStore((s) => s.token);
   const logout = useAuthStore((s) => s.logout);
+  const role   = user?.role;
 
   return (
     <BrowserRouter>
@@ -48,7 +51,7 @@ export default function App() {
               البحث
             </NavLink>
 
-            {(role === "technicien" || role === "client" || role === "admin") && (
+            {token && (
               <NavLink
                 to="/requests"
                 className={({ isActive }) =>
@@ -112,7 +115,6 @@ export default function App() {
               </>
             ) : (
               <div className="flex items-center gap-2">
-                {/* 👇 هنا التعديل: إذا كان Technicien نمشيو مباشرة لـ /me/tech */}
                 <NavLink
                   to={role === "technicien" ? "/me/tech" : "/me"}
                   className={({ isActive }) =>
@@ -159,7 +161,7 @@ export default function App() {
             <Route path="/create-request" element={<CreateRequest />} />
             <Route path="/chat/:threadId?" element={<ChatWindow />} />
 
-            {/* /me: متاح لأي مستخدم مسجّل. إذا كان Technicien نحولوه أوتوماتيكياً لـ /me/tech */}
+            {/* /me */}
             <Route
               path="/me"
               element={
@@ -169,7 +171,7 @@ export default function App() {
               }
             />
 
-            {/* بروفايل الحرفي الذاتي */}
+            {/* Tech self profile */}
             <Route
               path="/me/tech"
               element={
@@ -211,53 +213,6 @@ export default function App() {
           </Routes>
         </ErrorBoundary>
       </main>
-
-      {/* FOOTER */}
-      <footer className="border-t border-slate-200 bg-slate-50" dir="rtl">
-        <div className="container max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-3 gap-6 text-right text-slate-600">
-          <div>
-            <Logo withText className="mb-2" />
-            <p className="text-sm leading-relaxed">
-              منصة تربطك بأفضل الحرفيين القريبين منك بسرعة وثقة.
-            </p>
-          </div>
-
-          <div>
-            <div className="font-semibold text-slate-900 mb-2">روابط</div>
-            <nav className="flex flex-col gap-1 text-sm">
-              <Link
-                to="/search"
-                className="hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300 rounded-md px-1"
-              >
-                البحث
-              </Link>
-              <Link
-                to="/register"
-                className="hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300 rounded-md px-1"
-              >
-                حساب جديد
-              </Link>
-              <Link
-                to="/login"
-                className="hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300 rounded-md px-1"
-              >
-                تسجيل الدخول
-              </Link>
-            </nav>
-          </div>
-
-          <div>
-            <div className="font-semibold text-slate-900 mb-2">تواصل</div>
-            <div className="text-sm">contact@7irafyconnect.com</div>
-          </div>
-        </div>
-
-        <div className="border-t border-slate-200">
-          <div className="container max-w-7xl mx-auto px-4 py-4 text-xs text-slate-500 text-center">
-            © {new Date().getFullYear()} 7irafyConnect. كل الحقوق محفوظة.
-          </div>
-        </div>
-      </footer>
 
       <Toaster position="top-center" />
     </BrowserRouter>

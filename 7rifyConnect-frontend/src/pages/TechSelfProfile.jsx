@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Api } from "../api/endpoints";
 import { useAuthStore } from "../stores/auth";
@@ -10,65 +10,104 @@ import Input from "../components/Input";
 import toast from "react-hot-toast";
 
 export default function TechSelfProfile() {
-  const user = useAuthStore((s) => s.user);
-  const meId = user?.id ?? 2; // fallback to seeded tech id
   const qc = useQueryClient();
+  const user = useAuthStore((s) => s.user);
 
-  // Queries (ثابتة ديما)
-  const meQ = useQuery({
-    queryKey: ["tech", "profile", meId],
-    queryFn: () => Api.getTechnician(meId),
-    enabled: !!meId,
+  // technicianId يُفضَّل يجي من الـuser (مثلاً ارسلناه من /auth/me)
+  const technicianId = useMemo(
+    () => user?.technicianId ?? user?.technician_id ?? null,
+    [user]
+  );
+
+  /* ────────────────────────────── QUERIES ────────────────────────────── */
+  // بروفايل عام للحرفي (للـعرض فقط) — نحتاج technicianId
+  const techQ = useQuery({
+    queryKey: ["tech", "public", technicianId],
+    queryFn: () => Api.getTechnician(technicianId),
+    enabled: !!technicianId,
   });
 
+  // خدماتي (لا يوجد GET /tech/me/services في الراوتر، لذا نجيبها عبر /technicians/:id/services)
   const servicesQ = useQuery({
-    queryKey: ["tech", meId, "services"],
-    queryFn: () => Api.getTechnicianServices(meId),
-    enabled: !!meId,
+    queryKey: ["tech", technicianId, "services"],
+    queryFn: () => Api.getTechnicianServices(technicianId),
+    enabled: !!technicianId,
   });
 
+  // معرض الأعمال الذاتي عبر /tech/me/portfolio (ما كيتطلبش id)
   const portfolioQ = useQuery({
-    queryKey: ["tech", meId, "portfolio"],
-    queryFn: () => Api.getTechnicianPortfolio(meId),
-    enabled: !!meId,
+    queryKey: ["tech", "me", "portfolio"],
+    queryFn: () => Api.getMyPortfolio(),
   });
 
-  // Mutations
+  /* ──────────────────────────── MUTATIONS ───────────────────────────── */
+  // تحديث بروفايلي الذاتي عبر /tech/me
   const upd = useMutation({
-    mutationFn: (body) => Api.updateTechnicianProfile(meId, body),
+    mutationFn: (body) =>
+      Api.updateMyTechProfile({
+        // نرسل snake_case للباك
+        full_name: body.fullName,
+        city: body.city,
+        phone: body.phone,
+        bio: body.bio,
+        specialties: body.specialties ?? [],
+        is_premium: !!body.isPremium,
+      }),
     onSuccess: () => {
       toast.success("تم حفظ التغييرات");
-      qc.invalidateQueries({ queryKey: ["tech", "profile", meId] });
+      qc.invalidateQueries({ queryKey: ["tech", "public", technicianId] });
     },
-    onError: () => toast.error("تعذر الحفظ"),
+    onError: () => toast.error("تعذّر الحفظ"),
   });
 
+  // الخدمات الذاتيّة عبر /tech/me/services
   const svcCreate = useMutation({
-    mutationFn: (body) => Api.createTechnicianService(meId, body),
+    mutationFn: (b) =>
+      Api.createMyService({
+        title: b.title,
+        shortDesc: b.shortDesc,
+        priceFrom: b.priceFrom,
+        priceTo: b.priceTo,
+      }),
     onSuccess: () => {
       toast.success("تمت الإضافة");
-      qc.invalidateQueries({ queryKey: ["tech", meId, "services"] });
+      qc.invalidateQueries({ queryKey: ["tech", technicianId, "services"] });
     },
-    onError: () => toast.error("تعذر الإضافة"),
+    onError: () => toast.error("تعذّر الإضافة"),
   });
 
   const svcUpdate = useMutation({
-    mutationFn: ({ sid, body }) => Api.updateTechnicianService(meId, sid, body),
-    onSuccess: () =>
-      qc.invalidateQueries({ queryKey: ["tech", meId, "services"] }),
-    onError: () => toast.error("تعذر التعديل"),
+    mutationFn: ({ sid, body }) => Api.updateMyService(sid, body),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["tech", technicianId, "services"] });
+      toast.success("تم التعديل");
+    },
+    onError: () => toast.error("تعذّر التعديل"),
   });
 
   const svcDelete = useMutation({
-    mutationFn: (sid) => Api.deleteTechnicianService(meId, sid),
+    mutationFn: (sid) => Api.deleteMyService(sid),
     onSuccess: () => {
       toast.success("تم الحذف");
-      qc.invalidateQueries({ queryKey: ["tech", meId, "services"] });
+      qc.invalidateQueries({ queryKey: ["tech", technicianId, "services"] });
     },
-    onError: () => toast.error("تعذر الحذف"),
+    onError: () => toast.error("تعذّر الحذف"),
   });
 
-  // Form state (دائماً نفس الترتيب)
+  // معرض الأعمال الذاتي عبر /tech/me/portfolio
+  const addImage = async (file) => {
+    if (!file) return;
+    const { url } = await Api.upload(file);
+    await Api.uploadToMyPortfolio({ url });
+    qc.invalidateQueries({ queryKey: ["tech", "me", "portfolio"] });
+  };
+
+  const removeImage = async (imageId) => {
+    await Api.deleteFromMyPortfolio(imageId);
+    qc.invalidateQueries({ queryKey: ["tech", "me", "portfolio"] });
+  };
+
+  /* ─────────────────────────── FORM STATE ───────────────────────────── */
   const [fullName, setFullName] = useState("");
   const [city, setCity] = useState("");
   const [phone, setPhone] = useState("");
@@ -80,35 +119,38 @@ export default function TechSelfProfile() {
   const [svcDesc, setSvcDesc] = useState("");
   const [svcPrice, setSvcPrice] = useState("");
 
-  // Sync ملي كتجي data
+  // لما توصل بيانات العامّة ديال الحرفي (أو من user) كيتمّ المزامنة
   useEffect(() => {
-    const me = meQ.data;
-    if (!me) return;
-    setFullName(me.fullName || "");
-    setCity(me.city || "");
-    setPhone(me.phone || "");
-    setBio(me.bio || "");
-    setSpecialties(Array.isArray(me.specialties) ? me.specialties : []);
-    setIsPremium(!!me.isPremium);
-  }, [meQ.data]);
+    const me = techQ.data;
+    if (me) {
+      setFullName(me.fullName ?? me.full_name ?? user?.fullName ?? "");
+      setCity(me.city ?? user?.city ?? "");
+      setPhone(me.phone ?? user?.phone ?? "");
+      setBio(me.bio ?? "");
+      setSpecialties(Array.isArray(me.specialties) ? me.specialties : []);
+      setIsPremium(Boolean(me.isPremium ?? me.is_premium));
+    } else if (user) {
+      setFullName(user.fullName ?? user.full_name ?? "");
+      setCity(user.city ?? "");
+      setPhone(user.phone ?? "");
+    }
+  }, [techQ.data, user]);
 
-  // Helpers
-  const addImage = async (file) => {
-    if (!file) return;
-    const { url } = await Api.upload(file);
-    await Api.addPortfolioImage(meId, { url });
-    qc.invalidateQueries({ queryKey: ["tech", meId, "portfolio"] });
-  };
+  const isLoading = techQ.isLoading && !!technicianId;
+  const me = techQ.data;
+  const services = Array.isArray(servicesQ.data) ? servicesQ.data : [];
+  const portfolio = Array.isArray(portfolioQ.data) ? portfolioQ.data : [];
 
-  const removeImage = async (imageId) => {
-    await Api.deletePortfolioImage(meId, imageId);
-    qc.invalidateQueries({ queryKey: ["tech", meId, "portfolio"] });
-  };
-
-  const isLoading = meQ.isLoading;
-  const me = meQ.data;
-  const services = servicesQ.data ?? [];
-  const portfolio = portfolioQ.data ?? [];
+  /* ────────────────────────── RENDER STATES ─────────────────────────── */
+  if (!technicianId) {
+    return (
+      <div className="page-shell mx-auto max-w-screen-2xl px-4 sm:px-6 lg:px-8">
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-amber-700 mt-6" dir="rtl">
+          حسابك غير مربوط ببطاقة حرفي بعد. تواصل مع الإدارة لربط الحساب.
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -118,33 +160,34 @@ export default function TechSelfProfile() {
     );
   }
 
-  if (meQ.isError || !me) {
+  if (techQ.isError) {
     return (
       <div className="page-shell mx-auto max-w-screen-2xl px-4 sm:px-6 lg:px-8">
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-700 mt-6">
+        <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-700 mt-6" dir="rtl">
           تعذّر تحميل الملف. جرّب لاحقاً.
         </div>
       </div>
     );
   }
 
+  /* ─────────────────────────────── UI ──────────────────────────────── */
   return (
     <div className="page-shell mx-auto max-w-screen-2xl px-4 sm:px-6 lg:px-8" dir="rtl">
       {/* Header */}
       <section className="rounded-2xl border bg-white p-4 shadow-sm mt-4">
         <div className="flex items-center gap-4">
           <AvatarUpload
-            value={me?.avatarUrl}
-            placeholder={(me?.fullName || "ح").slice(0, 1)}
+            value={me?.avatarUrl ?? me?.avatar_url}
+            placeholder={(me?.fullName || me?.full_name || "ح").slice(0, 1)}
           />
           <div>
             <div className="text-xl font-semibold text-slate-900">
-              {me?.fullName}
+              {me?.fullName ?? me?.full_name}
             </div>
             <div className="text-sm text-slate-600">{me?.city}</div>
-            {me?.isPremium && (
+            {(me?.isPremium ?? me?.is_premium) ? (
               <div className="text-xs text-amber-600 mt-1">★ بريميوم</div>
-            )}
+            ) : null}
           </div>
         </div>
       </section>
@@ -218,35 +261,39 @@ export default function TechSelfProfile() {
             content: (
               <div className="rounded-2xl border bg-white p-4 shadow-sm space-y-3">
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                  {(Array.isArray(services) ? services : []).map((s) => (
-                    <div key={s.id} className="rounded-xl border p-3">
-                      <div className="font-medium text-slate-900">{s.title}</div>
-                      {s.priceFrom && (
-                        <div className="text-xs text-slate-600 mt-1">
-                          {s.priceFrom} - {s.priceTo || s.priceFrom} درهم
+                  {services.map((s) => {
+                    const priceFrom = s.priceFrom ?? s.price_from;
+                    const priceTo = s.priceTo ?? s.price_to ?? priceFrom;
+                    return (
+                      <div key={s.id} className="rounded-xl border p-3">
+                        <div className="font-medium text-slate-900">{s.title}</div>
+                        {priceFrom ? (
+                          <div className="text-xs text-slate-600 mt-1">
+                            {priceFrom} - {priceTo} درهم
+                          </div>
+                        ) : null}
+                        <div className="mt-2 flex gap-2">
+                          <Button
+                            variant="subtle"
+                            onClick={() =>
+                              svcUpdate.mutate({
+                                sid: s.id,
+                                body: { title: `${s.title} (تعديل)` },
+                              })
+                            }
+                          >
+                            تعديل
+                          </Button>
+                          <Button
+                            variant="subtle"
+                            onClick={() => svcDelete.mutate(s.id)}
+                          >
+                            حذف
+                          </Button>
                         </div>
-                      )}
-                      <div className="mt-2 flex gap-2">
-                        <Button
-                          variant="subtle"
-                          onClick={() =>
-                            svcUpdate.mutate({
-                              sid: s.id,
-                              body: { title: s.title + " (تعديل)" },
-                            })
-                          }
-                        >
-                          تعديل
-                        </Button>
-                        <Button
-                          variant="subtle"
-                          onClick={() => svcDelete.mutate(s.id)}
-                        >
-                          حذف
-                        </Button>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
 
                 <div className="border-t pt-3">
@@ -292,7 +339,7 @@ export default function TechSelfProfile() {
             content: (
               <div className="rounded-2xl border bg-white p-4 shadow-sm">
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                  {(Array.isArray(portfolio) ? portfolio : []).map((img) => (
+                  {portfolio.map((img) => (
                     <div
                       key={img.id}
                       className="relative group rounded-xl overflow-hidden border"
@@ -336,9 +383,7 @@ export default function TechSelfProfile() {
                 <div className="text-sm text-slate-700">
                   تعديل المدينة والهاتف من تبويب الملف.
                 </div>
-                <div className="text-sm text-slate-500">
-                  لاحقاً: حذف صورة الملف
-                </div>
+                <div className="text-sm text-slate-500">لاحقاً: حذف صورة الملف</div>
               </div>
             ),
           },
