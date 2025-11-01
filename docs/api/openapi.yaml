@@ -1,0 +1,954 @@
+openapi: 3.1.0
+info:
+  title: 7rifyConnect API (provisional)
+  version: 0.1.0
+  description: >-
+    Provisional API description inferred from the frontend client. Confirm each
+    operation against the Laravel backend once the backend repository becomes
+    available.
+servers:
+  - url: http://localhost:8000
+paths:
+  /sanctum/csrf-cookie:
+    get:
+      summary: Issue Sanctum CSRF cookie
+      tags: [Auth]
+      responses:
+        "204":
+          description: Cookie issued
+  /api/auth/register:
+    post:
+      summary: Register a new account
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+      responses:
+        "201":
+          description: Registration succeeded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+  /api/auth/login:
+    post:
+      summary: Issue access token
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Login succeeded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Invalid credentials
+  /api/auth/me:
+    get:
+      summary: Fetch authenticated user profile
+      tags: [Auth]
+      security:
+        - sanctum: []
+        - passport: []
+      responses:
+        "200":
+          description: Authenticated user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthenticated
+  /api/admin/metrics:
+    get:
+      summary: Retrieve dashboard metrics
+      tags: [Admin]
+      security:
+        - sanctum: []
+        - passport: []
+      responses:
+        "200":
+          description: Metrics payload
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+  /api/admin/stats:
+    get:
+      summary: Retrieve admin statistics
+      tags: [Admin]
+      security:
+        - sanctum: []
+        - passport: []
+      responses:
+        "200":
+          description: Statistics payload
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+  /api/admin/technicians:
+    get:
+      summary: List technicians (admin)
+      tags: [Admin]
+      parameters:
+        - in: query
+          name: status
+          schema:
+            type: string
+      security:
+        - sanctum: []
+        - passport: []
+      responses:
+        "200":
+          description: Technician list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedTechnicianList"
+  /api/admin/technicians/{id}/verify:
+    patch:
+      summary: Verify technician account
+      tags: [Admin]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      security:
+        - sanctum: []
+        - passport: []
+      responses:
+        "200":
+          description: Verification toggled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Technician"
+  /api/admin/technicians/{id}:
+    patch:
+      summary: Update technician profile (admin)
+      tags: [Admin]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      security:
+        - sanctum: []
+        - passport: []
+      responses:
+        "200":
+          description: Updated technician
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Technician"
+  /api/admin/requests:
+    get:
+      summary: List service requests (admin)
+      tags: [Admin]
+      security:
+        - sanctum: []
+        - passport: []
+      responses:
+        "200":
+          description: Requests list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedRequestList"
+  /api/technicians:
+    get:
+      summary: Search technicians
+      tags: [Public]
+      parameters:
+        - in: query
+          name: q
+          schema:
+            type: string
+        - in: query
+          name: city
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Public technician collection
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Technician"
+  /api/technicians/top:
+    get:
+      summary: List top technicians
+      tags: [Public]
+      responses:
+        "200":
+          description: Top technicians
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Technician"
+  /api/services/top:
+    get:
+      summary: List top services
+      tags: [Public]
+      responses:
+        "200":
+          description: Top services
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Service"
+  /api/technicians/{id}:
+    get:
+      summary: Get technician profile
+      tags: [Public]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Technician profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Technician"
+  /api/technicians/{id}/reviews:
+    get:
+      summary: List technician reviews
+      tags: [Public]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Reviews
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Review"
+  /api/technicians/{id}/services:
+    get:
+      summary: List technician services
+      tags: [Public]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Services list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Service"
+  /api/technicians/{id}/portfolio:
+    get:
+      summary: List technician portfolio items
+      tags: [Public]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Portfolio
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/PortfolioItem"
+  /api/requests:
+    post:
+      summary: Create service request
+      tags: [Client]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestCreate"
+      security:
+        - sanctum: []
+        - passport: []
+      responses:
+        "201":
+          description: Request created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServiceRequest"
+  /api/requests/me:
+    get:
+      summary: List current user's requests
+      tags: [Client]
+      security:
+        - sanctum: []
+        - passport: []
+      responses:
+        "200":
+          description: Current user's requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedRequestList"
+  /api/tech/requests:
+    get:
+      summary: List technician work queue
+      tags: [Technician]
+      parameters:
+        - in: query
+          name: status
+          schema:
+            type: string
+      security:
+        - sanctum: []
+        - passport: []
+      responses:
+        "200":
+          description: Technician requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedRequestList"
+  /api/tech/requests/{id}/accept:
+    post:
+      summary: Accept a request
+      tags: [Technician]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      security:
+        - sanctum: []
+        - passport: []
+      responses:
+        "200":
+          description: Request accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServiceRequest"
+  /api/tech/requests/{id}/start:
+    post:
+      summary: Start a request
+      tags: [Technician]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      security:
+        - sanctum: []
+        - passport: []
+      responses:
+        "200":
+          description: Request started
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServiceRequest"
+  /api/tech/requests/{id}/complete:
+    post:
+      summary: Complete a request
+      tags: [Technician]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      security:
+        - sanctum: []
+        - passport: []
+      responses:
+        "200":
+          description: Request completed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServiceRequest"
+  /api/tech/requests/{id}/cancel:
+    post:
+      summary: Cancel a request
+      tags: [Technician]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      security:
+        - sanctum: []
+        - passport: []
+      responses:
+        "200":
+          description: Request cancelled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServiceRequest"
+  /api/tech/me:
+    patch:
+      summary: Update own technician profile
+      tags: [Technician]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      security:
+        - sanctum: []
+        - passport: []
+      responses:
+        "200":
+          description: Updated profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Technician"
+  /api/tech/me/services:
+    post:
+      summary: Create technician service
+      tags: [Technician]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Service"
+      security:
+        - sanctum: []
+        - passport: []
+      responses:
+        "201":
+          description: Service created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Service"
+  /api/tech/me/services/{id}:
+    patch:
+      summary: Update technician service
+      tags: [Technician]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Service"
+      security:
+        - sanctum: []
+        - passport: []
+      responses:
+        "200":
+          description: Service updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Service"
+    delete:
+      summary: Delete technician service
+      tags: [Technician]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      security:
+        - sanctum: []
+        - passport: []
+      responses:
+        "204":
+          description: Service deleted
+  /api/tech/me/portfolio:
+    get:
+      summary: List portfolio items
+      tags: [Technician]
+      security:
+        - sanctum: []
+        - passport: []
+      responses:
+        "200":
+          description: Portfolio collection
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/PortfolioItem"
+    post:
+      summary: Upload portfolio asset
+      tags: [Technician]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                url:
+                  type: string
+              additionalProperties: false
+      security:
+        - sanctum: []
+        - passport: []
+      responses:
+        "201":
+          description: Portfolio item created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PortfolioItem"
+  /api/tech/me/portfolio/{id}:
+    delete:
+      summary: Remove portfolio item
+      tags: [Technician]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      security:
+        - sanctum: []
+        - passport: []
+      responses:
+        "204":
+          description: Portfolio item removed
+  /api/chat/threads:
+    get:
+      summary: List chat threads
+      tags: [Chat]
+      parameters:
+        - in: query
+          name: me
+          schema:
+            type: integer
+      security:
+        - sanctum: []
+        - passport: []
+      responses:
+        "200":
+          description: Chat threads
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedThreadList"
+    post:
+      summary: Create chat thread
+      tags: [Chat]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                peerUserId:
+                  type: integer
+              required: [peerUserId]
+      security:
+        - sanctum: []
+        - passport: []
+      responses:
+        "201":
+          description: Thread created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Thread"
+  /api/chat/threads/{id}/messages:
+    get:
+      summary: List messages in thread
+      tags: [Chat]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      security:
+        - sanctum: []
+        - passport: []
+      responses:
+        "200":
+          description: Messages list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedMessageList"
+    post:
+      summary: Send message
+      tags: [Chat]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                body:
+                  type: string
+              required: [body]
+      security:
+        - sanctum: []
+        - passport: []
+      responses:
+        "201":
+          description: Message sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+  /api/upload:
+    post:
+      summary: Upload media asset
+      tags: [Media]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                name:
+                  type: string
+              additionalProperties: false
+      security:
+        - sanctum: []
+        - passport: []
+      responses:
+        "201":
+          description: Upload succeeded
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+components:
+  securitySchemes:
+    sanctum:
+      type: apiKey
+      in: cookie
+      name: XSRF-TOKEN
+    passport:
+      type: http
+      scheme: bearer
+  schemas:
+    RegisterRequest:
+      type: object
+      properties:
+        role:
+          type: string
+        full_name:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+        city:
+          type: string
+          nullable: true
+        phone:
+          type: string
+          nullable: true
+      required:
+        - role
+        - full_name
+        - email
+        - password
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+      required:
+        - email
+        - password
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        user:
+          $ref: "#/components/schemas/User"
+    ValidationError:
+      type: object
+      properties:
+        message:
+          type: string
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        full_name:
+          type: string
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+        city:
+          type: string
+          nullable: true
+        phone:
+          type: string
+          nullable: true
+    Technician:
+      allOf:
+        - $ref: "#/components/schemas/User"
+        - type: object
+          properties:
+            specialties:
+              type: array
+              items:
+                type: string
+            average_rating:
+              type: number
+              format: float
+              nullable: true
+            is_premium:
+              type: boolean
+            services:
+              type: array
+              items:
+                $ref: "#/components/schemas/Service"
+    Service:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        short_desc:
+          type: string
+          nullable: true
+        price_from:
+          type: number
+          nullable: true
+        price_to:
+          type: number
+          nullable: true
+    Review:
+      type: object
+      properties:
+        id:
+          type: integer
+        author:
+          type: string
+        comment:
+          type: string
+        rating:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+    PortfolioItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        url:
+          type: string
+          format: uri
+    RequestCreate:
+      type: object
+      properties:
+        title:
+          type: string
+        city:
+          type: string
+        description:
+          type: string
+          nullable: true
+        technician_id:
+          type: integer
+          nullable: true
+      required:
+        - title
+        - city
+    ServiceRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        city:
+          type: string
+        status:
+          type: string
+        technician:
+          $ref: "#/components/schemas/Technician"
+        client:
+          $ref: "#/components/schemas/User"
+    Thread:
+      type: object
+      properties:
+        id:
+          type: integer
+        participants:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
+    Message:
+      type: object
+      properties:
+        id:
+          type: integer
+        body:
+          type: string
+        sender_id:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+    PaginatedTechnicianList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Technician"
+        meta:
+          type: object
+          additionalProperties: true
+        links:
+          type: object
+          additionalProperties: true
+    PaginatedRequestList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/ServiceRequest"
+        meta:
+          type: object
+          additionalProperties: true
+        links:
+          type: object
+          additionalProperties: true
+    PaginatedThreadList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Thread"
+    PaginatedMessageList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Message"

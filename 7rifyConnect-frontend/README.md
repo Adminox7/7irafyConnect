@@ -1,98 +1,54 @@
-## 7irafyConnect
+## 7irafyConnect Frontend
 
-منصة تربط الزبناء مع الحرفيين المحليين (كهربائيين، سباكين، صباغة...).
+منصة تربط الزبناء مع الحرفيين المحليين (كهربائيين، سباكين، صباغة...). هذا المستودع يحتوي فقط على الواجهة الأمامية المبنية بـ React + Vite. الواجهة الخلفية (Laravel) موجودة كموديول فرعي اسمه `7irafyConnect-api` لكنه غير متاح حالياً في هذه النسخة من المستودع، لذا تأكد من سحبه من المصدر الأصلي قبل محاولة التشغيل المتكامل.
 
 ### المكدس التقني
 - React + Vite + TailwindCSS
 - React Router + React Query
-- MSW لمحاكاة الـ API خلال التطوير
-- Recharts لرسوم بيانية خفيفة (اختياري)
+- Axios client موحد في `src/lib/api.ts` مع دعم Sanctum / Passport
+- Zustand لحالة المصادقة + Toast للتنبيهات
+- MSW لمحاكاة الـ API خلال التطوير (اختياري)
+
+### الإعداد السريع
+1. انسخ ملف البيئة: `cp .env.example .env`
+2. حدّث `VITE_API_URL` لتطابق عنوان واجهة Laravel (مثال: `http://localhost:8000`)
+3. إذا كنت تستعمل Sanctum (لارافيل افتراضياً) اترك `VITE_USE_SANCTUM=true`
+4. ثبّت الاعتمادات: `npm install`
+5. شغّل التطبيق: `npm run dev`
+
+> ملاحظة: أثناء التطوير يمكنك استعمال البروكسي الداخلي لـ Vite (أنظر `vite.config.js`) أو تعديل `VITE_API_URL` ليتوجّه مباشرة إلى الـ API.
 
 ### السكريبتات
-- `npm run dev` تشغيل التطبيق مع MSW
+- `npm run dev` تشغيل الواجهة على `http://localhost:5173`
 - `npm run build` إنشاء نسخة الإنتاج
-- `npm run preview` معاينة البناء
-- `npm run lint` فحص القواعد
+- `npm run preview` معاينة البناء محلياً
+- `npm run lint` فحص القواعد (يتطلب Node 18+)
 
-### تكامل MSW
-- تم إعداد العامل في `src/mocks/browser.js` ونسخة الـ worker موجودة في `public/mockServiceWorker.js`.
-- يتم تشغيل MSW تلقائياً في `src/main.jsx` أثناء التطوير.
-- النقاط المتاحة:
-  - Auth:
-    - `POST /api/v1/auth/register` → `{ user, token, role }`
-    - `POST /api/v1/auth/login` → `{ user, token, role }`
-    - `GET /api/v1/auth/me` → `{ user, role }`
-    - الحسابات التجريبية:
-      - Admin: `admin@site.com` / `admin123`
-      - Technicien: `tech@site.com` / `tech123`
-      - Client: `client@site.com` / `client123`
-  - Admin:
-    - `GET /api/v1/admin/metrics`
-    - `GET /api/v1/admin/technicians?status=pending`
-    - `PATCH /api/v1/admin/technicians/:id/verify`
-  - Technicians & Requests:
-    - `GET /api/v1/technicians`
-    - `GET /api/v1/technicians/:id`
-    - `POST /api/v1/requests`
-    - `GET /api/v1/requests/me`
-    - `GET /api/v1/tech/dashboard`
-    - `GET /api/v1/tech/requests?status=...`
+### ملفات البيئة
+- `.env.example` يحتوي على:
+  - `VITE_API_URL` : رابط الـ Laravel API
+  - `VITE_USE_SANCTUM` : فعّل `true` ليستعمل axios الكوكيز وCSRF
+- يمكنك تعيين متغير `VITE_API_PROXY` عند تشغيل Vite لتوجيه البروكسي إلى خادم مختلف من `http://127.0.0.1:8000`.
 
 ### بنية المجلدات
-- `src/pages` الصفحات: البحث، بروفايل الحرفي، إنشاء طلب، طلباتي، لوحة الحرفي
-- `src/components` مكوّنات قابلة لإعادة الاستخدام: Card, Button, Input, StatusBadge, DashboardCard, TechCard
-- `src/api` عميل axios (`http.js`) ونقاط (`endpoints.js`)
-- `src/mocks` المعالجات الخاصة بـ MSW
-- `src/util/ErrorBoundary.jsx` حاجز أخطاء لمنع الشاشة البيضاء
+- `src/lib/api.ts` العميل الموحد (`axios`) + `ensureCsrf`
+- `src/api/http.js` طبقة تهيئة تضيف هيدر التوكن من Zustand وتعرض `showErrorOnce`
+- `src/api/endpoints.js` تغليف لنقاط REST المستخدمة في الصفحات
+- `src/pages` الصفحات: البحث، بروفايل الحرفي، إنشاء طلب، طلباتي، لوحة الحرفي، ...
+- `src/components` مكوّنات عامة: Card, Button, Input, StatusBadge, DashboardCard, TechCard, ...
+- `src/mocks` معالجات MSW (يمكن تفعيلها أو تعطيلها حسب الحاجة)
 
-### التبديل لاحقاً لواجهة Laravel
-- إبقَ `baseURL` على `/api/v1` في الواجهة؛ اجعل Nginx/لارافيل يقدّم نفس المسارات.
-- عطّل MSW بإزالة شرط `import.meta.env.DEV` في `src/main.jsx`.
-- نفِّذ نفس المسارات في Laravel (انظر أدناه) لتجنّب تغييرات على الواجهة.
+### التكامل مع Laravel
+- عند استعمال Sanctum، يجب أن يسمح Laravel بالمسارات: `api/*`, `sanctum/csrf-cookie`, `login`, `logout`, `user` في إعدادات CORS وأن تكون `SESSION_DOMAIN` و `SANCTUM_STATEFUL_DOMAINS` متناسقة مع نطاق الواجهة.
+- غيّر `vite.config.js` حسب الحاجة؛ البروكسي الحالي يوجّه `/api`, `/sanctum`, `/login`, `/logout`, `/user` نحو الخادم الخلفي.
+- تأكد أن واجهة Laravel توفر نفس المسارات الموجودة في `docs/api/openapi.yaml`. المستند أنشئ بشكل استدلالي من الواجهة الأمامية، لذلك يلزم التحقق ضده فور توفر الكود الخلفي.
 
-### Migration Guide (Laravel)
+### التوثيق والأدوات
+- `docs/api/openapi.yaml` : مواصفة OpenAPI (نسخة أولية)
+- `docs/clients/postman_collection.json` : تجميعة Postman للبدايات السريعة
+- لتحديث المواصفة، راجع متحكمات Laravel (عند توفرها) ثم حدّث المخطط وأعد توليد التجميعات.
 
-لتشغيل الواجهة الأمامية مع Laravel، يجب أن يوفّر الـ backend هذه المسارات وترجع JSON بالشكل التالي. اضبط `VITE_API_URL` مثل `https://your-app.test/api/v1` في ملف البيئة الأمامية.
-
-- GET `/api/v1/technicians`
-  - Query params: `city?: string`, `q?: string`
-  - Returns: `Technician[]`
-    - Technician: `{ id:number, fullName:string, city:string, specialties:string[], isPremium:boolean, averageRating:number, lat:number, lng:number }`
-
-- GET `/api/v1/technicians/:id`
-  - Returns: `Technician`
-
-- POST `/api/v1/requests`
-  - Body: `{ title:string, city:string, description:string, technicianId?:number }`
-  - Returns: `ServiceRequest`
-
-- GET `/api/v1/requests/me`
-  - Returns: `ServiceRequest[]`
-
-- GET `/api/v1/tech/dashboard`
-  - Returns: `{ kpi: DashboardKPI, recent: ServiceRequest[], weekly: WeeklyPoint[] }`
-    - DashboardKPI: `{ newC:number, accC:number, progC:number, doneC:number, revenue:number }`
-    - WeeklyPoint: `{ date:string, requests:number }`
-
-- GET `/api/v1/tech/requests?status=all|new|accepted|in_progress|done|cancelled`
-  - Returns: `ServiceRequest[]`
-
-- POST `/api/v1/tech/requests/:id/accept`
-- POST `/api/v1/tech/requests/:id/start`
-- POST `/api/v1/tech/requests/:id/complete`
-- POST `/api/v1/tech/requests/:id/cancel`
-  - Returns for each: updated `ServiceRequest`
-
-Auth:
-- POST `/api/v1/auth/register` → `{ user, token, role }`
-- POST `/api/v1/auth/login` → `{ user, token, role }`
-- GET `/api/v1/auth/me` → `{ user, role }`
-
-Admin:
-- GET `/api/v1/admin/metrics` → `{ users, technicians, pendingTechnicians, totalRequests, revenue }`
-- GET `/api/v1/admin/technicians?status=pending` → `User[]`
-- PATCH `/api/v1/admin/technicians/:id/verify` → `User`
-
-Shapes:
-- ServiceRequest: `{ id:number, title:string, city:string, status:'new'|'accepted'|'in_progress'|'done'|'cancelled', price?:number, client?:string, createdAt:string, description?:string, technicianId?:number }`
+### ملاحظات حول المستودع
+- دليل `7irafyConnect-api/` مسجل كـ submodule لكنه بدون إعدادات `.gitmodules` في نسخة المستودع الحالية، ما يعني أن كود Laravel غير متوفر. اطلب من صاحب المستودع إرجاع إعدادات submodule أو نسخ الكود مباشرة إلى هذا المسار قبل تشغيل `php artisan` أو مزامنة العقود.
+- إلى حين توفر الواجهة الخلفية، يمكن الاعتماد على MSW أو الـ mocks الداخلية لاختبار الواجهة.
 
