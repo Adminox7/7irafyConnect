@@ -2,7 +2,7 @@ import { Navigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuthStore } from "../stores/auth";
 
-export default function ProtectedRoute({ children, role, requireApprovedArtisan = false }) {
+export default function ProtectedRoute({ children, role }) {
   const token = useAuthStore((s) => s.token);
   const user = useAuthStore((s) => s.user);
   const location = useLocation();
@@ -28,15 +28,6 @@ export default function ProtectedRoute({ children, role, requireApprovedArtisan 
   const userRole = user?.role; // ← من الباك
   if (role && userRole !== role) {
     return <Navigate to="/" replace />;
-  }
-
-  const artisanProfile = user?.artisan || user?.technician || user?.profile || null;
-  const rawIsVerified = artisanProfile?.isVerified ?? artisanProfile?.is_verified ?? user?.isVerified ?? user?.is_verified ?? null;
-  const isArtisanRole = userRole === "technicien" || userRole === "artisan";
-  const artisanApproved = isArtisanRole ? Number(rawIsVerified) === 1 || rawIsVerified === true : false;
-
-  if (requireApprovedArtisan && isArtisanRole && !artisanApproved) {
-    return <Navigate to="/pending-approval" replace state={{ from: location }} />;
   }
 
   return children;

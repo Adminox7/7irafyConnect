@@ -15,6 +15,7 @@ import UserProfile from "./pages/UserProfile";
 import TechSelfProfile from "./pages/TechSelfProfile";
 import PendingApproval from "./pages/PendingApproval";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ProtectedArtisan from "./routes/ProtectedArtisan";
 import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./stores/auth";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -189,29 +190,22 @@ export default function App() {
             />
 
             {/* Tech self profile */}
-            <Route
-              path="/me/tech"
-              element={
-                <ProtectedRoute role="technicien">
-                  <TechSelfProfile />
-                </ProtectedRoute>
-              }
-            />
+            <Route element={<ProtectedArtisan />}>
+              <Route
+                path="/me/tech"
+                element={<TechSelfProfile />}
+              />
+              <Route
+                path="/dashboard"
+                element={<TechDashboard />}
+              />
+            </Route>
 
             <Route
               path="/requests"
               element={
                 <ProtectedRoute>
                   <MyRequests />
-                </ProtectedRoute>
-              }
-            />
-
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute role="technicien" requireApprovedArtisan>
-                  <TechDashboard />
                 </ProtectedRoute>
               }
             />

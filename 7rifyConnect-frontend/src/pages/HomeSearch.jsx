@@ -40,6 +40,10 @@ export default function HomeSearch() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const visibleResults = Array.isArray(data)
+    ? data.filter((t) => Number(t?.isVerified ?? t?.is_verified) === 1)
+    : [];
+
   return (
     <div className="page-shell container max-w-7xl mx-auto px-4 space-y-6">
       <h1 className="text-2xl font-bold text-slate-800 text-center">
@@ -80,7 +84,7 @@ export default function HomeSearch() {
         {!isFetching && data?.length === 0 && searching === false && (
           <p className="text-center text-gray-500 col-span-full">ما كاين حتى تقني بهذ المواصفات.</p>
         )}
-        {!isFetching && Array.isArray(data) && data.map((t, i) => (
+        {!isFetching && Array.isArray(data) && visibleResults.map((t, i) => (
           <motion.div
             key={t.id}
             initial={r ? false : { opacity: 0, y: 8 }}
@@ -90,6 +94,9 @@ export default function HomeSearch() {
             <TechCard t={t} />
           </motion.div>
         ))}
+        {!isFetching && Array.isArray(data) && visibleResults.length === 0 && data.length > 0 && (
+          <p className="text-center text-gray-500 col-span-full">كل الحرفيين في النتائج مازالو قيد التحقق.</p>
+        )}
         {!isFetching && !Array.isArray(data) && searching === false && (
           <p className="text-center text-gray-500 col-span-full">لا توجد نتائج</p>
         )}

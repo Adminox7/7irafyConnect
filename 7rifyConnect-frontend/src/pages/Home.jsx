@@ -67,6 +67,9 @@ export default function Home() {
     queryKey: ["top-techs"],
     queryFn: Api.getTopTechnicians,
   });
+  const visibleTopTechs = (Array.isArray(topTechs) ? topTechs : []).filter(
+    (t) => Number(t?.isVerified ?? t?.is_verified) === 1
+  );
   const { data: topServices = [], isFetching: loadingTopServices, isError: errTopServices } = useQuery({
     queryKey: ["top-services"],
     queryFn: Api.getTopServices,
@@ -242,7 +245,7 @@ export default function Home() {
 
             {/* Cards */}
             {!loadingTopTechs && !errTopTechs &&
-              (Array.isArray(topTechs) ? topTechs : []).map((t) => <TechCard key={t.id} t={t} />)}
+              visibleTopTechs.map((t) => <TechCard key={t.id} t={t} />)}
           </div>
         </div>
       </section>
