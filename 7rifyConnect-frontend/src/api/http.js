@@ -1,6 +1,6 @@
 // src/api/http.js
-import axios from "axios";
 import toast from "react-hot-toast";
+import { api, ensureCsrf } from "../lib/api";
 import { useAuthStore } from "../stores/auth";
 
 /* ------------------ Toast once ------------------ */
@@ -11,17 +11,9 @@ export const showErrorOnce = (message, id) => {
   } catch {}
 };
 
-/* ------------------ Base URL (Proxy) ------------------
-   بما أنك مفعل Vite proxy على 127.0.0.1:8000،
-   خليه نسبي باش يمشي عبر البروكسي ديال Vite.  */
-const BASE_URL = "/api";
-
 /* ------------------ Axios instance ------------------ */
-export const http = axios.create({
-  baseURL: BASE_URL,
-  withCredentials: false, // كنستعملو Bearer token ماشي cookies
-  headers: { Accept: "application/json" },
-});
+export const http = api;
+export { ensureCsrf };
 
 /* ------------ انتظر rehydrate ديال Zustand (≤1s) ------------ */
 const waitForHydration = async () => {
