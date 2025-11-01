@@ -45,6 +45,14 @@ http.interceptors.response.use(
   (error) => {
     const res = error?.response;
     const status = res?.status;
+    const code = res?.data?.code;
+
+    if (code === "ARTISAN_NOT_APPROVED" && typeof window !== "undefined") {
+      const redirectTo = "/pending-approval";
+      if (window.location.pathname !== redirectTo) {
+        window.location.href = redirectTo;
+      }
+    }
 
     let message =
       res?.data?.message ||
@@ -67,6 +75,7 @@ http.interceptors.response.use(
 
     return Promise.reject({
       status,
+      code,
       message,
       data: res?.data,
       original: error,

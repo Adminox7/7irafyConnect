@@ -67,6 +67,24 @@ export default function TechnicianProfile() {
     );
   }
 
+  const rawIsVerified =
+    t.isVerified ??
+    t.is_verified ??
+    t.artisan?.isVerified ??
+    t.artisan?.is_verified ??
+    null;
+  const isVerified = Number(rawIsVerified) === 1 || rawIsVerified === true || rawIsVerified === "1";
+
+  if (!isVerified) {
+    return (
+      <div className="page-shell container max-w-7xl mx-auto px-4" dir="rtl">
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 mt-6 text-amber-800">
+          هذا الحرفي قيد التحقق من طرف الإدارة ولا يمكن عرضه حالياً.
+        </div>
+      </div>
+    );
+  }
+
   /* ─────────────── DATA NORMALIZATION ─────────────── */
   const fullName = t.fullName ?? t.full_name ?? "-";
   const avatarUrl = t.avatarUrl ?? t.avatar_url ?? null;

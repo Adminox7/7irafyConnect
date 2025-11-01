@@ -78,8 +78,8 @@ export default function AdminDashboard() {
     ...qOpts,
   });
 
-  const verify = useMutation({
-    mutationFn: (id) => Api.verifyTechnician(id),
+  const approve = useMutation({
+    mutationFn: (id) => Api.approveArtisan(id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-metrics"] });
       qc.invalidateQueries({ queryKey: ["admin-technicians", "pending"] }); // ✅ إصلاح
@@ -171,11 +171,11 @@ export default function AdminDashboard() {
                     <td className="py-2 pr-4">{t.city}</td>
                     <td className="py-2 pr-4">
                       <button
-                        onClick={() => verify.mutate(t.id)}
-                        disabled={verify.isPending}
+                        onClick={() => approve.mutate(t.id)}
+                        disabled={approve.isPending}
                         className="px-3 py-1.5 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-60"
                       >
-                        {verify.isPending ? "جارٍ القبول…" : "قبول"}
+                        {approve.isPending ? "جارٍ القبول…" : "قبول"}
                       </button>
                     </td>
                   </tr>

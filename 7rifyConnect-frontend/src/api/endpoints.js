@@ -13,6 +13,14 @@ const toArray = (payload) => {
   return Array.isArray(payload) ? payload : [];
 };
 
+const isApprovedArtisan = (item) => {
+  const raw = item?.isVerified ?? item?.is_verified ?? item?.artisan?.isVerified ?? item?.artisan?.is_verified ?? null;
+  if (raw === null || raw === undefined) return true;
+  return Number(raw) === 1 || raw === true || raw === "1";
+};
+
+const filterApproved = (list) => list.filter((item) => isApprovedArtisan(item));
+
 const mapRegisterPayload = (b) => ({
   role: b.role,
   full_name: b.fullName ?? b.full_name ?? b.name,
@@ -46,16 +54,20 @@ export const Api = {
   getAdminMetrics:     ()         => http.get("/admin/metrics").then(unwrap),
   getAdminStats:       ()         => http.get("/admin/stats").then(unwrap),
   getAdminTechnicians: (params)   => http.get("/admin/technicians", { params }).then(unwrap),
-  verifyTechnician:    (id)       => http.patch(`/admin/technicians/${id}/verify`).then(unwrap),
+  approveArtisan:      (id)       => http.post(`/admin/artisans/${id}/approve`).then(unwrap),
   updateTechnician:    (id, body) => http.patch(`/admin/technicians/${id}`, body).then(unwrap),
   getAdminRequests:    ()         => http.get("/admin/requests").then(unwrap),
 
   /* PUBLIC TECHS */
-  searchTechnicians:   (params)   => http.get("/technicians", { params }).then((r) => toArray(unwrap(r))),
+  searchTechnicians:   (params)   => http
+    .get("/technicians", { params })
+    .then((r) => filterApproved(toArray(unwrap(r)))),
   getTechnician:       (id)       => http.get(`/technicians/${id}`).then(unwrap),
   getTechnicianReviews:(id)       => http.get(`/technicians/${id}/reviews`).then(unwrap),
   getTechnicianServices:(id)      => http.get(`/technicians/${id}/services`).then(unwrap),
-  getTopTechnicians:   ()         => http.get("/technicians/top").then((r) => toArray(unwrap(r))),
+  getTopTechnicians:   ()         => http
+    .get("/technicians/top")
+    .then((r) => filterApproved(toArray(unwrap(r)))),
   getTopServices:      ()         => http.get("/services/top").then((r) => toArray(unwrap(r))),
 
   /* REQUESTS (client) */

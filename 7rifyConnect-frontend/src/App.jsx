@@ -13,6 +13,7 @@ import Register from "./pages/Register";
 import ChatWindow from "./components/ChatWindow";
 import UserProfile from "./pages/UserProfile";
 import TechSelfProfile from "./pages/TechSelfProfile";
+import PendingApproval from "./pages/PendingApproval";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./stores/auth";
@@ -24,6 +25,12 @@ export default function App() {
   const token  = useAuthStore((s) => s.token);
   const logout = useAuthStore((s) => s.logout);
   const role   = user?.role;
+
+  const artisanProfile = user?.artisan || user?.technician || user?.profile || null;
+  const rawIsVerified = artisanProfile?.isVerified ?? artisanProfile?.is_verified ?? user?.isVerified ?? user?.is_verified ?? null;
+  const isArtisanRole = role === "technicien" || role === "artisan";
+  const artisanApproved = isArtisanRole ? Number(rawIsVerified) === 1 || rawIsVerified === true : false;
+  const artisanPending = isArtisanRole && !artisanApproved;
 
   return (
     <BrowserRouter>
@@ -78,6 +85,11 @@ export default function App() {
                 }
               >
                 لوحة الحرفي
+                {artisanPending && (
+                  <span className="ml-2 inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
+                    قيد التحقق
+                  </span>
+                )}
               </NavLink>
             )}
 
@@ -127,6 +139,11 @@ export default function App() {
                 >
                   ملفي
                 </NavLink>
+                {artisanPending && (
+                  <span className="inline-flex items-center rounded-2xl border border-amber-200 bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700">
+                    حسابك قيد المراجعة
+                  </span>
+                )}
                 <NavLink
                   to="/chat"
                   className={({ isActive }) =>
@@ -193,8 +210,17 @@ export default function App() {
             <Route
               path="/dashboard"
               element={
-                <ProtectedRoute role="technicien">
+                <ProtectedRoute role="technicien" requireApprovedArtisan>
                   <TechDashboard />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/pending-approval"
+              element={
+                <ProtectedRoute>
+                  <PendingApproval />
                 </ProtectedRoute>
               }
             />

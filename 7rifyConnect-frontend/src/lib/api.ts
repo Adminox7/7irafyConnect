@@ -47,4 +47,18 @@ api.interceptors.request.use(async (config) => {
   return config;
 });
 
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const code = error?.response?.data?.code;
+    if (code === "ARTISAN_NOT_APPROVED" && typeof window !== "undefined") {
+      const redirectTo = "/pending-approval";
+      if (window.location.pathname !== redirectTo) {
+        window.location.href = redirectTo;
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default api;
