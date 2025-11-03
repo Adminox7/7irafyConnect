@@ -30,5 +30,17 @@ export default function ProtectedRoute({ children, role }) {
     return <Navigate to="/" replace />;
   }
 
+  if (role === "technicien") {
+    const verified =
+      user?.technician?.isVerified ??
+      user?.technician?.is_verified ??
+      user?.isVerified ??
+      user?.is_verified ??
+      false;
+    if (!verified) {
+      return <Navigate to="/pending-verification" replace />;
+    }
+  }
+
   return children;
 }

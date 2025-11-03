@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Api } from "../api/endpoints";
 import { useAuthStore } from "../stores/auth";
@@ -23,21 +23,28 @@ export default function Register() {
   const loginStore = useAuthStore((s) => s.login);
   const nav = useNavigate();
 
-  const m = useMutation({
-    mutationFn: (body) => Api.register(body),
-    onSuccess: (res) => {
-      loginStore({ user: res.user, token: res.token, role: res.role });
-      toast.success("تم إنشاء الحساب بنجاح");
-      if (res.role === "technicien") {
-        nav("/dashboard");
-      } else {
-        nav("/search");
-      }
-    },
-    onError: (err) => {
-      toast.error(err?.message || "تعذر إنشاء الحساب");
-    },
-  });
+    const m = useMutation({
+      mutationFn: (body) => Api.register(body),
+      onSuccess: (res) => {
+        loginStore({ user: res.user, token: res.token, role: res.role });
+        const isTech = res.role === "technicien";
+        const isVerified =
+          res.user?.technician?.isVerified ?? res.user?.technician?.is_verified ?? false;
+        toast.success(
+          isTech && !isVerified
+            ? "تم التسجيل، حسابك في انتظار التحقق"
+            : "تم إنشاء الحساب بنجاح"
+        );
+        if (isTech) {
+          nav(isVerified ? "/dashboard" : "/pending-verification");
+        } else {
+          nav("/search");
+        }
+      },
+      onError: (err) => {
+        toast.error(err?.message || "تعذر إنشاء الحساب");
+      },
+    });
 
   const submit = (e) => {
     e.preventDefault();
