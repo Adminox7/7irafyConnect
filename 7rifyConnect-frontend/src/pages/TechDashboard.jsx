@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { Api } from "../api/endpoints";
 import DashboardCard from "../components/DashboardCard";
 import StatusBadge from "../components/StatusBadge";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 /* ── تحميل Recharts بشكل lazy وآمن ── */
 function useRecharts() {
@@ -49,12 +49,22 @@ const buildWeekly = (rows) => {
 export default function TechDashboard() {
   const qc = useQueryClient();
   const recharts = useRecharts();
+  const navigate = useNavigate();
 
   /* ── لائحة كاملة (باش نحسب KPIs/Chart/Recent) ── */
   const allQ = useQuery({
     queryKey: ["tech-requests", "all"],
     queryFn: () => Api.getTechRequests({ status: "all" }),
   });
+
+  useEffect(() => {
+    const status = allQ.error?.status;
+    const code = allQ.error?.data?.status;
+    if (allQ.isError && status === 403 && code === "pending_verification") {
+      toast.error("حسابك في انتظار التحقق");
+      navigate("/pending-verification", { replace: true });
+    }
+  }, [allQ.isError, allQ.error, navigate]);
 
   /* ── فلتر الجدول حسب الحالة ── */
   const [status, setStatus] = useState("all");

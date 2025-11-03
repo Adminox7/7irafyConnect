@@ -42,12 +42,14 @@ export const Api = {
   login:    (body) => http.post("/auth/login", body).then(unwrap),
   me:              () => http.get("/auth/me").then(unwrap),
 
-  /* ADMIN (يطابق /routes/api.php بالضبط) */
-  getAdminMetrics:     ()         => http.get("/admin/metrics").then(unwrap),
-  getAdminStats:       ()         => http.get("/admin/stats").then(unwrap),
-  getAdminTechnicians: (params)   => http.get("/admin/technicians", { params }).then(unwrap),
-  verifyTechnician:    (id)       => http.patch(`/admin/technicians/${id}/verify`).then(unwrap),
-  updateTechnician:    (id, body) => http.patch(`/admin/technicians/${id}`, body).then(unwrap),
+    /* ADMIN (يطابق /routes/api.php بالضبط) */
+    getAdminMetrics:     ()         => http.get("/admin/metrics").then(unwrap),
+    getAdminStats:       ()         => http.get("/admin/stats").then(unwrap),
+    getAdminTechnicians: (params)   => http.get("/admin/technicians", { params }).then(unwrap),
+    getPendingTechnicians: ()       => http.get("/admin/technicians/pending").then(unwrap),
+    approveTechnician:   (id)       => http.post(`/admin/technicians/${id}/approve`).then(unwrap),
+    rejectTechnician:    (id, body) => http.post(`/admin/technicians/${id}/reject`, body).then(unwrap),
+    updateTechnician:    (id, body) => http.patch(`/admin/technicians/${id}`, body).then(unwrap),
   getAdminRequests:    ()         => http.get("/admin/requests").then(unwrap),
 
   /* PUBLIC TECHS */
@@ -79,11 +81,12 @@ export const Api = {
   uploadToMyPortfolio:  (body)                => http.post(`/tech/me/portfolio`, body).then(unwrap),
   deleteFromMyPortfolio:(imgId)               => http.delete(`/tech/me/portfolio/${imgId}`).then(unwrap),
 
-  /* CHAT */
-  getChatThreads:    (me)       => http.get("/chat/threads", { params: { me } }).then(unwrap),
-  getThreadMessages: (threadId) => http.get(`/chat/threads/${threadId}/messages`).then(unwrap),
-  sendMessage:       (threadId, body) => http.post(`/chat/threads/${threadId}/messages`, body).then(unwrap),
-  createThread:      (peerUserId)     => http.post(`/chat/threads`, { peerUserId }).then(unwrap),
+    /* CHAT */
+    getChatThreads:    ()         => http.get("/threads").then(unwrap),
+    getThreadMessages: (threadId) => http.get(`/threads/${threadId}`).then(unwrap),
+    sendMessage:       (threadId, body) => http.post(`/threads/${threadId}/messages`, body).then(unwrap),
+    createThread:      (peerUserId)     => http.post(`/threads`, { peerUserId }).then(unwrap),
+    markMessageRead:   (messageId)     => http.post(`/messages/${messageId}/read`).then(unwrap),
 
   /* UPLOAD */
   upload: (fileOrName) => {

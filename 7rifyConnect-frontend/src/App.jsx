@@ -1,5 +1,6 @@
 // src/App.jsx
 import { BrowserRouter, Routes, Route, Link, NavLink, Navigate } from "react-router-dom";
+import { useEffect } from "react";
 import Logo from "./components/Logo";
 import Home from "./pages/Home";
 import HomeSearch from "./pages/HomeSearch";
@@ -13,10 +14,15 @@ import Register from "./pages/Register";
 import ChatWindow from "./components/ChatWindow";
 import UserProfile from "./pages/UserProfile";
 import TechSelfProfile from "./pages/TechSelfProfile";
+import PendingVerification from "./pages/PendingVerification";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./stores/auth";
 import ErrorBoundary from "./components/ErrorBoundary";
+import NotificationBell from "./components/NotificationBell";
+import { ensureEchoAuthSync, initializeEcho } from "./lib/echo";
+import { initNoticeAuthSubscription } from "./stores/notifications";
+import { useChatThreads } from "./hooks/useChatThreads";
 
 export default function App() {
   // استخدم selectors منفصلة (أكثر استقراراً)
@@ -24,6 +30,20 @@ export default function App() {
   const token  = useAuthStore((s) => s.token);
   const logout = useAuthStore((s) => s.logout);
   const role   = user?.role;
+  const meId   = user?.id;
+
+  useEffect(() => {
+    initNoticeAuthSubscription();
+    ensureEchoAuthSync();
+  }, []);
+
+  useEffect(() => {
+    if (token) {
+      initializeEcho();
+    }
+  }, [token]);
+
+  useChatThreads(meId);
 
   return (
     <BrowserRouter>
@@ -113,20 +133,21 @@ export default function App() {
                   حساب جديد
                 </Link>
               </>
-            ) : (
-              <div className="flex items-center gap-2">
-                <NavLink
-                  to={role === "technicien" ? "/me/tech" : "/me"}
-                  className={({ isActive }) =>
-                    `text-sm px-3 py-1.5 rounded-2xl border ${
-                      isActive
-                        ? "border-brand-300 text-brand-700"
-                        : "border-slate-300 text-slate-700 hover:bg-slate-50"
-                    }`
-                  }
-                >
-                  ملفي
-                </NavLink>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <NotificationBell />
+                  <NavLink
+                    to={role === "technicien" ? "/me/tech" : "/me"}
+                    className={({ isActive }) =>
+                      `text-sm px-3 py-1.5 rounded-2xl border ${
+                        isActive
+                          ? "border-brand-300 text-brand-700"
+                          : "border-slate-300 text-slate-700 hover:bg-slate-50"
+                      }`
+                    }
+                  >
+                    ملفي
+                  </NavLink>
                 <NavLink
                   to="/chat"
                   className={({ isActive }) =>
@@ -154,12 +175,13 @@ export default function App() {
       {/* MAIN */}
       <main className="p-0 min-h-[60vh]" dir="rtl">
         <ErrorBoundary>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/search" element={<HomeSearch />} />
-            <Route path="/technicians/:id" element={<TechnicianProfile />} />
-            <Route path="/create-request" element={<CreateRequest />} />
-            <Route path="/chat/:threadId?" element={<ChatWindow />} />
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/search" element={<HomeSearch />} />
+              <Route path="/technicians/:id" element={<TechnicianProfile />} />
+              <Route path="/create-request" element={<CreateRequest />} />
+              <Route path="/chat/:threadId?" element={<ChatWindow />} />
+              <Route path="/pending-verification" element={<PendingVerification />} />
 
             {/* /me */}
             <Route
