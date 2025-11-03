@@ -1,9 +1,6 @@
-import { useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Api } from "../api/endpoints";
 import DashboardCard from "../components/DashboardCard";
-import toast from "react-hot-toast";
-import { useNotificationStore } from "../stores/notifications";
 
 const qOpts = {
   retry: 0,
@@ -31,7 +28,6 @@ function ErrorBox({ title = "خطأ", err }) {
 
 export default function AdminDashboard() {
   const qc = useQueryClient();
-  const setAdminPending = useNotificationStore((s) => s.setAdminPending);
 
   // من أنا؟
   const {
@@ -71,51 +67,22 @@ export default function AdminDashboard() {
   });
 
   const {
-    data: pendingRows = [],
+    data: pending = [],
     isLoading: tLoading,
     isError: tError,
     error: tErrObj,
   } = useQuery({
-    queryKey: ["admin-technicians", "pending"],
-    queryFn: () => Api.getPendingTechnicians(),
+    queryKey: ["admin-technicians", "pending"], // ✅ هاد اللي لازم نعمل له invalidate لاحقاً
+    queryFn: () => Api.getAdminTechnicians({ status: "pending" }),
     enabled: !notAuthed && !notAdmin,
     ...qOpts,
-    select: (res) => {
-      const list = Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : [];
-      return list.map((t) => ({
-        id: t.id ?? t.technician_id ?? t.user_id,
-        name: t.name ?? t.full_name ?? t.user?.name ?? "-",
-        email: t.email ?? t.user?.email ?? "-",
-        city: t.city ?? t.user?.city ?? "-",
-        created_at: t.requested_at ?? t.created_at ?? null,
-      }));
-    },
   });
 
-  useEffect(() => {
-    setAdminPending(Array.isArray(pendingRows) ? pendingRows.length : 0);
-  }, [pendingRows, setAdminPending]);
-
-  const approve = useMutation({
-    mutationFn: (id) => Api.approveTechnician(id),
+  const verify = useMutation({
+    mutationFn: (id) => Api.verifyTechnician(id),
     onSuccess: () => {
-      toast.success("تم القبول");
       qc.invalidateQueries({ queryKey: ["admin-metrics"] });
-      qc.invalidateQueries({ queryKey: ["admin-technicians", "pending"] });
-    },
-    onError: () => {
-      toast.error("تعذر قبول الحرفي");
-    },
-  });
-
-  const reject = useMutation({
-    mutationFn: (id) => Api.rejectTechnician(id),
-    onSuccess: () => {
-      toast.success("تم الرفض");
-      qc.invalidateQueries({ queryKey: ["admin-technicians", "pending"] });
-    },
-    onError: () => {
-      toast.error("تعذر رفض الطلب");
+      qc.invalidateQueries({ queryKey: ["admin-technicians", "pending"] }); // ✅ إصلاح
     },
   });
 
@@ -181,61 +148,48 @@ export default function AdminDashboard() {
             {sError && <ErrorBox title="تعذر تحميل الإحصائيات" err={sErrObj} />}
           </div>
 
-            <div className="rounded-2xl border bg-white p-4 shadow-sm">
-              <div className="mb-2 text-sm text-slate-600">حرفيون بانتظار التحقق</div>
-              {tLoading && <div className="text-slate-500">جارٍ التحميل…</div>}
-              {tError && <ErrorBox title="تعذر تحميل القائمة" err={tErrObj} />}
-              <table className="min-w-full text-sm">
-                <thead className="text-right text-slate-500">
-                  <tr>
-                    <th className="py-2 pr-4">#</th>
-                    <th className="py-2 pr-4">الإسم</th>
-                    <th className="py-2 pr-4">البريد</th>
-                    <th className="py-2 pr-4">المدينة</th>
-                    <th className="py-2 pr-4">تاريخ الطلب</th>
-                    <th className="py-2 pr-4">الفعل</th>
+          <div className="rounded-2xl border bg-white p-4 shadow-sm">
+            <div className="mb-2 text-sm text-slate-600">حرفيون بانتظار التحقق</div>
+            {tLoading && <div className="text-slate-500">جارٍ التحميل…</div>}
+            {tError && <ErrorBox title="تعذر تحميل القائمة" err={tErrObj} />}
+            <table className="min-w-full text-sm">
+              <thead className="text-right text-slate-500">
+                <tr>
+                  <th className="py-2 pr-4">#</th>
+                  <th className="py-2 pr-4">الإسم</th>
+                  <th className="py-2 pr-4">البريد</th>
+                  <th className="py-2 pr-4">المدينة</th>
+                  <th className="py-2 pr-4">الفعل</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(Array.isArray(pending) ? pending : []).map((t) => (
+                  <tr key={t.id} className="border-t">
+                    <td className="py-2 pr-4">{t.id}</td>
+                    <td className="py-2 pr-4">{t.name}</td>
+                    <td className="py-2 pr-4">{t.email}</td>
+                    <td className="py-2 pr-4">{t.city}</td>
+                    <td className="py-2 pr-4">
+                      <button
+                        onClick={() => verify.mutate(t.id)}
+                        disabled={verify.isPending}
+                        className="px-3 py-1.5 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-60"
+                      >
+                        {verify.isPending ? "جارٍ القبول…" : "قبول"}
+                      </button>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {(Array.isArray(pendingRows) ? pendingRows : []).map((t) => (
-                    <tr key={t.id} className="border-t">
-                      <td className="py-2 pr-4">{t.id}</td>
-                      <td className="py-2 pr-4">{t.name}</td>
-                      <td className="py-2 pr-4">{t.email}</td>
-                      <td className="py-2 pr-4">{t.city}</td>
-                      <td className="py-2 pr-4 text-xs text-slate-500">
-                        {t.created_at ? new Date(t.created_at).toLocaleDateString() : "-"}
-                      </td>
-                      <td className="py-2 pr-4">
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => approve.mutate(t.id)}
-                            disabled={approve.isPending}
-                            className="px-3 py-1.5 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-60"
-                          >
-                            {approve.isPending ? "جارٍ القبول…" : "قبول"}
-                          </button>
-                          <button
-                            onClick={() => reject.mutate(t.id)}
-                            disabled={reject.isPending}
-                            className="px-3 py-1.5 rounded-lg bg-red-500 text-white hover:bg-red-600 disabled:opacity-60"
-                          >
-                            {reject.isPending ? "جارٍ الرفض…" : "رفض"}
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                  {!tLoading && (Array.isArray(pendingRows) ? pendingRows.length === 0 : true) && (
-                    <tr>
-                      <td colSpan="5" className="py-6 text-center text-slate-500">
-                        لا يوجد طلبات تحقق معلّقة
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+                ))}
+                {!tLoading && (Array.isArray(pending) ? pending.length === 0 : true) && (
+                  <tr>
+                    <td colSpan="5" className="py-6 text-center text-slate-500">
+                      لا يوجد طلبات تحقق معلّقة
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
 
           <div className="rounded-2xl border bg-white p-4 shadow-sm">
             <div className="mb-2 flex items-center justify-between">

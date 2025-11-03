@@ -45,10 +45,8 @@ export const Api = {
   /* ADMIN (يطابق /routes/api.php بالضبط) */
   getAdminMetrics:     ()         => http.get("/admin/metrics").then(unwrap),
   getAdminStats:       ()         => http.get("/admin/stats").then(unwrap),
-    getAdminTechnicians: (params)   => http.get("/admin/technicians", { params }).then(unwrap),
-    getPendingTechnicians: ()       => http.get("/admin/technicians/pending").then(unwrap),
-    approveTechnician:   (id)       => http.post(`/admin/technicians/${id}/approve`).then(unwrap),
-    rejectTechnician:    (id)       => http.post(`/admin/technicians/${id}/reject`).then(unwrap),
+  getAdminTechnicians: (params)   => http.get("/admin/technicians", { params }).then(unwrap),
+  verifyTechnician:    (id)       => http.patch(`/admin/technicians/${id}/verify`).then(unwrap),
   updateTechnician:    (id, body) => http.patch(`/admin/technicians/${id}`, body).then(unwrap),
   getAdminRequests:    ()         => http.get("/admin/requests").then(unwrap),
 
@@ -64,14 +62,13 @@ export const Api = {
   createRequest: (body) => http.post("/requests", mapRequestPayload(body)).then(unwrap),
   getMyRequests: ()     => http.get("/requests/me").then(unwrap),
 
-    /* TECH DASHBOARD (طابق الراوتس ديالك) */
-    // ملاحظة: ما كاينش /tech/dashboard فـ routes ⇒ حيدناه
-    getTechRequests: (params) => http.get("/tech/requests", { params }).then(unwrap),
-    acceptRequest:   (id)     => http.post(`/tech/requests/${id}/accept`).then(unwrap),
-    startRequest:    (id)     => http.post(`/tech/requests/${id}/start`).then(unwrap),
-    completeRequest: (id)     => http.post(`/tech/requests/${id}/complete`).then(unwrap),
-    cancelRequest:   (id)     => http.post(`/tech/requests/${id}/cancel`).then(unwrap),
-    checkTechnicianGate: ()   => http.get("/technician/dashboard", { suppressToast: true }).then(unwrap),
+  /* TECH DASHBOARD (طابق الراوتس ديالك) */
+  // ملاحظة: ما كاينش /tech/dashboard فـ routes ⇒ حيدناه
+  getTechRequests: (params) => http.get("/tech/requests", { params }).then(unwrap),
+  acceptRequest:   (id)     => http.post(`/tech/requests/${id}/accept`).then(unwrap),
+  startRequest:    (id)     => http.post(`/tech/requests/${id}/start`).then(unwrap),
+  completeRequest: (id)     => http.post(`/tech/requests/${id}/complete`).then(unwrap),
+  cancelRequest:   (id)     => http.post(`/tech/requests/${id}/cancel`).then(unwrap),
 
   // تحديث بروفايل الحرفي الذاتي والخدمات/البورتفوليو ⇒ حسب routes: /tech/me/...
   updateMyTechProfile:  (body)                => http.patch(`/tech/me`, body).then(unwrap),
@@ -82,12 +79,11 @@ export const Api = {
   uploadToMyPortfolio:  (body)                => http.post(`/tech/me/portfolio`, body).then(unwrap),
   deleteFromMyPortfolio:(imgId)               => http.delete(`/tech/me/portfolio/${imgId}`).then(unwrap),
 
-    /* CHAT */
-    getChatThreads:    ()       => http.get("/chat/threads").then(unwrap),
-    getThreadMessages: (threadId) => http.get(`/chat/threads/${threadId}`).then(unwrap),
-    sendMessage:       (threadId, body) => http.post(`/chat/threads/${threadId}/messages`, body).then(unwrap),
-    markMessageRead:   (messageId) => http.post(`/messages/${messageId}/read`).then(unwrap),
-    createThread:      (peerUserId)     => http.post(`/chat/threads`, { peerUserId }).then(unwrap),
+  /* CHAT */
+  getChatThreads:    (me)       => http.get("/chat/threads", { params: { me } }).then(unwrap),
+  getThreadMessages: (threadId) => http.get(`/chat/threads/${threadId}/messages`).then(unwrap),
+  sendMessage:       (threadId, body) => http.post(`/chat/threads/${threadId}/messages`, body).then(unwrap),
+  createThread:      (peerUserId)     => http.post(`/chat/threads`, { peerUserId }).then(unwrap),
 
   /* UPLOAD */
   upload: (fileOrName) => {
