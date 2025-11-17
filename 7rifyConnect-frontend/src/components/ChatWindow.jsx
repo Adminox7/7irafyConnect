@@ -355,60 +355,68 @@ export default function ChatWindow() {
 
   const handleIncomingMessage = useCallback(
     (threadId, payload) => {
-      const message = normalizeMessage(payload?.message ?? payload);
-      const targetThreadId = message.threadId ?? threadId;
-      const isActive =
-        activeThreadRef.current != null &&
-        String(activeThreadRef.current) === String(targetThreadId);
+      try {
+        const raw = payload?.message ?? payload;
+        if (!raw) return;
+        const message = normalizeMessage(raw);
+        if (!message) return;
+        const targetThreadId = message.threadId ?? threadId;
+        if (!targetThreadId) return;
+        const isActive =
+          activeThreadRef.current != null &&
+          String(activeThreadRef.current) === String(targetThreadId);
 
-      qc.setQueryData(["messages", targetThreadId], (prev) => {
-        const bundle = prev || { messages: [] };
-        const merged = mergeUniqueMessages(bundle.messages, [message]);
-        return { ...bundle, messages: merged };
-      });
+        qc.setQueryData(["messages", targetThreadId], (prev) => {
+          const bundle = prev || { messages: [] };
+          const merged = mergeUniqueMessages(bundle.messages, [message]);
+          return { ...bundle, messages: merged };
+        });
 
-      qc.setQueryData(["threads", meId], (prev = []) => {
-        const arr = Array.isArray(prev) ? [...prev] : [];
-        const idx = arr.findIndex(
-          (t) => String(t.id) === String(targetThreadId)
-        );
-        const updatedAt = message.createdAt || new Date().toISOString();
-        const unreadIncrement = message.fromUserId !== meId && !isActive ? 1 : 0;
-        if (idx >= 0) {
-          const current = { ...arr[idx] };
-          current.lastMessage = message.text;
-          current.updatedAt = updatedAt;
-          if (!current.peer && message.sender) current.peer = message.sender;
-          current.peerName =
-            current.peer?.name ?? current.peerName ?? message.senderName ?? "محادثة";
-          if (unreadIncrement) {
-            current.unreadCount = (current.unreadCount || 0) + unreadIncrement;
+        qc.setQueryData(["threads", meId], (prev = []) => {
+          const arr = Array.isArray(prev) ? [...prev] : [];
+          const idx = arr.findIndex(
+            (t) => String(t.id) === String(targetThreadId)
+          );
+          const updatedAt = message.createdAt || new Date().toISOString();
+          const unreadIncrement = message.fromUserId !== meId && !isActive ? 1 : 0;
+          if (idx >= 0) {
+            const current = { ...arr[idx] };
+            current.lastMessage = message.text;
+            current.updatedAt = updatedAt;
+            if (!current.peer && message.sender) current.peer = message.sender;
+            current.peerName =
+              current.peer?.name ?? current.peerName ?? message.senderName ?? "محادثة";
+            if (unreadIncrement) {
+              current.unreadCount = (current.unreadCount || 0) + unreadIncrement;
+            }
+            arr[idx] = current;
+            const [item] = arr.splice(idx, 1);
+            arr.unshift(item);
+          } else {
+            arr.unshift({
+              id: targetThreadId,
+              peer: message.sender,
+              peerName: message.senderName ?? "محادثة",
+              lastMessage: message.text,
+              updatedAt,
+              unreadCount: unreadIncrement,
+            });
           }
-          arr[idx] = current;
-          const [item] = arr.splice(idx, 1);
-          arr.unshift(item);
-        } else {
-          arr.unshift({
-            id: targetThreadId,
-            peer: message.sender,
-            peerName: message.senderName ?? "محادثة",
-            lastMessage: message.text,
-            updatedAt,
-            unreadCount: unreadIncrement,
-          });
-        }
-        return arr;
-      });
+          return arr;
+        });
 
-      if (message.fromUserId !== meId) {
-        if (isActive) {
-          clearThreadUnread(targetThreadId);
+        if (message.fromUserId !== meId) {
+          if (isActive) {
+            clearThreadUnread(targetThreadId);
+          } else {
+            incrementUnread(targetThreadId);
+            showMessageToast(message);
+          }
         } else {
-          incrementUnread(targetThreadId);
-          showMessageToast(message);
+          clearThreadUnread(targetThreadId);
         }
-      } else {
-        clearThreadUnread(targetThreadId);
+      } catch (err) {
+        console.error("Failed to process incoming chat message", err);
       }
     },
     [qc, meId, incrementUnread, clearThreadUnread, showMessageToast]

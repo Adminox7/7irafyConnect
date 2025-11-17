@@ -68,7 +68,7 @@ export const Api = {
   /* AUTH */
   register: (body) => http.post("/auth/register", mapRegisterPayload(body)).then(unwrap),
   login:    (body) => http.post("/auth/login", body).then(unwrap),
-  me:              () => http.get("/auth/me").then(unwrap),
+  me:              (config) => http.get("/auth/me", config).then(unwrap),
 
     /* ADMIN (يطابق /routes/api.php بالضبط) */
     getAdminMetrics:     ()         => http.get("/admin/metrics").then(unwrap),
