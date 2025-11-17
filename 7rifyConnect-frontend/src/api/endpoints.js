@@ -76,7 +76,7 @@ export const Api = {
     getAdminTechnicians: (params)   => http.get("/admin/technicians", { params }).then(unwrap),
     getPendingTechnicians: ()       =>
       http.get("/admin/technicians", { params: { status: "pending" } }).then(unwrap),
-    approveTechnician:   (id)       => http.post(`/admin/technicians/${id}/approve`).then(unwrap),
+    approveTechnician:   (id)       => http.patch(`/admin/technicians/${id}/verify`).then(unwrap),
     rejectTechnician:    (id, body) => http.post(`/admin/technicians/${id}/reject`, body).then(unwrap),
     updateTechnician:    (id, body) => http.patch(`/admin/technicians/${id}`, body).then(unwrap),
   getAdminRequests:    ()         => http.get("/admin/requests").then(unwrap),
@@ -111,11 +111,12 @@ export const Api = {
   deleteFromMyPortfolio:(imgId)               => http.delete(`/tech/me/portfolio/${imgId}`).then(unwrap),
 
     /* CHAT */
-    getChatThreads:    ()         => http.get("/threads").then(unwrap),
-    getThreadMessages: (threadId) => http.get(`/threads/${threadId}`).then(unwrap),
+    getChatThreads:    (params)   => http.get("/chat/threads", { params }).then(unwrap),
+    getThreadMessages: (threadId) => http.get(`/chat/threads/${threadId}/messages`).then(unwrap),
     sendMessage:       (threadId, body) =>
-      http.post(`/threads/${threadId}/messages`, mapMessagePayload(body)).then(unwrap),
-    createThread:      (peerUserId)     => http.post(`/threads`, { peerUserId }).then(unwrap),
+      http.post(`/chat/threads/${threadId}/messages`, mapMessagePayload(body)).then(unwrap),
+    createThread:      (peerUserId, extra = {}) =>
+      http.post(`/chat/threads`, { peerUserId, ...extra }).then(unwrap),
     markMessageRead:   (messageId)     => http.post(`/messages/${messageId}/read`).then(unwrap),
 
   /* UPLOAD */
