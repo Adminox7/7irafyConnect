@@ -291,7 +291,7 @@ export default function ChatWindow() {
 
   const retrySend = useCallback(
     (failedMsg) => {
-      const content = failedMsg?.text ?? failedMsg?.message ?? "";
+      const content = (failedMsg?.text ?? failedMsg?.message ?? "").trim();
       if (!content) return;
 
       qc.setQueryData(["messages", currentThreadId], (prev) => {
@@ -302,13 +302,14 @@ export default function ChatWindow() {
         return { ...bundle, messages: next };
       });
 
-      send.mutate({ body: content });
+      send.mutate({ text: content, body: content, message: content });
     },
     [currentThreadId, qc, send]
   );
 
   const queueSend = useCallback(() => {
-    if (!text.trim() || !currentThreadId) return;
+    const trimmed = text.trim();
+    if (!trimmed || !currentThreadId) return;
     const now = new Date().toISOString();
 
     const optimistic = normalizeMessage({
@@ -316,7 +317,7 @@ export default function ChatWindow() {
       thread_id: currentThreadId,
       sender_id: meId,
       sender: { id: meId, name: myName },
-      body: text,
+      body: trimmed,
       created_at: now,
     });
     optimistic.fromMe = true;
@@ -330,7 +331,7 @@ export default function ChatWindow() {
     });
 
     setText("");
-    send.mutate({ body: text });
+    send.mutate({ text: trimmed, body: trimmed, message: trimmed });
   }, [text, currentThreadId, meId, myName, qc, send]);
 
   const subscriptionsRef = useRef(new Map());
