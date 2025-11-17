@@ -36,6 +36,34 @@ const mapRequestPayload = (b) => ({
   technician_id: b.technicianId ?? b.technician_id ?? undefined,
 });
 
+const mapMessagePayload = (payload) => {
+  if (typeof payload === "string") {
+    const text = payload.trim();
+    return {
+      text,
+      body: text,
+      message: text,
+    };
+  }
+  const rawText =
+    payload?.text ??
+    payload?.body ??
+    payload?.message ??
+    payload?.content ??
+    payload?.textBody ??
+    "";
+  const normalized =
+    typeof rawText === "string" ? rawText : rawText != null ? String(rawText) : "";
+  const trimmed = normalized.trim();
+  const finalText = trimmed || normalized;
+  return {
+    ...(payload || {}),
+    text: payload?.text ?? finalText,
+    body: payload?.body ?? finalText,
+    message: payload?.message ?? finalText,
+  };
+};
+
 export const Api = {
   /* AUTH */
   register: (body) => http.post("/auth/register", mapRegisterPayload(body)).then(unwrap),
@@ -46,7 +74,8 @@ export const Api = {
     getAdminMetrics:     ()         => http.get("/admin/metrics").then(unwrap),
     getAdminStats:       ()         => http.get("/admin/stats").then(unwrap),
     getAdminTechnicians: (params)   => http.get("/admin/technicians", { params }).then(unwrap),
-    getPendingTechnicians: ()       => http.get("/admin/technicians/pending").then(unwrap),
+    getPendingTechnicians: ()       =>
+      http.get("/admin/technicians", { params: { status: "pending" } }).then(unwrap),
     approveTechnician:   (id)       => http.post(`/admin/technicians/${id}/approve`).then(unwrap),
     rejectTechnician:    (id, body) => http.post(`/admin/technicians/${id}/reject`, body).then(unwrap),
     updateTechnician:    (id, body) => http.patch(`/admin/technicians/${id}`, body).then(unwrap),
@@ -84,7 +113,8 @@ export const Api = {
     /* CHAT */
     getChatThreads:    ()         => http.get("/threads").then(unwrap),
     getThreadMessages: (threadId) => http.get(`/threads/${threadId}`).then(unwrap),
-    sendMessage:       (threadId, body) => http.post(`/threads/${threadId}/messages`, body).then(unwrap),
+    sendMessage:       (threadId, body) =>
+      http.post(`/threads/${threadId}/messages`, mapMessagePayload(body)).then(unwrap),
     createThread:      (peerUserId)     => http.post(`/threads`, { peerUserId }).then(unwrap),
     markMessageRead:   (messageId)     => http.post(`/messages/${messageId}/read`).then(unwrap),
 
