@@ -26,17 +26,22 @@ function getMeId() {
   return u?.id ?? undefined;
 }
 
+const toSafeTimeString = (value) => {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
 function MessageBubble({ m, meId, peerName, onRetry }) {
   const fromMe = (meId != null && m.fromUserId === meId) || m.fromMe;
   const failed = Boolean(m.failed);
   const senderLabel = fromMe ? "أنت" : m.senderName ?? peerName ?? "مستخدم";
 
-  const timeStr = m.createdAt
-    ? new Date(m.createdAt).toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      })
-    : "";
+  const timeStr = toSafeTimeString(m.createdAt);
 
   return (
     <div className={`flex ${fromMe ? "justify-start" : "justify-end"}`}>
