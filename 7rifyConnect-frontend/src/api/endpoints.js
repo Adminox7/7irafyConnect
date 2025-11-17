@@ -116,7 +116,9 @@ export const Api = {
     sendMessage:       (threadId, body) =>
       http.post(`/chat/threads/${threadId}/messages`, mapMessagePayload(body)).then(unwrap),
     createThread:      (peerUserId, extra = {}) =>
-      http.post(`/chat/threads`, { peerUserId, ...extra }).then(unwrap),
+      http
+        .post(`/chat/threads`, { peerUserId, userId: peerUserId, ...extra })
+        .then(unwrap),
     markMessageRead:   (messageId)     => http.post(`/messages/${messageId}/read`).then(unwrap),
 
   /* UPLOAD */

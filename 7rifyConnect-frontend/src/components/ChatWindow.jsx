@@ -21,11 +21,6 @@ function normId(v) {
   return Number.isFinite(n) ? n : undefined;
 }
 
-function getMeId() {
-  const u = useAuthStore.getState()?.user;
-  return u?.id ?? undefined;
-}
-
 const toSafeTimeString = (value) => {
   if (!value) return "";
   const date = new Date(value);
@@ -87,7 +82,7 @@ export default function ChatWindow() {
   const qc = useQueryClient();
 
   const user = useAuthStore((s) => s.user);
-  const meId = getMeId() ?? 0;
+  const meId = user?.id ?? null;
   const myName =
     user?.full_name ?? user?.fullName ?? user?.name ?? user?.email ?? "أنا";
 
@@ -314,7 +309,7 @@ export default function ChatWindow() {
 
   const queueSend = useCallback(() => {
     const trimmed = text.trim();
-    if (!trimmed || !currentThreadId) return;
+    if (!trimmed || !currentThreadId || !meId) return;
     const now = new Date().toISOString();
 
     const optimistic = normalizeMessage({

@@ -1,5 +1,5 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Api } from "../api/endpoints";
 import Tabs from "../components/Tabs";
 import RatingStars from "../components/RatingStars";
@@ -7,11 +7,12 @@ import Chip from "../components/Chip";
 import AvatarUpload from "../components/AvatarUpload";
 import toast from "react-hot-toast";
 import { useAuthStore } from "../stores/auth";
-import { http } from "../api/http";
+import { normalizeThread } from "../hooks/useChatThreads";
 
 export default function TechnicianProfile() {
   const { id } = useParams();
   const nav = useNavigate();
+  const qc = useQueryClient();
   const { user, token } = useAuthStore();
 
   /* ─────────────── QUERIES ─────────────── */
@@ -102,15 +103,23 @@ export default function TechnicianProfile() {
     }
 
     try {
-      const res = await http.post("/chat/threads", { userId: peerUserId });
-      const thread = res.data.thread || res.data?.data?.thread || res.data?.thread;
+      const res = await Api.createThread(peerUserId);
+      const thread = normalizeThread(res?.thread ?? res);
       if (thread?.id) {
+        if (user?.id) {
+          qc.setQueryData(["threads", user.id], (prev = []) => {
+            const arr = Array.isArray(prev) ? [...prev] : [];
+            const idx = arr.findIndex((t) => String(t.id) === String(thread.id));
+            if (idx >= 0) arr[idx] = { ...arr[idx], ...thread };
+            else arr.unshift(thread);
+            return arr;
+          });
+        }
         nav(`/chat/${thread.id}`);
       } else {
         toast.error("تعذر فتح الدردشة");
       }
     } catch (err) {
-      // message ديال http interceptor كيوصل للتوست، هنا غير fallback
       console.error(err);
       if (!err?.message) toast.error("تعذر فتح الدردشة");
     }

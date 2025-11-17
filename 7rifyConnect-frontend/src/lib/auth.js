@@ -37,21 +37,6 @@ export const isTechnicianUser = (user) => user?.role === "technicien";
 export const getUserVerificationFlag = (user) => {
   if (!user) return false;
 
-  const statusCandidates = [
-    user?.technician?.status,
-    user?.technician?.state,
-    user?.status,
-    user?.state,
-  ];
-
-  for (const status of statusCandidates) {
-    if (typeof status !== "string") continue;
-    const normalized = status.trim().toLowerCase();
-    if (!normalized) continue;
-    if (truthyStatuses.has(normalized)) return true;
-    if (falsyStatuses.has(normalized)) return false;
-  }
-
   const timestampCandidates = [
     user?.technician?.verified_at,
     user?.technician?.approved_at,
@@ -91,6 +76,21 @@ export const getUserVerificationFlag = (user) => {
     if (coerced != null) {
       return coerced;
     }
+  }
+
+  const statusCandidates = [
+    user?.technician?.status,
+    user?.technician?.state,
+    user?.status,
+    user?.state,
+  ];
+
+  for (const status of statusCandidates) {
+    if (typeof status !== "string") continue;
+    const normalized = status.trim().toLowerCase();
+    if (!normalized) continue;
+    if (truthyStatuses.has(normalized)) return true;
+    if (falsyStatuses.has(normalized)) return false;
   }
 
   return false;
