@@ -99,7 +99,7 @@ export function useChatThreads(meId, options = {}) {
 
   const query = useQuery({
     queryKey: ["threads", meId],
-    queryFn: () => Api.getChatThreads(),
+    queryFn: () => Api.getChatThreads(meId ? { me: meId } : undefined),
     enabled: Boolean(meId),
     refetchOnWindowFocus: false,
     staleTime: 30_000,
