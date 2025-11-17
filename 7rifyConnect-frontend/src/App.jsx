@@ -23,14 +23,20 @@ import NotificationBell from "./components/NotificationBell";
 import { ensureEchoAuthSync, initializeEcho } from "./lib/echo";
 import { initNoticeAuthSubscription } from "./stores/notifications";
 import { useChatThreads } from "./hooks/useChatThreads";
+import { Api } from "./api/endpoints";
+import { getUserVerificationFlag, isTechnicianUser } from "./lib/auth";
 
 export default function App() {
   // استخدم selectors منفصلة (أكثر استقراراً)
-  const user   = useAuthStore((s) => s.user);
-  const token  = useAuthStore((s) => s.token);
-  const logout = useAuthStore((s) => s.logout);
+  const user     = useAuthStore((s) => s.user);
+  const token    = useAuthStore((s) => s.token);
+  const logout   = useAuthStore((s) => s.logout);
+  const setUser  = useAuthStore((s) => s.setUser);
+  const hydrated = useAuthStore((s) => s.hydrated);
   const role   = user?.role;
   const meId   = user?.id;
+  const isTech = isTechnicianUser(user);
+  const isTechVerified = getUserVerificationFlag(user);
 
   useEffect(() => {
     initNoticeAuthSubscription();
@@ -42,6 +48,38 @@ export default function App() {
       initializeEcho();
     }
   }, [token]);
+
+  useEffect(() => {
+    if (!token || !hydrated) return;
+    let cancelled = false;
+    let pollTimer;
+
+    const refreshProfile = async () => {
+      try {
+        const res = await Api.me({ suppressToast: true });
+        if (cancelled) return;
+        const nextUser = res?.user ?? res ?? null;
+        if (nextUser) {
+          setUser(nextUser);
+        }
+      } catch (err) {
+        if (err?.status === 401) {
+          logout();
+        }
+      }
+    };
+
+    refreshProfile();
+
+    if (isTech && !isTechVerified) {
+      pollTimer = setInterval(refreshProfile, 10000);
+    }
+
+    return () => {
+      cancelled = true;
+      if (pollTimer) clearInterval(pollTimer);
+    };
+  }, [token, hydrated, isTech, isTechVerified, setUser, logout]);
 
   useChatThreads(meId);
 
@@ -180,7 +218,14 @@ export default function App() {
               <Route path="/search" element={<HomeSearch />} />
               <Route path="/technicians/:id" element={<TechnicianProfile />} />
               <Route path="/create-request" element={<CreateRequest />} />
-              <Route path="/chat/:threadId?" element={<ChatWindow />} />
+            <Route
+              path="/chat/:threadId?"
+              element={
+                <ProtectedRoute>
+                  <ChatWindow />
+                </ProtectedRoute>
+              }
+            />
               <Route path="/pending-verification" element={<PendingVerification />} />
 
             {/* /me */}

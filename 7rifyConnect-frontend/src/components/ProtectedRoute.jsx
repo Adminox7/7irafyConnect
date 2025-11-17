@@ -1,6 +1,7 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuthStore } from "../stores/auth";
+import { getUserVerificationFlag } from "../lib/auth";
 
 export default function ProtectedRoute({ children, role }) {
   const token = useAuthStore((s) => s.token);
@@ -31,12 +32,7 @@ export default function ProtectedRoute({ children, role }) {
   }
 
   if (role === "technicien") {
-    const verified =
-      user?.technician?.isVerified ??
-      user?.technician?.is_verified ??
-      user?.isVerified ??
-      user?.is_verified ??
-      false;
+    const verified = getUserVerificationFlag(user);
     if (!verified) {
       return <Navigate to="/pending-verification" replace />;
     }

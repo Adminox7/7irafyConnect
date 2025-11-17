@@ -1,6 +1,20 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useAuthStore } from "../stores/auth";
+import { getUserVerificationFlag, isTechnicianUser } from "../lib/auth";
 
 export default function PendingVerification() {
+  const user = useAuthStore((s) => s.user);
+  const nav = useNavigate();
+  const isTech = isTechnicianUser(user);
+  const verified = getUserVerificationFlag(user);
+
+  useEffect(() => {
+    if (isTech && verified) {
+      nav("/dashboard", { replace: true });
+    }
+  }, [isTech, verified, nav]);
+
   return (
     <div className="page-shell container max-w-2xl mx-auto px-4 py-12" dir="rtl">
       <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm text-right">
