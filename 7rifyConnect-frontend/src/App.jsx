@@ -153,8 +153,8 @@ export default function App() {
         className="sticky top-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/70"
         dir="rtl"
       >
-        <div className="container max-w-7xl mx-auto flex items-center justify-between gap-4 px-4 sm:px-6 lg:px-8 py-3">
-          <div className="flex items-center gap-3">
+          <div className="container max-w-7xl mx-auto flex items-center justify-between gap-4 px-4 sm:px-6 lg:px-8 py-3">
+            <div className="flex items-center gap-3 w-full justify-between md:w-auto md:justify-start">
             <Link to="/" aria-label="الصفحة الرئيسية" className="flex items-center gap-2">
               <Logo className="!gap-2" />
             </Link>
