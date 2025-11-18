@@ -157,38 +157,38 @@ export default function App() {
     </>
   );
 
-  const mobileMenuItems = [
-    {
-      label: "?????",
-      desc: "???? ?? ?????? ???????",
-      to: "/search",
-      visible: true,
-    },
-    {
-      label: "??????",
-      desc: "???????? ??????? ????????",
-      to: "/requests",
-      visible: !!token,
-    },
-    {
-      label: "????? ??????",
-      desc: "???? ??????? ???????",
-      to: "/dashboard",
-      visible: role === "technicien",
-    },
-    {
-      label: "????? ???????",
-      desc: "????? ?????? ???????",
-      to: "/admin",
-      visible: role === "admin",
-    },
-    {
-      label: "??????????",
-      desc: "????? ?? ?????? ?????? ?????",
-      to: "/chat",
-      visible: !!token,
-    },
-  ].filter((item) => item.visible);
+    const mobileMenuItems = [
+      {
+        label: "البحث",
+        desc: "اكتشف الحرفيين والخدمات القريبة منك",
+        to: "/search",
+        visible: true,
+      },
+      {
+        label: "طلباتي",
+        desc: "تابع الطلبات الجارية والمكتملة",
+        to: "/requests",
+        visible: !!token,
+      },
+      {
+        label: "لوحة الحرفي",
+        desc: "إدارة طلبات عملائك وجدولك اليومي",
+        to: "/dashboard",
+        visible: role === "technicien",
+      },
+      {
+        label: "لوحة الإدارة",
+        desc: "إشراف كامل على المنصة والطلبات",
+        to: "/admin",
+        visible: role === "admin",
+      },
+      {
+        label: "المحادثات",
+        desc: "تواصل مباشر مع العملاء والحرفيين",
+        to: "/chat",
+        visible: !!token,
+      },
+    ].filter((item) => item.visible);
 
 
   return (
@@ -327,9 +327,9 @@ export default function App() {
               </div>
 
               <div className="flex-1 overflow-y-auto px-4 py-5 text-slate-800">
-                <div className="space-y-2">
-                  <div className="text-xs font-semibold text-slate-500">????? ?????</div>
-                  <ul className="space-y-2">
+                  <div className="space-y-2">
+                    <div className="text-xs font-semibold text-slate-500">روابط سريعة</div>
+                    <ul className="space-y-2">
                     {mobileMenuItems.map((item) => (
                       <li key={item.to}>
                         <NavLink
