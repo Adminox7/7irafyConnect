@@ -4,6 +4,7 @@ import Tabs from "../components/Tabs";
 import AvatarUpload from "../components/AvatarUpload";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
+import { Api } from "../api/endpoints";
 
 export default function UserProfile() {
   // ✅ ما نستعملوش selector كيصنع object جديد
@@ -44,6 +45,8 @@ export default function UserProfile() {
   const [city, setCity] = useState(initCity);
   const [phone, setPhone] = useState(initPhone);
   const [avatar, setAvatar] = useState(initAvatar);
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [saving, setSaving] = useState(false);
 
   // مزامنة إذا تغيّر user من الستور
   useEffect(() => {
@@ -51,17 +54,40 @@ export default function UserProfile() {
     setCity(user.city ?? "");
     setPhone(user.phone ?? "");
     setAvatar(user.avatarUrl ?? user.avatar_url ?? "");
+    setAvatarFile(null);
   }, [user]);
 
-  const saveLocal = () => {
-    setUser({
-      ...user,
-      fullName,
-      city,
-      phone,
-      avatarUrl: avatar,
-    });
-    toast.success("تم حفظ التغييرات محلياً");
+  const saveProfile = async () => {
+    if (saving) return;
+    setSaving(true);
+    try {
+      let avatarUrl = avatar;
+      if (avatarFile instanceof File) {
+        const uploaded = await Api.upload(avatarFile);
+        avatarUrl = uploaded?.url ?? avatarUrl;
+      }
+
+      const res = await Api.updateProfile({
+        fullName: fullName?.trim() || null,
+        city: city?.trim() || null,
+        phone: phone?.trim() || null,
+        avatarUrl: avatarUrl || null,
+      });
+
+      const nextUser = res?.user ?? res ?? null;
+      if (nextUser) {
+        setUser(nextUser);
+        toast.success("تم حفظ بياناتك بنجاح");
+        setAvatarFile(null);
+      } else {
+        toast.error("تعذر تحديث الحساب");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("تعذر حفظ التغييرات");
+    } finally {
+      setSaving(false);
+    }
   };
 
   // ✅ tabs ثابتة بالمرجع (باش ما تشعلش loop داخل <Tabs/>)
@@ -76,6 +102,7 @@ export default function UserProfile() {
               <AvatarUpload
                 value={avatar}
                 onChange={setAvatar}
+                onFileChange={setAvatarFile}
                 placeholder={(fullName || "ص").slice(0, 1)}
               />
             </div>
@@ -112,8 +139,9 @@ export default function UserProfile() {
             <div className="flex justify-end">
               <button
                 type="button"
-                onClick={saveLocal}
-                className="px-4 py-2 rounded-2xl bg-brand-600 text-white hover:bg-brand-700"
+                onClick={saveProfile}
+                disabled={saving}
+                className="px-4 py-2 rounded-2xl bg-brand-600 text-white hover:bg-brand-700 disabled:opacity-60"
               >
                 حفظ
               </button>
@@ -158,3 +186,14 @@ export default function UserProfile() {
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
+

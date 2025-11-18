@@ -36,6 +36,16 @@ const mapRequestPayload = (b) => ({
   technician_id: b.technicianId ?? b.technician_id ?? undefined,
 });
 
+const mapTechProfilePayload = (b) => ({
+  full_name: b.fullName ?? b.full_name ?? undefined,
+  city: b.city ?? undefined,
+  phone: b.phone ?? undefined,
+  bio: b.bio ?? undefined,
+  specialties: Array.isArray(b.specialties) ? b.specialties : undefined,
+  is_premium: typeof b.isPremium === "boolean" ? b.isPremium : undefined,
+  avatarUrl: b.avatarUrl ?? b.avatar_url ?? undefined,
+});
+
 const mapMessagePayload = (payload) => {
   if (typeof payload === "string") {
     const text = payload.trim();
@@ -69,6 +79,7 @@ export const Api = {
   register: (body) => http.post("/auth/register", mapRegisterPayload(body)).then(unwrap),
   login:    (body) => http.post("/auth/login", body).then(unwrap),
   me:              (config) => http.get("/auth/me", config).then(unwrap),
+  updateProfile:   (body)   => http.patch("/auth/me", body).then(unwrap),
 
     /* ADMIN (يطابق /routes/api.php بالضبط) */
     getAdminMetrics:     ()         => http.get("/admin/metrics").then(unwrap),
@@ -102,7 +113,7 @@ export const Api = {
   cancelRequest:   (id)     => http.post(`/tech/requests/${id}/cancel`).then(unwrap),
 
   // تحديث بروفايل الحرفي الذاتي والخدمات/البورتفوليو ⇒ حسب routes: /tech/me/...
-  updateMyTechProfile:  (body)                => http.patch(`/tech/me`, body).then(unwrap),
+  updateMyTechProfile:  (body)                => http.patch(`/tech/me`, mapTechProfilePayload(body)).then(unwrap),
   createMyService:      (body)                => http.post(`/tech/me/services`, mapServicePayload(body)).then(unwrap),
   updateMyService:      (sid, body)           => http.patch(`/tech/me/services/${sid}`, mapServicePayload(body)).then(unwrap),
   deleteMyService:      (sid)                 => http.delete(`/tech/me/services/${sid}`).then(unwrap),

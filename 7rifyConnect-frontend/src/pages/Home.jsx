@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import Input from "../components/Input";
@@ -71,6 +71,14 @@ export default function Home() {
     queryKey: ["top-services"],
     queryFn: Api.getTopServices,
   });
+
+  const verifiedTopTechs = useMemo(
+    () =>
+      Array.isArray(topTechs)
+        ? topTechs.filter((tech) => Boolean(tech?.isVerified ?? tech?.is_verified ?? tech?.verified))
+        : [],
+    [topTechs]
+  );
 
   return (
     <div className="space-y-0 [&>section]:scroll-mt-24" dir="rtl">
@@ -219,7 +227,7 @@ export default function Home() {
           )}
 
           {/* Empty state */}
-          {!errTopTechs && !loadingTopTechs && Array.isArray(topTechs) && topTechs.length === 0 && (
+          {!errTopTechs && !loadingTopTechs && verifiedTopTechs.length === 0 && (
             <div className="rounded-2xl border border-slate-200 bg-white p-6 text-slate-600 text-center">
               لا توجد بيانات متاحة.
             </div>
@@ -242,7 +250,7 @@ export default function Home() {
 
             {/* Cards */}
             {!loadingTopTechs && !errTopTechs &&
-              (Array.isArray(topTechs) ? topTechs : []).map((t) => <TechCard key={t.id} t={t} />)}
+              verifiedTopTechs.map((t) => <TechCard key={t.id} t={t} />)}
           </div>
         </div>
       </section>
@@ -322,3 +330,5 @@ export default function Home() {
     </div>
   );
 }
+
+

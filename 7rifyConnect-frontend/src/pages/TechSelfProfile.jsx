@@ -12,6 +12,7 @@ import toast from "react-hot-toast";
 export default function TechSelfProfile() {
   const qc = useQueryClient();
   const user = useAuthStore((s) => s.user);
+  const setUser = useAuthStore((s) => s.setUser);
 
   // technicianId يُفضَّل يجي من الـuser (مثلاً ارسلناه من /auth/me)
   const technicianId = useMemo(
@@ -43,21 +44,42 @@ export default function TechSelfProfile() {
   /* ──────────────────────────── MUTATIONS ───────────────────────────── */
   // تحديث بروفايلي الذاتي عبر /tech/me
   const upd = useMutation({
-    mutationFn: (body) =>
-      Api.updateMyTechProfile({
-        // نرسل snake_case للباك
-        full_name: body.fullName,
+    mutationFn: async (body) => {
+      let avatarUrl = body.avatar ?? null;
+      if (body.avatarFile instanceof File) {
+        const uploaded = await Api.upload(body.avatarFile);
+        avatarUrl = uploaded?.url ?? avatarUrl;
+      }
+      await Api.updateProfile({
+        fullName: body.fullName,
+        city: body.city,
+        phone: body.phone,
+        avatarUrl,
+      });
+      return Api.updateMyTechProfile({
+        fullName: body.fullName,
         city: body.city,
         phone: body.phone,
         bio: body.bio,
         specialties: body.specialties ?? [],
-        is_premium: !!body.isPremium,
-      }),
-    onSuccess: () => {
-      toast.success("تم حفظ التغييرات");
-      qc.invalidateQueries({ queryKey: ["tech", "public", technicianId] });
+        isPremium: body.isPremium,
+        avatarUrl,
+      });
     },
-    onError: () => toast.error("تعذّر الحفظ"),
+    onSuccess: (res) => {
+      toast.success("تم حفظ ملفك الشخصي");
+      qc.invalidateQueries({ queryKey: ["tech", "public", technicianId] });
+      qc.invalidateQueries({ queryKey: ["top-techs"] });
+      qc.invalidateQueries({ queryKey: ["technicians"] });
+      if (res?.user) {
+        setUser(res.user);
+      }
+      if (res?.technician?.avatarUrl) {
+        setAvatar(res.technician.avatarUrl);
+      }
+      setAvatarFile(null);
+    },
+    onError: () => toast.error("?حرفي مميز?"),
   });
 
   // الخدمات الذاتيّة عبر /tech/me/services
@@ -112,6 +134,8 @@ export default function TechSelfProfile() {
   const [city, setCity] = useState("");
   const [phone, setPhone] = useState("");
   const [bio, setBio] = useState("");
+  const [avatar, setAvatar] = useState("");
+  const [avatarFile, setAvatarFile] = useState(null);
   const [specialties, setSpecialties] = useState([]);
   const [isPremium, setIsPremium] = useState(false);
 
@@ -129,10 +153,14 @@ export default function TechSelfProfile() {
       setBio(me.bio ?? "");
       setSpecialties(Array.isArray(me.specialties) ? me.specialties : []);
       setIsPremium(Boolean(me.isPremium ?? me.is_premium));
+      setAvatar(me.avatarUrl ?? me.avatar_url ?? user?.avatarUrl ?? "");
+      setAvatarFile(null);
     } else if (user) {
       setFullName(user.fullName ?? user.full_name ?? "");
       setCity(user.city ?? "");
       setPhone(user.phone ?? "");
+      setAvatar(user.avatarUrl ?? user.avatar_url ?? "");
+      setAvatarFile(null);
     }
   }, [techQ.data, user]);
 
@@ -177,16 +205,16 @@ export default function TechSelfProfile() {
       <section className="rounded-2xl border bg-white p-4 shadow-sm mt-4">
         <div className="flex items-center gap-4">
           <AvatarUpload
-            value={me?.avatarUrl ?? me?.avatar_url}
-            placeholder={(me?.fullName || me?.full_name || "ح").slice(0, 1)}
+            value={avatar}
+            onChange={setAvatar}
+            onFileChange={setAvatarFile}
+            placeholder={(fullName || me?.fullName || me?.full_name || "?").slice(0, 1)}
           />
           <div>
-            <div className="text-xl font-semibold text-slate-900">
-              {me?.fullName ?? me?.full_name}
-            </div>
-            <div className="text-sm text-slate-600">{me?.city}</div>
-            {(me?.isPremium ?? me?.is_premium) ? (
-              <div className="text-xs text-amber-600 mt-1">★ بريميوم</div>
+            <div className="text-xl font-semibold text-slate-900">{fullName}</div>
+            <div className="text-sm text-slate-600">{city}</div>
+            {(isPremium || me?.isPremium || me?.is_premium) ? (
+              <div className="text-xs text-amber-600 mt-1">حرفي مميز</div>
             ) : null}
           </div>
         </div>
@@ -392,3 +420,10 @@ export default function TechSelfProfile() {
     </div>
   );
 }
+
+
+
+
+
+
+

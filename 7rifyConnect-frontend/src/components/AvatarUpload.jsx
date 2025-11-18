@@ -1,7 +1,21 @@
-import { useState } from "react";
 
-export default function AvatarUpload({ value, onChange, placeholder = "ص" }) {
+import { useEffect, useState } from "react";
+
+export default function AvatarUpload({ value, onChange, onFileChange, placeholder = "?" }) {
   const [preview, setPreview] = useState(value || "");
+
+  useEffect(() => {
+    setPreview(value || "");
+  }, [value]);
+
+  const handleFile = (file) => {
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    setPreview(url);
+    onChange?.(url);
+    onFileChange?.(file);
+  };
+
   return (
     <div className="flex items-center gap-4">
       <div className="h-24 w-24 rounded-full bg-slate-200 overflow-hidden flex items-center justify-center text-xl font-semibold text-slate-600">
@@ -13,7 +27,7 @@ export default function AvatarUpload({ value, onChange, placeholder = "ص" }) {
         )}
       </div>
       <label className="inline-flex items-center px-3 py-2 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50 cursor-pointer">
-        رفع صورة
+        تحميل صورة
         <input
           type="file"
           accept="image/*"
@@ -21,9 +35,7 @@ export default function AvatarUpload({ value, onChange, placeholder = "ص" }) {
           onChange={(e) => {
             const f = e.target.files?.[0];
             if (f) {
-              const url = URL.createObjectURL(f);
-              setPreview(url);
-              onChange?.(url);
+              handleFile(f);
             }
           }}
         />

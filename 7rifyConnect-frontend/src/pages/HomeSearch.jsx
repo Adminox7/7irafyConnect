@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Api } from "../api/endpoints";
@@ -19,6 +19,14 @@ export default function HomeSearch() {
     queryFn: () => Api.searchTechnicians({ city, q: query }),
     enabled: false,
   });
+
+  const verifiedResults = useMemo(
+    () =>
+      Array.isArray(data)
+        ? data.filter((tech) => Boolean(tech?.isVerified ?? tech?.is_verified ?? tech?.verified))
+        : [],
+    [data]
+  );
 
   const handleSearch = () => {
     setSearching(true);
@@ -77,10 +85,10 @@ export default function HomeSearch() {
             ))}
           </>
         )}
-        {!isFetching && data?.length === 0 && searching === false && (
+        {!isFetching && verifiedResults.length === 0 && searching === false && (
           <p className="text-center text-gray-500 col-span-full">ما كاين حتى تقني بهذ المواصفات.</p>
         )}
-        {!isFetching && Array.isArray(data) && data.map((t, i) => (
+        {!isFetching && verifiedResults.map((t, i) => (
           <motion.div
             key={t.id}
             initial={r ? false : { opacity: 0, y: 8 }}
@@ -97,3 +105,4 @@ export default function HomeSearch() {
     </div>
   );
 }
+
