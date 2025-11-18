@@ -10,7 +10,15 @@ html {
   height: 100%;
 }
 
-body, #root { min-height: 100%; }
+body {
+  min-height: 100%;
+  margin: 0;
+  background-color: #ffffff;
+}
+
+#root {
+  min-height: 100%;
+}
 
 .bg-app {
   background-image:
