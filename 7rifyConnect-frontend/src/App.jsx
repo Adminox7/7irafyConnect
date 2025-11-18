@@ -288,9 +288,11 @@ export default function App() {
                   </button>
               </div>
             )}
+            </div>
           </div>
-        </div>
+        </header>
 
+        {/* MOBILE DRAWER */}
         <div className="lg:hidden">
           <div
             className={`fixed inset-0 z-[70] bg-white transition-transform duration-300 ${
@@ -438,9 +440,7 @@ export default function App() {
           </div>
         </div>
 
-      </header>
-
-      {/* MAIN */}
+        {/* MAIN */}
       <main className="p-0 min-h-[60vh]" dir="rtl">
         <ErrorBoundary>
             <Routes>
