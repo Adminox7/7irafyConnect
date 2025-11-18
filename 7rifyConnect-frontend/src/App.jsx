@@ -107,7 +107,7 @@ export default function App() {
         className={({ isActive }) => navLinkClasses(isActive, isMobile)}
         onClick={isMobile ? closeMobileMenu : undefined}
       >
-        ??????
+        البحث
       </NavLink>
 
       {token && (
@@ -116,7 +116,7 @@ export default function App() {
           className={({ isActive }) => navLinkClasses(isActive, isMobile)}
           onClick={isMobile ? closeMobileMenu : undefined}
         >
-          ??????
+          طلباتي
         </NavLink>
       )}
 
@@ -126,7 +126,7 @@ export default function App() {
           className={({ isActive }) => navLinkClasses(isActive, isMobile)}
           onClick={isMobile ? closeMobileMenu : undefined}
         >
-          ?????? ??????
+          لوحة الحرفي
         </NavLink>
       )}
 
@@ -136,7 +136,7 @@ export default function App() {
           className={({ isActive }) => navLinkClasses(isActive, isMobile)}
           onClick={isMobile ? closeMobileMenu : undefined}
         >
-          ?????? ???????
+          لوحة الإدارة
         </NavLink>
       )}
     </>
@@ -152,6 +152,9 @@ export default function App() {
       >
         <div className="container max-w-7xl mx-auto flex items-center justify-between gap-4 px-4 sm:px-6 lg:px-8 py-3">
           <div className="flex items-center gap-3">
+            <Link to="/" aria-label="الصفحة الرئيسية" className="flex items-center gap-2">
+              <Logo className="!gap-2" />
+            </Link>
             <button
               type="button"
               className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white p-2 text-slate-700 shadow-sm hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300 lg:hidden"
@@ -173,9 +176,6 @@ export default function App() {
                 <line x1="4" x2="20" y1="18" y2="18" />
               </svg>
             </button>
-            <Link to="/" aria-label="????????" className="flex items-center gap-2">
-              <Logo className="!gap-2" />
-            </Link>
           </div>
 
           <nav className="hidden lg:flex items-center gap-5 text-sm text-slate-700">
@@ -189,48 +189,48 @@ export default function App() {
                   to="/login"
                   className="rounded-2xl px-2 py-1 text-slate-700 hover:text-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300"
                 >
-                  ????
+                  تسجيل الدخول
                 </Link>
                 <Link
                   to="/register"
                   className="rounded-2xl bg-brand-600 px-3 py-1.5 text-white shadow-sm hover:bg-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300"
                 >
-                  ???? ????
+                  إنشاء حساب
                 </Link>
               </>
             ) : (
               <div className="flex items-center gap-2">
                 <NotificationBell />
-                <NavLink
-                  to={role === "technicien" ? "/me/tech" : "/me"}
-                  className={({ isActive }) =>
-                    `rounded-2xl border px-3 py-1.5 ${
-                      isActive
-                        ? "border-brand-300 text-brand-700"
-                        : "border-slate-300 text-slate-700 hover:bg-slate-50"
-                    }`
-                  }
-                >
-                  ????
-                </NavLink>
-                <NavLink
-                  to="/chat"
-                  className={({ isActive }) =>
-                    `rounded-2xl border px-3 py-1.5 ${
-                      isActive
-                        ? "border-brand-300 text-brand-700"
-                        : "border-slate-300 text-slate-700 hover:bg-slate-50"
-                    }`
-                  }
-                >
-                  ??????
-                </NavLink>
-                <button
-                  onClick={logout}
-                  className="rounded-2xl bg-slate-700 px-3 py-1.5 text-white shadow-sm hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300"
-                >
-                  ????
-                </button>
+                  <NavLink
+                    to={role === "technicien" ? "/me/tech" : "/me"}
+                    className={({ isActive }) =>
+                      `rounded-2xl border px-3 py-1.5 ${
+                        isActive
+                          ? "border-brand-300 text-brand-700"
+                          : "border-slate-300 text-slate-700 hover:bg-slate-50"
+                      }`
+                    }
+                  >
+                    حسابي
+                  </NavLink>
+                  <NavLink
+                    to="/chat"
+                    className={({ isActive }) =>
+                      `rounded-2xl border px-3 py-1.5 ${
+                        isActive
+                          ? "border-brand-300 text-brand-700"
+                          : "border-slate-300 text-slate-700 hover:bg-slate-50"
+                      }`
+                    }
+                  >
+                    المحادثات
+                  </NavLink>
+                  <button
+                    onClick={logout}
+                    className="rounded-2xl bg-slate-700 px-3 py-1.5 text-white shadow-sm hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300"
+                  >
+                    تسجيل الخروج
+                  </button>
               </div>
             )}
           </div>
@@ -252,7 +252,7 @@ export default function App() {
             aria-hidden={!mobileMenuOpen}
           >
             <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
-              <span className="text-base font-semibold text-slate-800">?????</span>
+              <span className="text-base font-semibold text-slate-800">القائمة</span>
               <button
                 type="button"
                 className="rounded-full border border-slate-200 p-2 text-slate-600 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300"
@@ -285,20 +285,20 @@ export default function App() {
                       onClick={closeMobileMenu}
                       className="block rounded-xl border border-slate-200 px-3 py-2 text-center font-medium text-slate-700 hover:border-brand-300 hover:text-brand-700"
                     >
-                      ????
+                      تسجيل الدخول
                     </Link>
                     <Link
                       to="/register"
                       onClick={closeMobileMenu}
                       className="block rounded-xl bg-brand-600 px-3 py-2 text-center font-medium text-white shadow-sm hover:bg-brand-700"
                     >
-                      ???? ????
+                      إنشاء حساب
                     </Link>
                   </>
                 ) : (
                   <>
                     <div className="flex items-center justify-between rounded-xl border border-slate-200 px-3 py-2">
-                      <span className="font-medium text-slate-700">????????</span>
+                      <span className="font-medium text-slate-700">الإشعارات</span>
                       <NotificationBell />
                     </div>
                     <NavLink
@@ -312,7 +312,7 @@ export default function App() {
                         }`
                       }
                     >
-                      ????
+                      حسابي
                     </NavLink>
                     <NavLink
                       to="/chat"
@@ -325,7 +325,7 @@ export default function App() {
                         }`
                       }
                     >
-                      ??????
+                      المحادثات
                     </NavLink>
                     <button
                       onClick={() => {
@@ -334,7 +334,7 @@ export default function App() {
                       }}
                       className="block rounded-xl bg-slate-700 px-3 py-2 text-center font-medium text-white shadow-sm hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300"
                     >
-                      ????
+                      تسجيل الخروج
                     </button>
                   </>
                 )}
