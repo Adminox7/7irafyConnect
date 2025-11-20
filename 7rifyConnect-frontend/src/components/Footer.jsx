@@ -101,12 +101,12 @@ export default function Footer() {
     <footer className="bg-slate-950 text-slate-100" dir="rtl">
       <div className="border-b border-white/5">
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-          <div className="grid gap-10 lg:grid-cols-[1.1fr,1fr,0.9fr,1.2fr]">
-            <div className="space-y-4">
+          <div className="grid gap-12 lg:grid-cols-[1.3fr,1fr,1fr,1.2fr]">
+            <div className="space-y-5">
               <Logo className="text-white" />
               <p className="text-sm leading-relaxed text-slate-300">
-                7rify Connect منصة مغربية تربط الأسر والشركات بأفضل الحرفيين المعتمدين. نضمن
-                لك تجربة حجز بالعربية، مواعيد واضحة، وتقارير صيانة رقمية لحرفييك المفضلين.
+                7rify Connect منصة مغربية تربط الأسر والشركات بأفضل الحرفيين المعتمدين. نضمن لك تجربة
+                حجز بالعربية، مواعيد واضحة، وتقارير صيانة رقمية لحرفييك المفضلين.
               </p>
               <div className="flex flex-wrap gap-3 text-slate-200">
                 {socialLinks.map((item) => (
@@ -129,20 +129,20 @@ export default function Footer() {
             <div className="space-y-6">
               <div>
                 <p className="text-lg font-semibold text-white">تواصل معنا</p>
-                <div className="mt-1 h-1 w-12 rounded-full bg-brand-400" />
+                <div className="mt-2 h-1 w-12 rounded-full bg-brand-400" />
               </div>
               <ul className="space-y-4">
                 {contactItems.map((item) => (
-                  <li key={item.label} className="flex items-start gap-3 text-sm text-slate-300">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-brand-200">
+                  <li
+                    key={item.label}
+                    className="flex items-center gap-3 rounded-2xl bg-white/5 p-4 text-sm text-slate-300"
+                  >
+                    <span className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-500/15 text-brand-200">
                       {item.icon}
                     </span>
-                    <div>
+                    <div className="space-y-1">
                       <p className="text-xs text-slate-400">{item.label}</p>
-                      <a
-                        href={item.href}
-                        className="font-semibold text-slate-100 transition hover:text-brand-300"
-                      >
+                      <a href={item.href} className="block text-base font-semibold text-slate-100 transition hover:text-brand-300">
                         {item.value}
                       </a>
                     </div>
@@ -151,84 +151,83 @@ export default function Footer() {
               </ul>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-8">
               <div>
-                <p className="text-lg font-semibold text-white">خدمات متخصصة</p>
-                <div className="mt-1 h-1 w-12 rounded-full bg-brand-400" />
+                <div>
+                  <p className="text-lg font-semibold text-white">خدمات متخصصة</p>
+                  <div className="mt-2 h-1 w-12 rounded-full bg-brand-400" />
+                </div>
+                <ul className="mt-4 space-y-3 text-sm text-slate-300">
+                  {serviceLinks.map((link) => (
+                    <li key={link.to}>
+                      <Link to={link.to} className="flex items-center gap-2 transition hover:text-brand-300">
+                        <svg viewBox="0 0 24 24" fill="none" strokeWidth="1.5" stroke="currentColor" className="h-4 w-4">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="m9 18 6-6-6-6" />
+                        </svg>
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <ul className="space-y-3 text-sm text-slate-300">
-                {serviceLinks.map((link) => (
-                  <li key={link.to}>
-                    <Link
-                      to={link.to}
-                      className="flex items-center gap-2 transition hover:text-brand-300"
-                    >
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        strokeWidth="1.5"
-                        stroke="currentColor"
-                        className="h-4 w-4"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" d="m9 18 6-6-6-6" />
-                      </svg>
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+
+              <div>
+                <div>
+                  <p className="text-lg font-semibold text-white">الدعم والشراكات</p>
+                  <div className="mt-2 h-1 w-12 rounded-full bg-brand-400" />
+                </div>
+                <ul className="mt-4 space-y-3 text-sm text-slate-300">
+                  {supportLinks.map((link) => (
+                    <li key={link.to}>
+                      <Link to={link.to} className="flex items-center gap-2 transition hover:text-brand-300">
+                        <svg viewBox="0 0 24 24" fill="none" strokeWidth="1.5" stroke="currentColor" className="h-4 w-4">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="m9 18 6-6-6-6" />
+                        </svg>
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-4 rounded-3xl bg-white/5 p-6 shadow-[0_15px_60px_rgba(15,23,42,0.35)]">
               <div>
-                <p className="text-lg font-semibold text-white">الدعم والشراكات</p>
-                <div className="mt-1 h-1 w-12 rounded-full bg-brand-400" />
+                <p className="text-lg font-semibold text-white">نشرة الزبناء والشركاء</p>
+                <div className="mt-2 h-1 w-12 rounded-full bg-brand-400" />
               </div>
-              <ul className="space-y-3 text-sm text-slate-300">
-                {supportLinks.map((link) => (
-                  <li key={link.to}>
-                    <Link
-                      to={link.to}
-                      className="flex items-center gap-2 transition hover:text-brand-300"
-                    >
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        strokeWidth="1.5"
-                        stroke="currentColor"
-                        className="h-4 w-4"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" d="m9 18 6-6-6-6" />
-                      </svg>
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-
-              <div className="rounded-3xl bg-white/5 p-4">
-                <p className="text-sm font-semibold text-white">نشرة الزبناء والشركاء</p>
-                <p className="mt-1 text-xs text-slate-300">
-                  توصلك أحدث فرص الصيانة والعروض الخاصة مرتين في الشهر، باللغة العربية.
-                </p>
-                <form className="mt-3 flex flex-col gap-3 sm:flex-row">
-                  <label className="sr-only" htmlFor="footer-email">
-                    البريد الإلكتروني
-                  </label>
+              <p className="text-sm leading-relaxed text-slate-300">
+                توصلك أحدث فرص الصيانة والعروض الخاصة مرتين كل شهر، باللغة العربية وبأسلوب يلائم احتياجاتك.
+              </p>
+              <form className="space-y-3">
+                <label className="sr-only" htmlFor="footer-email">
+                  البريد الإلكتروني
+                </label>
+                <div className="flex items-center rounded-full bg-slate-900/70 p-1 pr-3 ring-1 ring-white/10 focus-within:ring-2 focus-within:ring-brand-300">
                   <input
                     id="footer-email"
                     type="email"
                     placeholder="أدخل بريدك الإلكتروني"
-                    className="flex-1 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm text-white placeholder:text-slate-400 focus:border-brand-300 focus:outline-none"
+                    className="flex-1 bg-transparent px-4 py-2 text-sm text-white placeholder:text-slate-400 focus:outline-none"
                   />
                   <button
                     type="button"
-                    className="rounded-full bg-brand-500 px-5 py-2 text-sm font-semibold text-white transition hover:bg-brand-400"
+                    className="flex items-center gap-2 rounded-full bg-brand-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-400"
                   >
-                    اشترك
+                    <span>اشترك</span>
+                    <svg viewBox="0 0 24 24" fill="none" strokeWidth="1.8" stroke="currentColor" className="h-4 w-4">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M4.5 12.75 19.5 5.25l-4.5 14.5-2.5-5-5-2.5Z"
+                      />
+                    </svg>
                   </button>
-                </form>
-              </div>
+                </div>
+                <p className="text-xs text-slate-400">
+                  بالاشتراك، توافق على شروط الاستخدام وسياسة الخصوصية الخاصة بـ 7rify Connect.
+                </p>
+              </form>
             </div>
           </div>
         </div>
