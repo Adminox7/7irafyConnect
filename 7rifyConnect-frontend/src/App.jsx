@@ -25,6 +25,7 @@ import { initNoticeAuthSubscription } from "./stores/notifications";
 import { useChatThreads } from "./hooks/useChatThreads";
 import { Api } from "./api/endpoints";
 import { getUserVerificationFlag, isTechnicianUser } from "./lib/auth";
+import Footer from "./components/Footer";
 
 export default function App() {
   // استخدم selectors منفصلة (أكثر استقراراً)
@@ -509,9 +510,11 @@ export default function App() {
             <Route path="/register" element={<Register />} />
           </Routes>
         </ErrorBoundary>
-      </main>
+        </main>
 
-      <Toaster position="top-center" />
+        <Footer />
+
+        <Toaster position="top-center" />
     </BrowserRouter>
   );
 }
