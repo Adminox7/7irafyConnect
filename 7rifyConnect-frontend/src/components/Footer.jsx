@@ -96,123 +96,35 @@ const iconPaths = {
   ),
 };
 
+
 export default function Footer() {
   return (
-    <footer className="bg-slate-950 text-slate-100" dir="rtl">
+    <footer className="bg-gradient-to-b from-[#041735] via-[#020c1a] to-[#01050f] text-slate-100" dir="rtl">
       <div className="border-b border-white/5">
-        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-          <div className="grid gap-12 lg:grid-cols-[1.3fr,1fr,1fr,1.2fr]">
-            <div className="space-y-5">
-              <Logo className="text-white" />
-              <p className="text-sm leading-relaxed text-slate-300">
-                7rify Connect منصة مغربية تربط الأسر والشركات بأفضل الحرفيين المعتمدين. نضمن لك تجربة
-                حجز بالعربية، مواعيد واضحة، وتقارير صيانة رقمية لحرفييك المفضلين.
-              </p>
-              <div className="flex flex-wrap gap-3 text-slate-200">
-                {socialLinks.map((item) => (
-                  <a
-                    key={item.icon}
-                    href={item.href}
-                    target="_blank"
-                    rel="noreferrer"
-                    aria-label={item.label}
-                    className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-slate-50 transition hover:bg-brand-500 hover:text-white"
-                  >
-                    <svg viewBox="0 0 24 24" fill="none" strokeWidth="1.5" stroke="currentColor" className="h-5 w-5">
-                      {iconPaths[item.icon]}
-                    </svg>
-                  </a>
-                ))}
-              </div>
-            </div>
-
-            <div className="space-y-6">
-              <div>
-                <p className="text-lg font-semibold text-white">تواصل معنا</p>
-                <div className="mt-2 h-1 w-12 rounded-full bg-brand-400" />
-              </div>
-              <ul className="space-y-4">
-                {contactItems.map((item) => (
-                  <li
-                    key={item.label}
-                    className="flex items-center gap-3 rounded-2xl bg-white/5 p-4 text-sm text-slate-300"
-                  >
-                    <span className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-500/15 text-brand-200">
-                      {item.icon}
-                    </span>
-                    <div className="space-y-1">
-                      <p className="text-xs text-slate-400">{item.label}</p>
-                      <a href={item.href} className="block text-base font-semibold text-slate-100 transition hover:text-brand-300">
-                        {item.value}
-                      </a>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="space-y-8">
-              <div>
-                <div>
-                  <p className="text-lg font-semibold text-white">خدمات متخصصة</p>
-                  <div className="mt-2 h-1 w-12 rounded-full bg-brand-400" />
-                </div>
-                <ul className="mt-4 space-y-3 text-sm text-slate-300">
-                  {serviceLinks.map((link) => (
-                    <li key={link.to}>
-                      <Link to={link.to} className="flex items-center gap-2 transition hover:text-brand-300">
-                        <svg viewBox="0 0 24 24" fill="none" strokeWidth="1.5" stroke="currentColor" className="h-4 w-4">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="m9 18 6-6-6-6" />
-                        </svg>
-                        {link.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div>
-                <div>
-                  <p className="text-lg font-semibold text-white">الدعم والشراكات</p>
-                  <div className="mt-2 h-1 w-12 rounded-full bg-brand-400" />
-                </div>
-                <ul className="mt-4 space-y-3 text-sm text-slate-300">
-                  {supportLinks.map((link) => (
-                    <li key={link.to}>
-                      <Link to={link.to} className="flex items-center gap-2 transition hover:text-brand-300">
-                        <svg viewBox="0 0 24 24" fill="none" strokeWidth="1.5" stroke="currentColor" className="h-4 w-4">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="m9 18 6-6-6-6" />
-                        </svg>
-                        {link.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-
-            <div className="space-y-4 rounded-3xl bg-white/5 p-6 shadow-[0_15px_60px_rgba(15,23,42,0.35)]">
+        <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+          <div className="grid gap-6 lg:grid-cols-[1.15fr,0.95fr,0.95fr,1.05fr]">
+            <div className="rounded-[32px] border border-white/5 bg-gradient-to-b from-[#0d2146]/95 to-[#050e20] p-6 shadow-[0_25px_70px_rgba(1,5,15,0.65)]">
               <div>
                 <p className="text-lg font-semibold text-white">نشرة الزبناء والشركاء</p>
-                <div className="mt-2 h-1 w-12 rounded-full bg-brand-400" />
+                <div className="mt-2 h-1 w-16 rounded-full bg-brand-400" />
               </div>
-              <p className="text-sm leading-relaxed text-slate-300">
+              <p className="mt-4 text-sm leading-relaxed text-slate-300">
                 توصلك أحدث فرص الصيانة والعروض الخاصة مرتين كل شهر، باللغة العربية وبأسلوب يلائم احتياجاتك.
               </p>
-              <form className="space-y-3">
+              <form className="mt-5 space-y-3">
                 <label className="sr-only" htmlFor="footer-email">
                   البريد الإلكتروني
                 </label>
-                <div className="flex items-center rounded-full bg-slate-900/70 p-1 pr-3 ring-1 ring-white/10 focus-within:ring-2 focus-within:ring-brand-300">
+                <div className="flex items-center gap-2 rounded-full border border-white/10 bg-[#040b18]/90 px-3 py-1.5 focus-within:border-brand-300">
                   <input
                     id="footer-email"
                     type="email"
                     placeholder="أدخل بريدك الإلكتروني"
-                    className="flex-1 bg-transparent px-4 py-2 text-sm text-white placeholder:text-slate-400 focus:outline-none"
+                    className="flex-1 bg-transparent px-2 py-1.5 text-sm text-white placeholder:text-slate-400 focus:outline-none"
                   />
                   <button
                     type="button"
-                    className="flex items-center gap-2 rounded-full bg-brand-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-400"
+                    className="flex items-center gap-2 rounded-full bg-brand-500 px-5 py-2 text-sm font-semibold text-white shadow-[0_10px_25px_rgba(14,165,233,0.35)] transition hover:bg-brand-400"
                   >
                     <span>اشترك</span>
                     <svg viewBox="0 0 24 24" fill="none" strokeWidth="1.8" stroke="currentColor" className="h-4 w-4">
@@ -229,20 +141,110 @@ export default function Footer() {
                 </p>
               </form>
             </div>
+
+            <div className="rounded-[32px] border border-white/5 bg-[#050f21]/90 p-6 shadow-[0_20px_55px_rgba(1,5,15,0.55)]">
+              <div>
+                <p className="text-lg font-semibold text-white">خدمات متخصصة</p>
+                <div className="mt-2 h-1 w-14 rounded-full bg-brand-400" />
+              </div>
+              <ul className="mt-4 divide-y divide-white/5 text-sm text-slate-300">
+                {serviceLinks.map((link) => (
+                  <li key={link.to}>
+                    <Link
+                      to={link.to}
+                      className="flex items-center justify-between gap-3 py-2 transition hover:text-white"
+                    >
+                      {link.label}
+                      <svg viewBox="0 0 24 24" fill="none" strokeWidth="1.5" stroke="currentColor" className="h-4 w-4">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="m9 18 6-6-6-6" />
+                      </svg>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="mt-7">
+                <p className="text-lg font-semibold text-white">الدعم والشراكات</p>
+                <div className="mt-2 h-1 w-14 rounded-full bg-brand-400" />
+              </div>
+              <ul className="mt-4 divide-y divide-white/5 text-sm text-slate-300">
+                {supportLinks.map((link) => (
+                  <li key={link.to}>
+                    <Link
+                      to={link.to}
+                      className="flex items-center justify-between gap-3 py-2 transition hover:text-white"
+                    >
+                      {link.label}
+                      <svg viewBox="0 0 24 24" fill="none" strokeWidth="1.5" stroke="currentColor" className="h-4 w-4">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="m9 18 6-6-6-6" />
+                      </svg>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="rounded-[32px] border border-white/5 bg-[#04142d]/90 p-6 shadow-[0_20px_55px_rgba(1,5,15,0.55)]">
+              <div>
+                <p className="text-lg font-semibold text-white">تواصل معنا</p>
+                <div className="mt-2 h-1 w-14 rounded-full bg-brand-400" />
+              </div>
+              <ul className="mt-5 space-y-3">
+                {contactItems.map((item) => (
+                  <li
+                    key={item.label}
+                    className="flex items-center gap-3 rounded-2xl border border-white/5 bg-[#030c1d]/80 px-4 py-3 text-sm text-slate-200 shadow-[0_10px_25px_rgba(1,4,14,0.6)]"
+                  >
+                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-500/20 text-brand-100">
+                      {item.icon}
+                    </span>
+                    <div className="space-y-0.5">
+                      <p className="text-xs text-slate-400">{item.label}</p>
+                      <a href={item.href} className="block text-base font-semibold text-white transition hover:text-brand-200">
+                        {item.value}
+                      </a>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="rounded-[32px] border border-white/5 bg-[#040f21]/85 p-6 shadow-[0_25px_70px_rgba(1,5,15,0.65)]">
+              <Logo className="text-white" />
+              <p className="mt-4 text-sm leading-relaxed text-slate-300">
+                7rify Connect منصة مغربية تربط الأسر والشركات بأفضل الحرفيين المعتمدين. نضمن لك تجربة حجز بالعربية، مواعيد واضحة، وتقارير صيانة رقمية لحرفييك المفضلين.
+              </p>
+              <div className="mt-6 flex flex-wrap gap-3 text-slate-200">
+                {socialLinks.map((item) => (
+                  <a
+                    key={item.icon}
+                    href={item.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={item.label}
+                    className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-slate-50 transition hover:border-brand-300 hover:text-brand-200"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" strokeWidth="1.5" stroke="currentColor" className="h-5 w-5">
+                      {iconPaths[item.icon]}
+                    </svg>
+                  </a>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-6 text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
-        <p>© {new Date().getFullYear()} 7rify Connect. جميع الحقوق محفوظة.</p>
+      <div className="mx-auto flex max-w-7xl flex-col gap-4 border-t border-white/5 px-4 py-6 text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+        <p>&copy; {new Date().getFullYear()} 7rify Connect. جميع الحقوق محفوظة.</p>
         <div className="flex flex-wrap gap-4">
-          <Link to="/terms" className="transition hover:text-brand-300">
+          <Link to="/terms" className="transition hover:text-brand-200">
             شروط الاستخدام
           </Link>
-          <Link to="/privacy" className="transition hover:text-brand-300">
+          <Link to="/privacy" className="transition hover:text-brand-200">
             سياسة الخصوصية
           </Link>
-          <Link to="/cookies" className="transition hover:text-brand-300">
+          <Link to="/cookies" className="transition hover:text-brand-200">
             سياسة ملفات تعريف الارتباط
           </Link>
         </div>
@@ -250,4 +252,3 @@ export default function Footer() {
     </footer>
   );
 }
-

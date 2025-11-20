@@ -14,10 +14,12 @@ body {
   min-height: 100%;
   margin: 0;
   background-color: #ffffff;
+  overflow-x: hidden;
 }
 
 #root {
   min-height: 100%;
+  overflow-x: hidden;
 }
 
 .bg-app {
