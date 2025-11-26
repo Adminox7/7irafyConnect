@@ -210,7 +210,7 @@ export default function Footer() {
             </div>
 
             <div className="rounded-[32px] border border-white/5 bg-[#040f21]/85 p-6 shadow-[0_25px_70px_rgba(1,5,15,0.65)]">
-              <Logo className="text-white" />
+              <Logo variant="light" />
               <p className="mt-4 text-sm leading-relaxed text-slate-300">
                 7rify Connect منصة مغربية تربط الأسر والشركات بأفضل الحرفيين المعتمدين. نضمن لك تجربة حجز بالعربية، مواعيد واضحة، وتقارير صيانة رقمية لحرفييك المفضلين.
               </p>

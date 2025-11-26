@@ -28,6 +28,11 @@ const waitForHydration = async () => {
 http.interceptors.request.use(
   async (config) => {
     await waitForHydration();
+    // Allow callers to bypass auth (e.g., uploads before login).
+    if (config.skipAuth) {
+      config.headers = { ...(config.headers || {}), Accept: "application/json" };
+      return config;
+    }
     const { token } = useAuthStore.getState() || {};
     if (token) {
       config.headers = config.headers || {};

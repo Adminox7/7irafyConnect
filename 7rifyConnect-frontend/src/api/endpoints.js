@@ -20,6 +20,13 @@ const mapRegisterPayload = (b) => ({
   password: b.password,
   city: b.city ?? null,
   phone: b.phone ?? null,
+  specialties: Array.isArray(b.specialties) ? b.specialties : undefined,
+  specialty_description: b.specialtyDescription ?? b.specialty_description ?? b.bio,
+  bio: b.bio ?? b.specialtyDescription ?? undefined,
+  is_premium: typeof b.isPremium === "boolean" ? b.isPremium : undefined,
+  avatar_url: b.avatarUrl ?? b.avatar_url ?? undefined,
+  national_id_front_url: b.nationalIdFrontUrl ?? b.national_id_front_url ?? undefined,
+  national_id_back_url: b.nationalIdBackUrl ?? b.national_id_back_url ?? undefined,
 });
 
 const mapServicePayload = (b) => ({
@@ -133,12 +140,18 @@ export const Api = {
     markMessageRead:   (messageId)     => http.post(`/messages/${messageId}/read`).then(unwrap),
 
   /* UPLOAD */
-  upload: (fileOrName) => {
+  upload: (fileOrName, options = {}) => {
+    const skipAuth = options.skipAuth === true;
     if (typeof File !== "undefined" && fileOrName instanceof File) {
       const fd = new FormData();
       fd.append("file", fileOrName);
-      return http.post(`/upload`, fd, { headers: { "Content-Type": "multipart/form-data" } }).then(unwrap);
+      return http
+        .post(`/upload`, fd, {
+          headers: { "Content-Type": "multipart/form-data" },
+          skipAuth,
+        })
+        .then(unwrap);
     }
-    return http.post(`/upload`, { name: String(fileOrName || "img") }).then(unwrap);
+    return http.post(`/upload`, { name: String(fileOrName || "img") }, { skipAuth }).then(unwrap);
   },
 };

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import Input from "../components/Input";
@@ -79,6 +79,15 @@ export default function Home() {
         : [],
     [topTechs]
   );
+
+  const topTechsRef = useRef(null);
+  const limitedTopTechs = verifiedTopTechs.slice(0, 10);
+
+  const scrollTopTechs = (dir) => {
+    const node = topTechsRef.current;
+    if (!node) return;
+    node.scrollBy({ left: dir * 320, behavior: "smooth" });
+  };
 
   return (
     <div className="space-y-0 [&>section]:scroll-mt-24" dir="rtl">
@@ -233,24 +242,59 @@ export default function Home() {
             </div>
           )}
 
-          {/* Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {/* Skeletons */}
-            {loadingTopTechs &&
-              Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="rounded-2xl border border-slate-200 bg-white p-4 animate-pulse">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-full bg-slate-200" />
-                    <div className="h-3 w-24 bg-slate-200 rounded" />
-                  </div>
-                  <div className="mt-3 h-3 w-40 bg-slate-200 rounded" />
-                  <div className="mt-4 h-8 w-full bg-slate-200 rounded" />
-                </div>
-              ))}
+          {/* Horizontal carousel */}
+          <div className="relative">
+            <div className="overflow-x-auto scrollbar-hide pb-4" ref={topTechsRef}>
+              <div className="flex gap-4 min-h-[20rem] snap-x snap-mandatory">
+                {/* Skeletons */}
+                {loadingTopTechs &&
+                  Array.from({ length: 4 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="snap-start shrink-0 w-[300px] rounded-2xl border border-slate-200 bg-white p-4 animate-pulse"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-full bg-slate-200" />
+                        <div className="h-3 w-24 bg-slate-200 rounded" />
+                      </div>
+                      <div className="mt-3 h-3 w-40 bg-slate-200 rounded" />
+                      <div className="mt-4 h-8 w-full bg-slate-200 rounded" />
+                    </div>
+                  ))}
 
-            {/* Cards */}
-            {!loadingTopTechs && !errTopTechs &&
-              verifiedTopTechs.map((t) => <TechCard key={t.id} t={t} />)}
+                {/* Cards (scrollable horizontally) */}
+                {!loadingTopTechs &&
+                  !errTopTechs &&
+                  limitedTopTechs.map((t) => (
+                    <div key={t.id} className="snap-start shrink-0 w-[300px]">
+                      <TechCard t={t} />
+                    </div>
+                  ))}
+              </div>
+            </div>
+
+            <div className="pointer-events-none absolute inset-y-0 left-0 right-0 flex items-center justify-between px-1">
+              <button
+                type="button"
+                onClick={() => scrollTopTechs(-1)}
+                aria-label="تمرير لليسار"
+                className="pointer-events-auto h-11 w-11 rounded-full border border-slate-200 bg-white text-slate-700 shadow-md transition hover:border-brand-200 hover:text-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300"
+              >
+                <svg viewBox="0 0 24 24" className="mx-auto h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                onClick={() => scrollTopTechs(1)}
+                aria-label="تمرير لليمين"
+                className="pointer-events-auto h-11 w-11 rounded-full border border-slate-200 bg-white text-slate-700 shadow-md transition hover:border-brand-200 hover:text-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300"
+              >
+                <svg viewBox="0 0 24 24" className="mx-auto h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="m15 5-7 7 7 7" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
       </section>

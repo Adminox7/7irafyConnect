@@ -228,7 +228,21 @@ export const handlers = [
   http.post("/api/v1/auth/register", async ({ request }) => {
     await delay(120);
     const body = await request.json();
-    const { name, email, password, city, phone, role, specialties = [], bio = "", isPremium = false } = body || {};
+    const {
+      name,
+      email,
+      password,
+      city,
+      phone,
+      role,
+      specialties = [],
+      bio = "",
+      specialtyDescription = "",
+      isPremium = false,
+      avatarUrl = "",
+      nationalIdFrontUrl = "",
+      nationalIdBackUrl = "",
+    } = body || {};
     if (!name || !email || !password || !role) {
       return HttpResponse.json({ message: "حقول ناقصة" }, { status: 400 });
     }
@@ -248,6 +262,12 @@ export const handlers = [
       city: city || "",
       phone: phone || "",
       verified: role === "technicien" ? false : true,
+      specialties,
+      specialtyDescription: specialtyDescription || bio,
+      bio: bio || specialtyDescription,
+      avatarUrl,
+      nationalIdFrontUrl,
+      nationalIdBackUrl,
     };
     users.push(created);
     const token = `mock-${created.id}`;
@@ -262,8 +282,11 @@ export const handlers = [
         averageRating: 0,
         lat: 34.02,
         lng: -6.83,
-        avatarUrl: "",
-        bio: String(bio || ""),
+        avatarUrl: avatarUrl || "",
+        bio: String(bio || specialtyDescription || ""),
+        nationalIdFrontUrl,
+        nationalIdBackUrl,
+        specialtyDescription: specialtyDescription || bio,
       });
       technicianServices[String(created.id)] = technicianServices[String(created.id)] || [];
       technicianPortfolio[String(created.id)] = technicianPortfolio[String(created.id)] || [];

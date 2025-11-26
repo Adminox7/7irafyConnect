@@ -24,7 +24,7 @@ body {
 
 .bg-app {
   background-image:
-    linear-gradient(to bottom, #F6FAFF, #FFFFFF 35%, #F7FAFF);
+    linear-gradient(to bottom, #f4f6fb, #ffffff 35%, #f7faef);
   background-attachment: fixed;
   margin: 0;
 }
@@ -51,10 +51,19 @@ body {
   padding-inline: clamp(1rem, 4vw, 2rem);
 }
 
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+
 .hero-rings {
   background:
-    radial-gradient(1200px 500px at 90% -10%, rgba(14,165,233,.08), transparent 60%),
-    radial-gradient(900px 500px at 10% 110%, rgba(34,197,94,.10), transparent 65%);
+    radial-gradient(1200px 500px at 90% -10%, rgba(28,48,94,.10), transparent 60%),
+    radial-gradient(900px 500px at 10% 110%, rgba(183,214,93,.12), transparent 65%);
   
 }
 
@@ -73,6 +82,6 @@ p, li, span, label { color: var(--text); }
 
 :focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px rgba(14,165,233,0.35);
+  box-shadow: 0 0 0 2px rgba(58,81,127,0.35);
   border-radius: 0.75rem;
 }

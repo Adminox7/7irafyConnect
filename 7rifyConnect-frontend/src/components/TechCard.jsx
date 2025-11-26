@@ -27,10 +27,10 @@ export default function TechCard({ t }) {
 
   return (
     <div
-      className="group flex flex-col overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm transition-shadow hover:shadow-xl"
+      className="group flex h-full min-h-[27rem] flex-col overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm transition-shadow hover:shadow-xl"
       dir="rtl"
     >
-      <div className="relative h-48 w-full overflow-hidden">
+      <div className="relative h-56 sm:h-60 w-full overflow-hidden">
         {avatar ? (
           // eslint-disable-next-line jsx-a11y/alt-text
           <img src={avatar} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />

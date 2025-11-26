@@ -16,6 +16,12 @@ import UserProfile from "./pages/UserProfile";
 import TechSelfProfile from "./pages/TechSelfProfile";
 import PendingVerification from "./pages/PendingVerification";
 import ProtectedRoute from "./components/ProtectedRoute";
+import LegalTerms from "./pages/LegalTerms";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import CookiesPolicy from "./pages/CookiesPolicy";
+import HelpCenter from "./pages/HelpCenter";
+import HelpFaq from "./pages/HelpFaq";
+import QualityPolicy from "./pages/QualityPolicy";
 import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./stores/auth";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -508,6 +514,12 @@ export default function App() {
 
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/terms" element={<LegalTerms />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/cookies" element={<CookiesPolicy />} />
+            <Route path="/help" element={<HelpCenter />} />
+            <Route path="/help/faq" element={<HelpFaq />} />
+            <Route path="/policies/quality" element={<QualityPolicy />} />
           </Routes>
         </ErrorBoundary>
         </main>

@@ -180,9 +180,10 @@ export default function AdminDashboard() {
               <thead className="text-right text-slate-500">
                 <tr>
                   <th className="py-2 pr-4">#</th>
-                  <th className="py-2 pr-4">الإسم</th>
-                  <th className="py-2 pr-4">البريد</th>
-                  <th className="py-2 pr-4">المدينة</th>
+                  <th className="py-2 pr-4">الإسم / البريد الإلكتروني</th>
+                  <th className="py-2 pr-4">المدينة / الهاتف</th>
+                  <th className="py-2 pr-4">التخصصات والوصف</th>
+                  <th className="py-2 pr-4">الوثائق</th>
                   <th className="py-2 pr-4">الفعل</th>
                 </tr>
               </thead>
@@ -190,9 +191,45 @@ export default function AdminDashboard() {
                   {(Array.isArray(pending) ? pending : []).map((t) => (
                     <tr key={t.id} className="border-t">
                       <td className="py-2 pr-4">{t.id}</td>
-                      <td className="py-2 pr-4">{t.name}</td>
-                      <td className="py-2 pr-4">{t.email}</td>
-                      <td className="py-2 pr-4">{t.city}</td>
+                      <td className="py-2 pr-4">
+                        <div className="font-medium text-slate-900">{t.name}</div>
+                        <div className="text-xs text-slate-500 break-words">{t.email}</div>
+                      </td>
+                      <td className="py-2 pr-4">
+                        <div>{t.city || "-"}</div>
+                        <div className="text-xs text-slate-500">{t.phone || "-"}</div>
+                      </td>
+                      <td className="py-2 pr-4">
+                        <div className="flex flex-wrap gap-1">
+                          {(t.specialties || []).map((s) => (
+                            <span key={s} className="inline-flex items-center rounded-full bg-brand-50 text-brand-700 border border-brand-200 px-2 py-0.5 text-xs">
+                              {s}
+                            </span>
+                          ))}
+                        </div>
+                        <div className="text-xs text-slate-600 mt-1 max-w-xs break-words">
+                          {t.specialtyDescription || t.bio || "-"}
+                        </div>
+                      </td>
+                      <td className="py-2 pr-4">
+                        <div className="flex flex-col gap-1 text-xs">
+                          {t.avatarUrl ? (
+                            <a className="text-brand-700 underline" href={t.avatarUrl} target="_blank" rel="noreferrer">
+                              صورة الملف الشخصي
+                            </a>
+                          ) : null}
+                          {t.nationalIdFrontUrl ? (
+                            <a className="text-brand-700 underline" href={t.nationalIdFrontUrl} target="_blank" rel="noreferrer">
+                              بطاقة وطنية (أمامي)
+                            </a>
+                          ) : null}
+                          {t.nationalIdBackUrl ? (
+                            <a className="text-brand-700 underline" href={t.nationalIdBackUrl} target="_blank" rel="noreferrer">
+                              بطاقة وطنية (خلفي)
+                            </a>
+                          ) : null}
+                        </div>
+                      </td>
                       <td className="py-2 pr-4 flex items-center gap-2">
                         <button
                           onClick={() => approve.mutate(t.id)}
