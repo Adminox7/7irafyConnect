@@ -81,7 +81,7 @@ export default function Home() {
   );
 
   const topTechsRef = useRef(null);
-  const limitedTopTechs = verifiedTopTechs.slice(0, 10);
+  const limitedTopTechs = verifiedTopTechs;
 
   const scrollTopTechs = (dir) => {
     const node = topTechsRef.current;
@@ -227,8 +227,9 @@ export default function Home() {
             <div className="rounded-2xl border border-red-200 bg-red-50 text-red-700 p-4 text-right">
               تعذّر تحميل القائمة.
               <button
+                type="button"
                 onClick={() => queryClient.invalidateQueries({ queryKey: ["top-techs"] })}
-                className="ms-3 underline"
+                className="ms-3 font-semibold underline text-red-700 hover:text-red-800"
               >
                 إعادة المحاولة
               </button>
@@ -244,7 +245,7 @@ export default function Home() {
 
           {/* Horizontal carousel */}
           <div className="relative">
-            <div className="overflow-x-auto scrollbar-hide pb-4" ref={topTechsRef}>
+            <div className="overflow-x-auto scrollbar-hide pb-4 px-6" ref={topTechsRef}>
               <div className="flex gap-4 min-h-[20rem] snap-x snap-mandatory">
                 {/* Skeletons */}
                 {loadingTopTechs &&
@@ -273,10 +274,10 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="pointer-events-none absolute inset-y-0 left-0 right-0 flex items-center justify-between px-1">
+            <div className="pointer-events-none absolute inset-y-0 left-[-1.5rem] right-[-1.5rem] flex items-center justify-between px-2">
               <button
                 type="button"
-                onClick={() => scrollTopTechs(-1)}
+                onClick={() => scrollTopTechs(1)}
                 aria-label="تمرير لليسار"
                 className="pointer-events-auto h-11 w-11 rounded-full border border-slate-200 bg-white text-slate-700 shadow-md transition hover:border-brand-200 hover:text-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300"
               >
@@ -286,12 +287,12 @@ export default function Home() {
               </button>
               <button
                 type="button"
-                onClick={() => scrollTopTechs(1)}
+                onClick={() => scrollTopTechs(-1)}
                 aria-label="تمرير لليمين"
                 className="pointer-events-auto h-11 w-11 rounded-full border border-slate-200 bg-white text-slate-700 shadow-md transition hover:border-brand-200 hover:text-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300"
               >
                 <svg viewBox="0 0 24 24" className="mx-auto h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="m15 5-7 7 7 7" />
+                  <path d="M15 5l-7 7 7 7" />
                 </svg>
               </button>
             </div>
@@ -374,5 +375,7 @@ export default function Home() {
     </div>
   );
 }
+
+
 
 

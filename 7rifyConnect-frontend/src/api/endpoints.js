@@ -40,6 +40,8 @@ const mapRequestPayload = (b) => ({
   title: b.title,
   city: b.city,
   description: b.description ?? undefined,
+  budget: b.budget ?? b.price ?? undefined,
+  attachments: Array.isArray(b.attachments) ? b.attachments : undefined,
   technician_id: b.technicianId ?? b.technician_id ?? undefined,
 });
 
@@ -50,7 +52,7 @@ const mapTechProfilePayload = (b) => ({
   bio: b.bio ?? undefined,
   specialties: Array.isArray(b.specialties) ? b.specialties : undefined,
   is_premium: typeof b.isPremium === "boolean" ? b.isPremium : undefined,
-  avatarUrl: b.avatarUrl ?? b.avatar_url ?? undefined,
+  avatar_url: b.avatarUrl ?? b.avatar_url ?? undefined,
 });
 
 const mapMessagePayload = (payload) => {

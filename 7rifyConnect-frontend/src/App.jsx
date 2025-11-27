@@ -25,6 +25,8 @@ import QualityPolicy from "./pages/QualityPolicy";
 import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./stores/auth";
 import ErrorBoundary from "./components/ErrorBoundary";
+import RequestsBoard from "./pages/RequestsBoard";
+import RequestNew from "./pages/RequestNew";
 import NotificationBell from "./components/NotificationBell";
 import { ensureEchoAuthSync, initializeEcho } from "./lib/echo";
 import { initNoticeAuthSubscription } from "./stores/notifications";
@@ -34,7 +36,7 @@ import { getUserVerificationFlag, isTechnicianUser } from "./lib/auth";
 import Footer from "./components/Footer";
 
 export default function App() {
-  // استخدم selectors منفصلة (أكثر استقراراً)
+  // Separate selectors for stability
   const user     = useAuthStore((s) => s.user);
   const token    = useAuthStore((s) => s.token);
   const logout   = useAuthStore((s) => s.logout);
@@ -90,8 +92,8 @@ export default function App() {
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const mobilePrimaryCta = token
-    ? { href: "/create-request", label: "أنشئ طلباً جديداً" }
-    : { href: "/register?role=technicien", label: "سجّل كحرفي" };
+    ? { href: "/requests/new", label: "طلب خدمة جديدة" }
+    : { href: "/register?role=technicien", label: "تسجيل حرفي" };
 
   const closeMobileMenu = () => setMobileMenuOpen(false);
 
@@ -151,6 +153,16 @@ export default function App() {
           لوحة الحرفي
         </NavLink>
       )}
+      {role === "technicien" && (
+        <NavLink
+          to="/requests/board"
+          className={({ isActive }) => navLinkClasses(isActive, isMobile)}
+          onClick={isMobile ? closeMobileMenu : undefined}
+        >
+          لوحة الطلبات
+        </NavLink>
+      )}
+
 
       {role === "admin" && (
         <NavLink
@@ -164,38 +176,44 @@ export default function App() {
     </>
   );
 
-    const mobileMenuItems = [
-      {
-        label: "البحث",
-        desc: "اكتشف الحرفيين والخدمات القريبة منك",
-        to: "/search",
-        visible: true,
-      },
+  const mobileMenuItems = [
+    {
+      label: "الرئيسية",
+      desc: "ابحث عن الحرفيين القريبين منك",
+      to: "/search",
+      visible: true,
+    },
       {
         label: "طلباتي",
-        desc: "تابع الطلبات الجارية والمكتملة",
+        desc: "طلبات الخدمات الخاصة بك",
         to: "/requests",
         visible: !!token,
       },
+    {
+      label: "طلب خدمة جديدة",
+      desc: "إنشاء طلب خدمة جديد بسرعة",
+      to: "/requests/new",
+      visible: !!token && role !== "technicien",
+    },
       {
         label: "لوحة الحرفي",
-        desc: "إدارة طلبات عملائك وجدولك اليومي",
+        desc: "تابع طلباتك كمحترف",
         to: "/dashboard",
         visible: role === "technicien",
-      },
-      {
-        label: "لوحة الإدارة",
-        desc: "إشراف كامل على المنصة والطلبات",
-        to: "/admin",
-        visible: role === "admin",
-      },
-      {
-        label: "المحادثات",
-        desc: "تواصل مباشر مع العملاء والحرفيين",
-        to: "/chat",
-        visible: !!token,
-      },
-    ].filter((item) => item.visible);
+    },
+    {
+      label: "لوحة الطلبات",
+      desc: "استعرض طلبات العملاء",
+      to: "/requests/board",
+      visible: role === "technicien",
+    },
+    {
+      label: "لوحة الإدارة",
+      desc: "إدارة النظام",
+      to: "/admin",
+      visible: role === "admin",
+    },
+  ].filter((item) => item.visible);
 
 
   return (
@@ -263,36 +281,32 @@ export default function App() {
             ) : (
               <div className="flex items-center gap-2">
                 <NotificationBell />
-                  <NavLink
-                    to={role === "technicien" ? "/me/tech" : "/me"}
-                    className={({ isActive }) =>
-                      `rounded-2xl border px-3 py-1.5 ${
-                        isActive
-                          ? "border-brand-300 text-brand-700"
-                          : "border-slate-300 text-slate-700 hover:bg-slate-50"
-                      }`
-                    }
+                {role !== "technicien" && (
+                  <Link
+                    to="/requests/new"
+                    className="rounded-2xl border border-brand-200 bg-brand-50 px-3 py-1.5 text-brand-700 shadow-sm hover:bg-brand-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300"
                   >
-                    حسابي
-                  </NavLink>
-                  <NavLink
-                    to="/chat"
-                    className={({ isActive }) =>
-                      `rounded-2xl border px-3 py-1.5 ${
-                        isActive
-                          ? "border-brand-300 text-brand-700"
-                          : "border-slate-300 text-slate-700 hover:bg-slate-50"
-                      }`
-                    }
-                  >
-                    المحادثات
-                  </NavLink>
-                  <button
-                    onClick={logout}
-                    className="rounded-2xl bg-slate-700 px-3 py-1.5 text-white shadow-sm hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300"
-                  >
-                    تسجيل الخروج
-                  </button>
+                    طلب خدمة جديدة
+                  </Link>
+                )}
+                <NavLink
+                  to={role === "technicien" ? "/me/tech" : "/me"}
+                  className={({ isActive }) =>
+                    `rounded-2xl border px-3 py-1.5 ${
+                      isActive
+                        ? "border-brand-300 text-brand-700"
+                        : "border-slate-300 text-slate-700 hover:bg-slate-50"
+                    }`
+                  }
+                >
+                  حسابي
+                </NavLink>
+                <button
+                  onClick={logout}
+                  className="rounded-2xl bg-slate-700 px-3 py-1.5 text-white shadow-sm hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300"
+                >
+                  تسجيل الخروج
+                </button>
               </div>
             )}
             </div>
@@ -410,19 +424,7 @@ export default function App() {
                       >
                         حسابي
                       </NavLink>
-                      <NavLink
-                        to="/chat"
-                        onClick={closeMobileMenu}
-                        className={({ isActive }) =>
-                          `block rounded-2xl border px-3 py-2 text-center ${
-                            isActive
-                              ? "border-brand-300 text-brand-700"
-                              : "border-slate-200 text-slate-700 hover:border-brand-300 hover:text-brand-700"
-                          }`
-                        }
-                      >
-                        المحادثات
-                      </NavLink>
+             
                       <button
                         onClick={() => {
                           closeMobileMenu();
@@ -493,12 +495,29 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/requests/new"
+              element={
+                <ProtectedRoute>
+                  <RequestNew />
+                </ProtectedRoute>
+              }
+            />
 
             <Route
               path="/dashboard"
               element={
                 <ProtectedRoute role="technicien">
                   <TechDashboard />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/requests/board"
+              element={
+                <ProtectedRoute role="technicien">
+                  <RequestsBoard />
                 </ProtectedRoute>
               }
             />
@@ -530,5 +549,10 @@ export default function App() {
     </BrowserRouter>
   );
 }
+
+
+
+
+
 
 

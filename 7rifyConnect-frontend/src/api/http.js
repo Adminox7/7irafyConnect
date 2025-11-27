@@ -15,11 +15,11 @@ export const showErrorOnce = (message, id) => {
 export const http = api;
 export { ensureCsrf };
 
-/* ------------ انتظر rehydrate ديال Zustand (≤1s) ------------ */
+/* ------------ wait for rehydrate Zustand (=3s) ------------ */
 const waitForHydration = async () => {
   const start = Date.now();
   while (!useAuthStore.getState()?.hydrated) {
-    if (Date.now() - start > 1000) break; // safety timeout
+    if (Date.now() - start > 3000) break; // safety timeout
     await new Promise((r) => setTimeout(r, 30));
   }
 };
